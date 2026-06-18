@@ -13,11 +13,21 @@ você vê o código completo — aqui mostramos só o trecho mais ilustrativo.
 ```
 src/fabrica_sites/
 ├── config.py            # configurações centrais (cidade, pesos, timeouts)
-├── models.py            # modelos de dados (Pydantic)
-├── db.py                # persistência SQLite
+├── models.py            # modelos de dados (Pydantic) — usados no pipeline
 ├── cli.py               # interface de linha de comando
 ├── core/
 │   └── sectors.py       # taxonomia de setores + tag→setor
+├── db/                  # camada de dados (SQLModel + Alembic)
+│   ├── models.py        # RunTable, BusinessTable (SQLModel table=True)
+│   ├── engine.py        # create_engine, get_session (FastAPI Depends)
+│   └── repository.py    # save_run, latest_run, get_businesses, filtros
+├── services/
+│   └── scout_service.py # run_and_save + get_insights (CLI e API)
+├── api/                 # FastAPI REST
+│   ├── app.py           # instância da app + CORS
+│   ├── deps.py          # SessionDep (Annotated[Session, Depends])
+│   ├── schemas/         # DTOs de request/response
+│   └── routers/         # scout.py, runs.py, misc.py
 └── agents/scout/
     ├── sources/         # fontes plugáveis (base, overpass, serper)
     ├── enrichers/       # enriquecedores plugáveis (base, domain_guesser)
@@ -25,7 +35,7 @@ src/fabrica_sites/
     ├── scorer.py        # score de oportunidade
     ├── insighter.py     # KPIs + insights
     ├── reporter.py      # dashboard HTML (Jinja2)
-    └── scout.py         # orquestra o pipeline
+    └── scout.py         # orquestra o pipeline (função pura)
 ```
 
 ## [`models.py`](https://github.com/hectorautomacoesdev/fabrica-de-sites/blob/main/src/fabrica_sites/models.py)
@@ -129,13 +139,41 @@ score ≥ 65 **E** contactável — funil honesto.
 ## [`reporter.py`](https://github.com/hectorautomacoesdev/fabrica-de-sites/blob/main/src/fabrica_sites/agents/scout/reporter.py)
 Renderiza o dashboard HTML com Jinja2 e dados embutidos como JSON (escapado para `<script>`).
 
-## [`db.py`](https://github.com/hectorautomacoesdev/fabrica-de-sites/blob/main/src/fabrica_sites/db.py)
-Persistência SQLite (stdlib). Duas tabelas (`runs` 1—N `businesses`), tags como JSON. Será
-substituído por SQLModel + repositórios na reestruturação (ver [Design de Banco](../arquitetura/banco-de-dados.md)).
+## [`db/`](https://github.com/hectorautomacoesdev/fabrica-de-sites/tree/main/src/fabrica_sites/db)
+Substituiu o `db.py` original (SQL cru). Três arquivos:
+
+- **`models.py`** — `RunTable` e `BusinessTable` como `SQLModel(table=True)`. Nota: não usa
+  `from __future__ import annotations` — o metaclass do SQLModel precisa das anotações em
+  tempo de definição de classe.
+- **`engine.py`** — cria o engine SQLite com `create_all(checkfirst=True)` (seguro para DBs
+  existentes) e expõe `get_session()` como gerador para `Depends` do FastAPI.
+- **`repository.py`** — funções puras que recebem `Session` explicitamente: `save_run`,
+  `latest_run`, `get_run_by_id`, `list_runs`, `get_businesses` (com filtros e paginação).
+
+## [`services/scout_service.py`](https://github.com/hectorautomacoesdev/fabrica-de-sites/blob/main/src/fabrica_sites/services/scout_service.py)
+Service layer compartilhado pela CLI e pela API: `run_and_save` (executa + persiste) e
+`get_insights` (wrapper fino do insighter). Resolve o problema de duplicar lógica entre
+os dois pontos de entrada.
+
+## [`api/`](https://github.com/hectorautomacoesdev/fabrica-de-sites/tree/main/src/fabrica_sites/api)
+FastAPI com 7 endpoints REST:
+
+| Método | Caminho | Descrição |
+|--------|---------|-----------|
+| `GET` | `/healthz` | Verifica se a API está no ar |
+| `GET` | `/api/sectors` | Lista taxonomia de setores |
+| `POST` | `/api/scout/runs` | Dispara uma nova coleta |
+| `GET` | `/api/runs` | Lista runs (metadados) |
+| `GET` | `/api/runs/{id}` | Detalhes de uma run |
+| `GET` | `/api/runs/{id}/insights` | KPIs + insights de texto |
+| `GET` | `/api/runs/{id}/businesses` | Negócios com filtros e paginação |
+
+Para rodar: `uvicorn fabrica_sites.api.app:app --reload --port 8001` → Swagger em
+[`http://localhost:8001/docs`](http://localhost:8001/docs).
 
 ## [`cli.py`](https://github.com/hectorautomacoesdev/fabrica-de-sites/blob/main/src/fabrica_sites/cli.py)
-A interface no terminal (Typer + Rich): `fabrica scout run|setores|stats`. Na reestruturação,
-passará a chamar o *service layer* compartilhado com a API.
+Interface no terminal (Typer + Rich): `fabrica scout run|setores|stats`. Migrada para
+chamar `scout_service.run_and_save()` — sem dependência direta do banco.
 
 ---
 

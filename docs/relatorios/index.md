@@ -34,6 +34,23 @@ convenções de código e autoavaliação honesta. Foi a base de boa parte desta
 
 [:material-file-document: Abrir relatório completo (HTML)](https://hectorautomacoesdev.github.io/fabrica-de-sites/_arquivo/RELATORIO_SESSAO_03.html){ target=_blank }
 
+## Sessão 04 — Documentação e CI/CD
+
+Planejamento da "Fase 1.5 — Base Sólida", aprovação do plano e montagem de toda a estrutura
+de documentação: MkDocs Material publicado no GitHub Pages com deploy automático via GitHub
+Actions, 14 páginas cobrindo arquitetura, design patterns, banco, bibliotecas, código,
+testes, escala, ADRs e roadmap. Varredura de segredos antes do push público. Relatório
+educacional sobre bibliotecas (HTML, 84 KB, 43 exemplos de código).
+
+## Sessão 05 — Reestruturação do Scout (Fase 1.5)
+
+Implementação completa da reestruturação: `db.py` cru → **SQLModel** (RunTable, BusinessTable,
+engine, repository), **Alembic** com migration inicial, **service layer** compartilhado
+(`scout_service.run_and_save`), **FastAPI** com 7 endpoints REST (healthz, sectors, runs CRUD,
+insights, businesses com filtros), **frontend Vite + React + TypeScript** (KpiCards,
+BusinessTable filtrável, RunSelector, modal ScoutForm). CLI migrada para service layer.
+93 testes passando (77 originais + 16 novos de contrato de API). Build do frontend: 236KB JS.
+
 ---
 
 !!! tip "A partir de agora"

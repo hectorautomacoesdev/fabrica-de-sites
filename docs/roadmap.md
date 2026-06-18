@@ -5,7 +5,7 @@ e gera valor.
 
 ```mermaid
 flowchart LR
-    F1["Fase 1<br/>Scout ✅"] --> F15["Base Sólida<br/>API+React+DB 🚧"]
+    F1["Fase 1<br/>Scout ✅"] --> F15["Base Sólida<br/>API+React+DB ✅"]
     F15 --> F2["Fase 2<br/>Benchmark"]
     F2 --> F3["Fase 3<br/>Auditor"]
     F3 --> F4["Fase 4<br/>Criador"]
@@ -30,17 +30,20 @@ Mapear negócios da cidade, detectar quem não tem site, ranquear oportunidade.
 - [x] **77 testes** automatizados (unit, integração, desempenho)
 - [x] Execução real validada: **513 negócios** em Guarujá, **145 leads quentes**
 
-## 🚧 Fase 1.5 — Base Sólida (em andamento)
+## ✅ Fase 1.5 — Base Sólida (concluída — jun/2026)
 
 Transformar o Scout em aplicação real e criar a base de conhecimento. Detalhe completo no
 [Plano — Base Sólida](plano-base-solida.md).
 
 - [x] Repositório público no GitHub + higiene de segredos
-- [ ] Documentação MkDocs Material publicada no GitHub Pages
-- [ ] Backend FastAPI (API REST) sobre service layer compartilhado com a CLI
-- [ ] Banco com SQLModel + Alembic (migrations)
-- [ ] Frontend Vite + React + TypeScript consumindo a API
-- [ ] Pirâmide de testes (API, componente, e2e) + CI
+- [x] Documentação MkDocs Material publicada no GitHub Pages (auto-deploy via Actions)
+- [x] Backend FastAPI (7 endpoints REST) + service layer compartilhado com a CLI
+- [x] Banco com SQLModel + Alembic (migration inicial + stamp para DBs existentes)
+- [x] Frontend Vite + React + TypeScript (KPIs, tabela filtrável, modal de nova coleta)
+- [x] Testes de API (16 testes de contrato — total: **93 testes**)
+- [ ] Testes de componente React (Vitest + RTL) — próxima iteração
+- [ ] E2E (Playwright) — próxima iteração
+- [ ] CI para testes (`tests.yml`) — próxima iteração
 
 ## Fase 2 — Agente Benchmark
 

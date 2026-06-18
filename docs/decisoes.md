@@ -115,3 +115,53 @@ o caminho mais simples e sem custo.
 **Porta de segurança:** segredos (chave do Serper) ficam **só** no `.env` (no `.gitignore`);
 varredura de segredos antes de cada push. Dados sensíveis de execução (banco, dashboards)
 moram em `data/`, que é ignorado pelo git.
+
+---
+
+## D13 — ORM: SQLModel em vez de SQL cru
+
+**Escolha:** substituir o `db.py` (sqlite3 da stdlib) por **SQLModel** (SQLAlchemy 2 + Pydantic).
+**Por quê:** tipagem nativa, queries composáveis, migrations via Alembic e transição simples
+para Postgres (só muda a URL de conexão). O `db.py` cru era SQL manual sem type safety —
+aceitável como MVP, mas dificulta evoluções e testes.
+**Decisão de compatibilidade:** não usar `from __future__ import annotations` nos models
+SQLModel — o metaclass precisa inspecionar as anotações em tempo de definição de classe.
+**Alembic:** `create_all(checkfirst=True)` para dev; `alembic upgrade head` para produção.
+DBs existentes recebem `alembic stamp head` para marcar como migrados sem re-executar DDL.
+
+## D14 — Service layer explícito entre CLI e API
+
+**Escolha:** `services/scout_service.py` como único ponto de orquestração:
+`run_and_save` (pipeline → persiste) e `get_insights`. CLI e API chamam este módulo.
+**Por quê:** sem o service layer, os dois pontos de entrada (CLI e FastAPI) precisariam
+replicar a lógica de montar fontes, chamar `run_scout`, salvar no banco e calcular insights.
+**Padrão:** Application Service (Fowler — *Patterns of Enterprise Application Architecture*).
+
+## D15 — DTO separado do model de banco
+
+**Escolha:** `api/schemas/responses.py` com `RunRead`, `BusinessRead`, `KpiRead` etc.,
+**separados** dos `RunTable`/`BusinessTable` do SQLModel.
+**Por quê:** o schema de banco e o contrato de API evoluem em ritmos diferentes.
+Colocar `table=True` direto nos schemas de resposta acopla as duas camadas — qualquer
+refatoração de banco quebra a API e vice-versa.
+**Nota:** `KpiRead` é calculado em runtime (não persiste no banco), reforçando que nem
+todo dado de resposta precisa ter uma tabela.
+
+## D16 — Session por request no FastAPI via Depends
+
+**Escolha:** `get_session()` como gerador (`yield`) injetado via `Depends` do FastAPI.
+Todos os endpoints recebem a sessão como parâmetro tipado (`SessionDep`).
+**Por quê:** garante que cada request HTTP usa uma sessão própria (sem vazamento de estado
+entre requests), e o `with Session(engine) as session` fecha a conexão mesmo em caso de
+exceção. Para a CLI, cria-se uma sessão diretamente no service layer.
+**Referência:** [SQLModel — FastAPI Integration](https://sqlmodel.tiangolo.com/tutorial/fastapi/).
+
+## D17 — Frontend: Vite + React + TypeScript (SPA local)
+
+**Escolha:** SPA em `frontend/` consumindo a API REST via TanStack Query.
+**Por quê:** o usuário já conhece React. SPA é adequado para um painel interno (sem SEO,
+sem SSR). TanStack Query cuida de cache, revalidação e estados de loading/error sem boilerplate.
+**Proxy Vite:** em dev, `/api/*` é proxiado para `localhost:8001` — CORS só precisa estar
+habilitado para prod. Em prod, um reverse proxy (nginx) faz o mesmo.
+**`verbatimModuleSyntax`:** o `tsconfig` do Vite exige `import type` para importações
+que são só tipos — padrão moderno que evita imports circulares e clarifica intenção.
