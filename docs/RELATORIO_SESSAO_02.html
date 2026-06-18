@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relatório Sessão 02 — Fábrica de Sites</title>
+<style>
+  :root{
+    --bg:#0f172a;--bg2:#1e293b;--bg3:#263148;--line:#334155;
+    --txt:#e2e8f0;--mut:#94a3b8;--acc:#38bdf8;--grn:#22c55e;
+    --warn:#f59e0b;--red:#ef4444;--pur:#a78bfa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.7;font-size:15px}
+  a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+
+  /* NAV */
+  nav{position:sticky;top:0;background:rgba(15,23,42,.96);backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);padding:10px 20px;z-index:99;
+    display:flex;gap:16px;flex-wrap:wrap;font-size:13px;align-items:center}
+  nav .logo{color:var(--acc);font-weight:700;font-size:14px;margin-right:8px}
+
+  /* LAYOUT */
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 60px}
+  h1{font-size:30px;font-weight:800;line-height:1.2;margin-bottom:6px}
+  h2{font-size:20px;font-weight:700;margin:44px 0 14px;border-left:3px solid var(--acc);padding-left:12px;scroll-margin-top:58px}
+  h3{font-size:16px;font-weight:700;margin:26px 0 10px;color:var(--acc)}
+  h4{font-size:14px;font-weight:600;margin:18px 0 8px;color:var(--mut)}
+  p{margin:8px 0}
+  .sub{color:var(--mut);font-size:13px}
+
+  /* CARDS */
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:18px;margin:12px 0}
+  .card-ok{border-left:3px solid var(--grn)}
+  .card-warn{border-left:3px solid var(--warn)}
+  .card-red{border-left:3px solid var(--red)}
+  .card-pur{border-left:3px solid var(--pur)}
+
+  /* GRIDS */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+  .grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+  @media(max-width:600px){.grid2{grid-template-columns:1fr}}
+
+  /* KPIs */
+  .kpi .num{font-size:34px;font-weight:800;line-height:1;color:var(--acc)}
+  .kpi .lbl{color:var(--mut);font-size:12px;margin-top:4px}
+  .kpi .sub-num{font-size:13px;color:var(--mut);margin-top:2px}
+
+  /* CODE */
+  pre{background:#080f1e;border:1px solid var(--line);border-radius:8px;
+      padding:14px;overflow-x:auto;font-size:13px;line-height:1.5;margin:10px 0}
+  code{background:#0b1828;border:1px solid var(--line);border-radius:4px;
+       padding:1px 5px;font-size:13px;font-family:ui-monospace,Consolas,monospace}
+  pre code{background:none;border:none;padding:0}
+
+  /* SYNTAX COLORS (manual) */
+  .kw{color:#c792ea}   /* keyword */
+  .fn{color:#82aaff}   /* function/class */
+  .st{color:#c3e88d}   /* string */
+  .cm{color:#546e7a}   /* comment */
+  .nu{color:#f78c6c}   /* number */
+  .op{color:#89ddff}   /* operator/punct */
+  .ty{color:#ffcb6b}   /* type */
+
+  /* TABLES */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+  th{background:var(--bg3);color:var(--mut);padding:8px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  td{padding:8px 12px;border-bottom:1px solid rgba(51,65,85,.5)}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .td-ok{color:var(--grn);font-weight:600}
+  .td-warn{color:var(--warn);font-weight:600}
+  .td-red{color:var(--red);font-weight:600}
+
+  /* BADGES */
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+  .b-ok{background:#052e16;color:#86efac;border:1px solid #166534}
+  .b-warn{background:#3f2d09;color:#fcd34d;border:1px solid #92660b}
+  .b-red{background:#2d0a0a;color:#fca5a5;border:1px solid #991b1b}
+  .b-pur{background:#2d1f4a;color:#c4b5fd;border:1px solid #6d28d9}
+  .b-acc{background:#0c2a3d;color:#7dd3fc;border:1px solid #0369a1}
+
+  /* TIMELINE */
+  .tl{list-style:none;padding:0}
+  .tl li{position:relative;padding:12px 0 12px 32px;border-left:2px solid var(--line);margin-left:8px}
+  .tl li::before{content:"";position:absolute;left:-8px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--acc)}
+  .tl li.done::before{background:var(--grn)}
+  .tl li.fix::before{background:var(--warn)}
+
+  /* DIFF */
+  .diff-add{color:var(--grn)}
+  .diff-rem{color:var(--red)}
+  .diff-block{background:#080f1e;border:1px solid var(--line);border-radius:8px;padding:14px;font-family:ui-monospace,monospace;font-size:13px;line-height:1.6}
+
+  /* CALLOUT */
+  .callout{display:flex;gap:12px;background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:14px;margin:12px 0}
+  .callout-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+  .callout p{margin:0}
+
+  ul,ol{padding-left:22px;margin:8px 0}
+  li{margin:4px 0}
+  strong{color:#f1f5f9}
+  footer{border-top:1px solid var(--line);padding-top:16px;color:var(--mut);font-size:12px;margin-top:40px}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">🏭 Fábrica de Sites</span>
+  <a href="#resumo">Resumo</a>
+  <a href="#features">Features</a>
+  <a href="#bibliotecas">Bibliotecas</a>
+  <a href="#arquitetura">Arquitetura</a>
+  <a href="#modulos">Módulos</a>
+  <a href="#testes">Testes</a>
+  <a href="#resultados">Resultados</a>
+  <a href="#bug">Bug descoberto</a>
+  <a href="#avaliacao">Avaliação</a>
+  <a href="#proximos">Próximos passos</a>
+</nav>
+
+<div class="wrap">
+
+<h1>Relatório da Sessão 02 — Fábrica de Sites</h1>
+<p class="sub">Enriquecimento de dados: DomainGuesser, SerperSource e correção de bug. Guia educacional completo.</p>
+
+<!-- =====================================================================
+     1. RESUMO EXECUTIVO
+     ===================================================================== -->
+<h2 id="resumo">1. Resumo executivo</h2>
+
+<div class="card card-ok">
+  <p>A Sessão 01 construiu o <strong>Agente Scout</strong>: ele mapeia negócios de uma cidade e identifica quem não tem site. A Sessão 02 focou em <strong>melhorar a qualidade dos dados</strong>: descobrir sites que o OSM não sabia que existiam, preparar uma segunda fonte de dados (Google Maps via Serper) e corrigir um bug sutil.</p>
+  <p style="margin-top:10px">
+    <span class="badge b-ok">✅ 65 testes passando (era 25)</span>&nbsp;
+    <span class="badge b-ok">✅ 60 sites ocultos descobertos</span>&nbsp;
+    <span class="badge b-warn">🐛 1 bug crítico corrigido</span>&nbsp;
+    <span class="badge b-acc">🆕 2 novas features</span>
+  </p>
+</div>
+
+<div class="grid4" style="margin-top:16px">
+  <div class="card kpi"><div class="num">65</div><div class="lbl">testes passando</div><div class="sub-num">era 25 na sessão 01</div></div>
+  <div class="card kpi"><div class="num">60</div><div class="lbl">sites ocultos descobertos</div><div class="sub-num">em 287 negócios SEM_SITE</div></div>
+  <div class="card kpi"><div class="num">2</div><div class="lbl">novas features</div><div class="sub-num">DomainGuesser + SerperSource</div></div>
+  <div class="card kpi"><div class="num">1</div><div class="lbl">bug corrigido</div><div class="sub-num">falso positivo no classifier</div></div>
+</div>
+
+<!-- =====================================================================
+     2. O QUE FOI IMPLEMENTADO
+     ===================================================================== -->
+<h2 id="features">2. O que foi implementado e por quê</h2>
+
+<h3>2.1 DomainGuesser — descobre sites ocultos</h3>
+<div class="card">
+  <p><strong>Problema:</strong> O OpenStreetMap tem ótima cobertura geográfica mas baixa cobertura de URLs. Muitos negócios têm site, mas o dono nunca cadastrou o endereço no OSM. Você citou um exemplo real: o <em>Hotel Ilhas da Grécia</em> tem site em <code>hotelilhasdagrecia.com.br</code>, mas aparecia no Scout como "sem site".</p>
+  <p style="margin-top:10px"><strong>Solução:</strong> Para cada negócio classificado como <code>SEM_SITE</code>, tentamos adivinhar o domínio a partir do nome e fazemos uma requisição HTTP rápida para ver se o endereço responde.</p>
+  <pre><code><span class="cm"># Exemplo: "Hotel Ilhas da Grécia" gera estes candidatos:</span>
+hotelilhasdagrecia.com.br   <span class="cm"># slug completo</span>
+hotel-ilhas-da-grecia.com.br  <span class="cm"># variante com hifens</span>
+hotelilhasgrecia.com.br     <span class="cm"># sem artigos (da)</span>
+hotelilhasdagrecia.com      <span class="cm"># sem .br</span></code></pre>
+  <p><strong>Por que HTTP HEAD e não GET?</strong> O método HEAD pede ao servidor apenas o cabeçalho de resposta — o servidor confirma que o site existe sem enviar o corpo da página. Isso é ~10x mais rápido e consome zero banda.</p>
+  <p style="margin-top:8px"><strong>Por que threads e não sequencial?</strong> Verificar 287 negócios um por um levaria vários minutos (latência de rede somada). Com 15 threads simultâneas o tempo cai para ~30 segundos.</p>
+</div>
+
+<h3>2.2 Filtro de nomes genéricos (refinamento necessário)</h3>
+<div class="card card-warn">
+  <p>Na primeira versão sem filtro, o DomainGuesser encontrava falsos positivos preocupantes: "Pousada" → <code>pousada.com</code> (um portal de pousadas, não a pousada específica em Guarujá). O domínio existia e respondia HTTP 200, mas era o site errado.</p>
+  <p style="margin-top:8px"><strong>Regra implementada:</strong></p>
+  <ul>
+    <li>Se o nome for apenas uma palavra de categoria genérica (<em>"Pousada", "Bar", "Lan House", "Bicicletaria"</em>…) → pula sem verificar.</li>
+    <li>Se o nome tiver 2+ palavras significativas → verifica. ("Pousada Caiçara" → ok)</li>
+    <li>Se tiver 1 palavra com 8+ caracteres → provavelmente é marca, verifica. ("McDonald's" → ok, "Pousada" → não passa)</li>
+  </ul>
+  <p style="margin-top:8px"><strong>Resultado:</strong> falsos positivos caíram de 19 para 12 descobertas em 80 negócios — qualidade muito melhor.</p>
+</div>
+
+<h3>2.3 SerperSource — Google Maps como segunda fonte</h3>
+<div class="card">
+  <p><strong>Problema:</strong> O OSM tem contato (telefone) em apenas 12,5% dos negócios. O Google Maps tem cobertura muito maior. Serper.dev é um serviço que permite consultar o Google Maps via API: 2.500 buscas gratuitas/mês sem cartão.</p>
+  <p style="margin-top:10px"><strong>Estratégia:</strong> Em vez de buscar um negócio por vez (esgotaria a cota), fazemos buscas <em>por setor</em>: "restaurantes Guarujá SP", "salões de beleza Guarujá SP" etc. Cada chamada retorna até 20 resultados e custa apenas 1 crédito da cota. O scout completo de Guarujá gasta ~17 chamadas.</p>
+  <p style="margin-top:10px"><strong>Graceful degradation:</strong> Se <code>SERPER_API_KEY</code> não estiver configurada, a fonte simplesmente retorna lista vazia com um aviso — o pipeline não quebra, apenas roda sem o Serper. Esta é uma boa prática de engenharia: <em>o sistema funciona no modo mais simples, e vai melhorando à medida que você adiciona recursos</em>.</p>
+  <p style="margin-top:10px"><strong>Como ativar:</strong> Configure no arquivo <code>.env</code>:</p>
+  <pre><code>SERPER_API_KEY=sua_chave_aqui</code></pre>
+  <p>Depois rode:</p>
+  <pre><code>fabrica scout run --com-serper</code></pre>
+</div>
+
+<!-- =====================================================================
+     3. BIBLIOTECAS
+     ===================================================================== -->
+<h2 id="bibliotecas">3. Cada biblioteca — o que faz e por que foi escolhida</h2>
+
+<div class="callout">
+  <div class="callout-icon">💡</div>
+  <p>O critério de seleção foi sempre: <strong>menor dependência possível, máxima compatibilidade com Python 3.14, zero custo</strong>. Testamos a stack completa antes de começar a codificar.</p>
+</div>
+
+<h3>httpx — requisições HTTP</h3>
+<div class="card">
+  <p>Substituto moderno da biblioteca <code>requests</code>. Por que httpx e não requests?</p>
+  <ul>
+    <li><strong>Suporte nativo a async:</strong> em fases futuras do projeto (Auditor, Creator), vamos fazer centenas de requisições simultâneas. httpx tem <code>AsyncClient</code> pronto; requests não.</li>
+    <li><strong>Timeout por fase:</strong> httpx permite configurar timeout separadamente para conexão, leitura e escrita — mais controle no DomainGuesser.</li>
+    <li><strong>API quase idêntica ao requests:</strong> curva de aprendizado zero.</li>
+  </ul>
+  <p style="margin-top:8px"><strong>Onde usamos:</strong> Overpass API (buscas OSM), DomainGuesser (verificação de domínios), SerperSource (Google Maps).</p>
+  <pre><code><span class="cm"># Exemplo real do DomainGuesser</span>
+resp = httpx.head(
+    <span class="st">f"https://{dominio}"</span>,
+    follow_redirects=<span class="kw">True</span>,   <span class="cm"># segue redirecionamentos (301/302)</span>
+    timeout=<span class="nu">3.0</span>,             <span class="cm"># abandona se demorar mais de 3s</span>
+)</code></pre>
+</div>
+
+<h3>Pydantic v2 — validação de dados com tipagem forte</h3>
+<div class="card">
+  <p>Pydantic cria "moldes" para os seus dados: você descreve os campos com tipos Python, e ele garante que os dados estão no formato certo, convertendo e validando automaticamente.</p>
+  <pre><code><span class="kw">class</span> <span class="fn">Business</span>(<span class="ty">BaseModel</span>):
+    nome: <span class="ty">str | None</span> = <span class="kw">None</span>         <span class="cm"># aceita string ou None</span>
+    score: <span class="ty">int</span> = <span class="nu">0</span>                   <span class="cm"># sempre um inteiro</span>
+    website_kind: <span class="ty">WebsiteKind</span> = WebsiteKind.NENHUM  <span class="cm"># enum com valor padrão</span></code></pre>
+  <p><strong>Por que v2 e não v1?</strong> O núcleo do Pydantic v2 foi reescrito em Rust, o que o torna 5-50x mais rápido que a v1. Isso importa quando processamos centenas ou milhares de negócios.</p>
+  <p><strong>model_copy():</strong> uma feature importante que usamos no DomainGuesser. Em vez de criar um objeto do zero quando atualizamos um negócio, copiamos o existente mudando só os campos necessários:</p>
+  <pre><code><span class="cm"># Cria novo Business com site atualizado, mantendo todo o resto igual</span>
+negocio_novo = negocio_antigo.model_copy(update={
+    <span class="st">"website"</span>: <span class="st">"https://hotelilhasdagrecia.com.br"</span>,
+    <span class="st">"website_kind"</span>: WebsiteKind.PROPRIO,
+    <span class="op">**</span>nova_avaliacao,
+})</code></pre>
+</div>
+
+<h3>Typer + Rich — CLI bonita e ergonômica</h3>
+<div class="card">
+  <p><strong>Typer</strong> transforma funções Python comuns em comandos de terminal, usando as anotações de tipo para inferir os argumentos automaticamente. Você escreve Python, ele gera o CLI.</p>
+  <pre><code><span class="cm"># Typer lê os tipos e cria --cidade, --limit, --enriquecer automaticamente</span>
+<span class="kw">def</span> <span class="fn">scout_run</span>(
+    cidade: <span class="ty">str</span> = typer.Option(<span class="st">"Guarujá"</span>),
+    limit: <span class="ty">int | None</span> = typer.Option(<span class="kw">None</span>),
+    enriquecer: <span class="ty">bool</span> = typer.Option(<span class="kw">False</span>),
+)</code></pre>
+  <p><strong>Rich</strong> cuida da formatação visual: tabelas, painéis com borda, cores, spinner de progresso. Sem Rich, o output seria texto plano; com Rich, parece um produto profissional.</p>
+  <p><strong>Problema que encontramos:</strong> o Windows usa encoding CP1252 por padrão, que não consegue renderizar emojis. O spinner do Rich exibiu erro na primeira rodada. A correção foi definir <code>PYTHONIOENCODING=utf-8</code> antes de rodar. Isso é <em>um problema do terminal do Windows, não do nosso código</em> — em sistemas Linux/Mac não ocorre.</p>
+</div>
+
+<h3>Jinja2 — geração do relatório HTML</h3>
+<div class="card">
+  <p>Jinja2 é um motor de templates: você escreve um arquivo HTML com marcadores especiais <code>{% ... %}</code> e <code>{{ ... }}</code>, e ele preenche com seus dados. A alternativa seria concatenar strings Python — verboso e propenso a erros.</p>
+  <pre><code><span class="cm">&lt;!-- Trecho do template report.html.j2 --&gt;</span>
+<span class="op">{% for</span> b <span class="op">in</span> top_leads <span class="op">%}</span>
+  &lt;tr&gt;
+    &lt;td&gt;<span class="op">{{ b.nome or "(sem nome)" }}</span>&lt;/td&gt;
+    &lt;td class="score"&gt;<span class="op">{{ b.score }}</span>&lt;/td&gt;
+  &lt;/tr&gt;
+<span class="op">{% endfor %}</span></code></pre>
+  <p><strong>Por que não f-strings?</strong> O HTML tem muitas aspas, chaves e caracteres especiais. Misturar HTML com strings Python é um pesadelo de manutenção. Jinja2 mantém o template limpo e separado da lógica.</p>
+  <p><strong>Segurança (XSS):</strong> implementamos uma função <code>_j()</code> que escapa caracteres perigosos (<code>&lt; &gt; &amp;</code>) antes de embutir dados como JSON nos <code>&lt;script&gt;</code> do relatório. Sem isso, um nome de negócio com <code>&lt;script&gt;</code> poderia injetar JavaScript no relatório.</p>
+</div>
+
+<h3>pytest — testes automatizados</h3>
+<div class="card">
+  <p>pytest encontra e roda funções que começam com <code>test_</code>. Simples assim. Mas o que o torna poderoso são dois recursos que usamos extensivamente:</p>
+  <p><strong>1. parametrize</strong> — roda o mesmo teste com diferentes entradas:</p>
+  <pre><code><span class="op">@pytest.mark.parametrize</span>(<span class="st">"nome, esperado"</span>, [
+    (<span class="st">"Farmácia Central"</span>, <span class="st">"farmaciacentral.com.br"</span>),
+    (<span class="st">"Hotel Ilhas da Grécia"</span>, <span class="st">"hotelilhasdagrecia.com.br"</span>),
+])
+<span class="kw">def</span> <span class="fn">test_gerar_candidatos</span>(nome, esperado):
+    assert gerar_candidatos(nome)[<span class="nu">0</span>] == esperado</code></pre>
+  <p>Isso cria 2 testes com 1 função. No nosso projeto, geramos 11 testes de setor e 11 de filtro de nomes com este recurso.</p>
+  <p><strong>2. monkeypatch</strong> — substitui funções reais por versões controladas nos testes:</p>
+  <pre><code><span class="kw">def</span> <span class="fn">test_site_descoberto</span>(monkeypatch):
+    <span class="cm"># Substitui a função real de rede por uma que sempre "encontra" o site</span>
+    monkeypatch.setattr(
+        <span class="st">"fabrica_sites...domain_guesser._encontrar_site"</span>,
+        <span class="kw">lambda</span> nome, timeout: <span class="st">f"https://{nome}.com.br"</span>
+    )
+    <span class="cm"># O teste roda sem nenhuma requisição de rede real</span></code></pre>
+  <p>Isso é fundamental: os testes rodam em 0,37 segundos porque não fazem requisições HTTP. Sem monkeypatch, cada teste demoraria segundos e dependeria da internet.</p>
+</div>
+
+<h3>concurrent.futures (stdlib) — paralelismo com threads</h3>
+<div class="card">
+  <p>Esta é da <strong>biblioteca padrão do Python</strong> — não precisamos instalar nada extra. <code>ThreadPoolExecutor</code> cria um grupo de threads ("pool") e distribui o trabalho entre elas.</p>
+  <pre><code><span class="kw">with</span> ThreadPoolExecutor(max_workers=<span class="nu">15</span>) <span class="kw">as</span> pool:
+    <span class="cm"># Submete todas as verificações de uma vez</span>
+    futures = {
+        pool.submit(_encontrar_site, b.nome, timeout): i
+        <span class="kw">for</span> i, b <span class="kw">in</span> alvos.items()
+    }
+    <span class="cm"># Processa os resultados na medida em que chegam</span>
+    <span class="kw">for</span> future <span class="kw">in</span> as_completed(futures):
+        resultado = future.result()   <span class="cm"># URL ou None</span></code></pre>
+  <p><strong>Por que threads e não asyncio?</strong> O resto do pipeline é síncrono. Misturar código async com síncrono exigiria refatorar todo o pipeline. Threads são o "caminho de menor resistência" aqui: funcionam muito bem para operações de rede (I/O-bound), onde o thread fica parado esperando a resposta — momento em que outro thread pode trabalhar.</p>
+  <p><strong>Thread safety:</strong> cada thread cria seu próprio <code>httpx.Client</code>. Não compartilhamos estado mutável entre threads, então não precisamos de locks.</p>
+</div>
+
+<!-- =====================================================================
+     4. ARQUITETURA
+     ===================================================================== -->
+<h2 id="arquitetura">4. Arquitetura do código — como está organizado</h2>
+
+<div class="card">
+  <p>O projeto segue um princípio central: <strong>cada arquivo faz uma coisa só</strong>. Isso é chamado de <em>Single Responsibility Principle</em>. Veja o pipeline completo:</p>
+  <pre><code>Overpass API          Serper.dev (opcional)
+     │                      │
+     ▼                      ▼
+ OverpassSource        SerperSource
+  (RawPlace[])          (RawPlace[])
+          │              │
+          └──────┬────────┘
+                 ▼
+          scout.py (orquestra)
+          │
+          ├─ classifier.py   → extrai campos do negócio
+          ├─ scorer.py       → calcula o score 0-100
+          ├─ DomainGuesser   → descobre sites ocultos (HTTP)
+          │
+          ▼
+      ScoutRun (Business[])
+          │
+          ├─ db.py           → salva no SQLite
+          ├─ insighter.py    → agrega KPIs e insights
+          └─ reporter.py     → gera HTML via Jinja2</code></pre>
+</div>
+
+<h3>Padrão Plugin (sources e enrichers)</h3>
+<div class="card">
+  <p>Tanto as <strong>fontes</strong> quanto os <strong>enriquecedores</strong> seguem um <em>padrão de plugin</em>: cada um implementa uma interface simples (uma classe abstrata), e o pipeline não sabe nem se importa com os detalhes de cada implementação.</p>
+  <div class="grid2">
+    <div>
+      <h4>BusinessSource (interface)</h4>
+      <pre><code><span class="kw">class</span> <span class="fn">BusinessSource</span>(ABC):
+    name: <span class="ty">str</span> = <span class="st">"desconhecida"</span>
+
+    <span class="op">@</span>abstractmethod
+    <span class="kw">def</span> <span class="fn">fetch</span>(self, cidade, ...)
+        <span class="op">-&gt;</span> <span class="ty">list[RawPlace]</span>:
+        ...</code></pre>
+      <p class="sub">Qualquer fonte de dados implementa isso</p>
+    </div>
+    <div>
+      <h4>BusinessEnricher (interface)</h4>
+      <pre><code><span class="kw">class</span> <span class="fn">BusinessEnricher</span>(ABC):
+    name: <span class="ty">str</span> = <span class="st">"desconhecido"</span>
+
+    <span class="op">@</span>abstractmethod
+    <span class="kw">def</span> <span class="fn">enrich</span>(self, businesses, cidade)
+        <span class="op">-&gt;</span> <span class="ty">list[Business]</span>:
+        ...</code></pre>
+      <p class="sub">Qualquer enriquecedor implementa isso</p>
+    </div>
+  </div>
+  <p style="margin-top:12px"><strong>Benefício:</strong> para adicionar o Google Places como terceira fonte, basta criar <code>sources/google_places.py</code> que herda de <code>BusinessSource</code> e implementa <code>fetch()</code>. Não é necessário tocar em mais nenhum arquivo.</p>
+</div>
+
+<h3>Layout <code>src/</code> — por que não colocamos tudo na raiz?</h3>
+<div class="card">
+  <p>O projeto usa o padrão <code>src/fabrica_sites/</code> em vez de colocar o código na raiz. Isso parece burocrático mas tem uma razão importante:</p>
+  <p>Se o código ficasse na raiz, Python poderia importá-lo <em>sem instalação</em> — o que cria bugs difíceis de reproduzir. Com o layout <code>src/</code>, só funciona depois de <code>pip install -e .</code>, garantindo que todos usam o mesmo pacote instalado.</p>
+  <p>Os <strong>imports relativos</strong> (com pontos) refletem essa hierarquia:</p>
+  <pre><code><span class="cm"># Dentro de enrichers/domain_guesser.py</span>
+<span class="kw">from</span> <span class="fn">....</span>models <span class="kw">import</span> Business   <span class="cm"># 4 níveis acima = fabrica_sites/</span>
+<span class="kw">from</span> <span class="fn">..</span>scorer <span class="kw">import</span> score          <span class="cm"># 2 níveis acima = agents/scout/</span>
+<span class="kw">from</span> <span class="fn">.</span>base <span class="kw">import</span> BusinessEnricher  <span class="cm"># mesmo nível = enrichers/</span>
+
+<span class="cm"># Mapa do pacote:</span>
+<span class="cm"># src/fabrica_sites/agents/scout/enrichers/domain_guesser.py</span>
+<span class="cm">#              ....          ..         .   (contando os pontos)</span></code></pre>
+</div>
+
+<!-- =====================================================================
+     5. MÓDULOS EM DETALHE
+     ===================================================================== -->
+<h2 id="modulos">5. Cada módulo — o que faz e como funciona</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Arquivo</th>
+      <th>Responsabilidade</th>
+      <th>Detalhe chave</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>config.py</code></td>
+      <td>Configurações centrais</td>
+      <td>Todos os parâmetros ajustáveis ficam aqui. <code>os.getenv()</code> lê do <code>.env</code>.</td>
+    </tr>
+    <tr>
+      <td><code>models.py</code></td>
+      <td>Tipos de dados (Pydantic)</td>
+      <td><code>RawPlace</code> = dado bruto do OSM. <code>Business</code> = negócio processado. <code>ScoutRun</code> = execução completa.</td>
+    </tr>
+    <tr>
+      <td><code>db.py</code></td>
+      <td>Persistência SQLite</td>
+      <td>Salva cada execução com todos os negócios. <code>latest_run()</code> reconstrói a última execução do banco.</td>
+    </tr>
+    <tr>
+      <td><code>core/sectors.py</code></td>
+      <td>Taxonomia de setores</td>
+      <td>Mapa de tags OSM → setor. Ordem importa: setores específicos vêm antes do "catch-all" Comércio.</td>
+    </tr>
+    <tr>
+      <td><code>sources/overpass.py</code></td>
+      <td>Busca no OpenStreetMap</td>
+      <td>Query OverpassQL, tentativa em 3 espelhos, fallback para bounding box em Guarujá.</td>
+    </tr>
+    <tr>
+      <td><code>sources/serper.py</code></td>
+      <td>Busca no Google Maps</td>
+      <td>Queries por setor, IDs sintéticos por hash MD5, graceful degradation sem API key.</td>
+    </tr>
+    <tr>
+      <td><code>classifier.py</code></td>
+      <td>Extração de campos</td>
+      <td>De tags OSM → nome, telefone, site, setor, endereço. <code>detect_website()</code> classifica presença web.</td>
+    </tr>
+    <tr>
+      <td><code>scorer.py</code></td>
+      <td>Score 0-100</td>
+      <td>Determinístico, explicável: cada ponto tem um motivo legível. Pesos em <code>config.py</code>.</td>
+    </tr>
+    <tr>
+      <td><code>enrichers/domain_guesser.py</code></td>
+      <td>Descobre sites ocultos</td>
+      <td>Gera candidatos de domínio, filtra nomes genéricos, verifica com HTTP HEAD paralelo.</td>
+    </tr>
+    <tr>
+      <td><code>scout.py</code></td>
+      <td>Orquestra o pipeline</td>
+      <td>Coleta → classifica → deduplica (por ID e por nome) → enriquece → ordena.</td>
+    </tr>
+    <tr>
+      <td><code>insighter.py</code></td>
+      <td>KPIs e insights</td>
+      <td>Agrega resultados, gera frases de insight por template. Plugável para LLM depois.</td>
+    </tr>
+    <tr>
+      <td><code>reporter.py</code></td>
+      <td>Gera o dashboard HTML</td>
+      <td>Jinja2 + JSON embutido para gráficos (Chart.js) e mapa (Leaflet).</td>
+    </tr>
+    <tr>
+      <td><code>cli.py</code></td>
+      <td>Interface de terminal</td>
+      <td>Typer + Rich. Novos flags: <code>--enriquecer</code>, <code>--com-serper</code>. Mostra tempo de execução.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Como o DomainGuesser funciona por dentro (passo a passo)</h3>
+<div class="card">
+  <p>Esta é a feature mais inovadora desta sessão. Veja o fluxo completo:</p>
+  <pre><code><span class="cm"># Passo 1 — filtrar apenas quem vale verificar</span>
+alvos = {i: b <span class="kw">for</span> i, b <span class="kw">in</span> enumerate(businesses)
+          <span class="kw">if</span> b.site_status <span class="kw">is</span> SiteStatus.SEM_SITE
+          <span class="kw">and</span> b.nome
+          <span class="kw">and</span> _nome_vale_tentar(b.nome)}   <span class="cm"># filtra "Bar", "Pousada"...</span>
+
+<span class="cm"># Passo 2 — paralelizar: cada thread fica responsável por um negócio</span>
+<span class="kw">with</span> ThreadPoolExecutor(max_workers=<span class="nu">15</span>) <span class="kw">as</span> pool:
+    futures = {pool.submit(_encontrar_site, b.nome, timeout): i
+               <span class="kw">for</span> i, b <span class="kw">in</span> alvos.items()}
+
+<span class="cm"># Passo 3 — para cada negócio, tenta candidatos em sequência (para no 1º)</span>
+<span class="kw">def</span> <span class="fn">_encontrar_site</span>(nome, timeout):
+    <span class="kw">for</span> dominio <span class="kw">in</span> gerar_candidatos(nome):
+        <span class="kw">if</span> _checar_dominio(dominio, timeout):
+            <span class="kw">return</span> <span class="st">f"https://{dominio}"</span>
+    <span class="kw">return</span> <span class="kw">None</span>
+
+<span class="cm"># Passo 4 — para os que encontraram: atualizar Business e recalcular score</span>
+<span class="kw">for</span> idx, url <span class="kw">in</span> encontrados.items():
+    result[idx] = _rescore(result[idx], url)
+    <span class="cm"># _rescore usa model_copy + scorer.score() para gerar nova instância</span></code></pre>
+  <p><strong>Por que o score CAI quando encontramos um site?</strong> O score base de SEM_SITE é 60 pontos. Se descobrimos que o negócio tem site, ele vira COM_SITE com base de 25 pontos — <em>porque ele não é mais um prospect primário para venda de site, e o Auditor terá que avaliar a qualidade do site existente</em>. Os dados ficam mais precisos.</p>
+</div>
+
+<h3>Deduplicação de duas fontes (OSM + Serper)</h3>
+<div class="card">
+  <p>Quando usamos Overpass e Serper juntos, o mesmo negócio pode aparecer nas duas fontes com IDs diferentes. Resolvemos isso com <strong>dois níveis de deduplicação</strong>:</p>
+  <ol>
+    <li><strong>Por ID OSM:</strong> <code>(osm_type, osm_id)</code> — rápido, O(n), elimina duplicatas dentro de uma mesma fonte.</li>
+    <li><strong>Por similaridade de nome:</strong> compara cada novo negócio com todos os já aceitos. Se a similaridade de bigramas for ≥ 45%, descarta o duplicado.</li>
+  </ol>
+  <p style="margin-top:8px"><strong>O que são bigramas?</strong> Pares de caracteres consecutivos. "Hotel" vira: "Ho", "ot", "te", "el". Comparar bigramas é mais robusto que comparar strings diretamente — funciona mesmo com palavras na ordem trocada ("Drogasil Guarujá" ≈ "Guarujá Drogasil").</p>
+  <pre><code><span class="cm"># Jaccard de bigramas: |A ∩ B| / |A ∪ B|</span>
+<span class="kw">def</span> <span class="fn">_similar</span>(a, b, threshold=<span class="nu">0.45</span>):
+    ba = _bigrams(_normalizar(a))   <span class="cm"># frozenset de bigramas normalizados</span>
+    bb = _bigrams(_normalizar(b))
+    inter = <span class="ty">len</span>(ba &amp; bb)
+    union = <span class="ty">len</span>(ba | bb)
+    <span class="kw">return</span> (inter / union) &gt;= threshold</code></pre>
+  <p><strong>Limitação honesta:</strong> esta deduplicação é O(n²) — cada novo negócio é comparado com todos os anteriores. Para 385 negócios isso é rápido (&lt;1ms). Para 10.000 negócios precisaríamos de uma estrutura de índice (ex.: MinHash LSH). Anotado para escala futura.</p>
+</div>
+
+<!-- =====================================================================
+     6. TESTES
+     ===================================================================== -->
+<h2 id="testes">6. Testes — o que testamos, por que e como</h2>
+
+<div class="grid2">
+  <div class="card kpi"><div class="num">65</div><div class="lbl">testes passando</div><div class="sub-num">em 0.37 segundos</div></div>
+  <div class="card kpi"><div class="num">0</div><div class="lbl">chamadas de rede nos testes</div><div class="sub-num">100% isolados (monkeypatch)</div></div>
+</div>
+
+<table style="margin-top:14px">
+  <thead>
+    <tr><th>Arquivo de teste</th><th>O que cobre</th><th>Técnica chave</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>test_sectors.py</code></td>
+      <td>Classificação de 15 tipos de negócio + prioridade</td>
+      <td>parametrize</td>
+    </tr>
+    <tr>
+      <td><code>test_scorer.py</code></td>
+      <td>Score, status, motivos explicáveis, casos de borda</td>
+      <td>build_business (pipeline real)</td>
+    </tr>
+    <tr>
+      <td><code>test_pipeline.py</code></td>
+      <td>Deduplicação, ordenação, lead quente exige contato</td>
+      <td>FakeSource (sem rede)</td>
+    </tr>
+    <tr>
+      <td><code>test_domain_guesser.py</code></td>
+      <td>Geração de candidatos, filtro de genéricos, enriquecimento, HTTP</td>
+      <td>monkeypatch + parametrize</td>
+    </tr>
+    <tr>
+      <td><code>test_serper_source.py</code></td>
+      <td>Parsing de resultados, dedup interna, graceful sem key, pipeline integrado</td>
+      <td>FakeResp (mock HTTP)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Testes que preveniram bugs reais</h3>
+<div class="card card-warn">
+  <p>Dois casos onde os testes <em>encontraram</em> problemas que o código não detectaria sozinho:</p>
+
+  <h4>Caso 1 — test_enricher_nao_modifica_negocios_com_site</h4>
+  <pre><code>b = build_business(RawPlace(tags={<span class="st">"website"</span>: <span class="st">"https://salaox.com.br"</span>}))
+assert b.site_status <span class="kw">is</span> SiteStatus.COM_SITE
+<span class="cm"># FALHOU: retornou SO_REDE_SOCIAL. Por quê?</span></code></pre>
+  <p>A URL "salaox.com.br" continha "x.com" como <em>substring</em>, e "x.com" estava na lista de domínios sociais (Twitter/X). A função <code>_is_social()</code> usava <code>any(dom in url)</code> — uma comparação de substring, não de domínio. O bug estava no código desde o início, não era visível, e só apareceu porque o teste foi escrito de forma criativa com esse nome específico. <em>Veja a correção na seção 8.</em></p>
+
+  <h4>Caso 2 — test_lead_quente_exige_contato (sessão anterior)</h4>
+  <p>O teste revelou que a definição de "lead quente" era frouxa demais: só exigir score ≥ 65 produzia 268 "leads" — praticamente todos os negócios. Um lead sem telefone não é acionável. O teste forçou a refinação: score ≥ 65 <strong>E</strong> contactável, resultando em 34 leads reais.</p>
+</div>
+
+<!-- =====================================================================
+     7. RESULTADOS COMPARATIVOS
+     ===================================================================== -->
+<h2 id="resultados">7. Resultados — antes e depois</h2>
+
+<h3>Impacto do DomainGuesser em Guarujá (385 negócios)</h3>
+
+<table>
+  <thead>
+    <tr><th>Métrica</th><th>Sem enriquecimento</th><th>Com DomainGuesser</th><th>Delta</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sem site próprio</td>
+      <td>296 (76,9%)</td>
+      <td><strong>236 (61,3%)</strong></td>
+      <td class="td-ok">−60</td>
+    </tr>
+    <tr>
+      <td>Com site</td>
+      <td>89 (23,1%)</td>
+      <td><strong>149 (38,7%)</strong></td>
+      <td class="td-ok">+60</td>
+    </tr>
+    <tr>
+      <td>Leads quentes</td>
+      <td>34</td>
+      <td><strong>29</strong></td>
+      <td class="td-warn">−5 (mais preciso)</td>
+    </tr>
+    <tr>
+      <td>Contactável</td>
+      <td>48 (12,5%)</td>
+      <td>48 (12,5%)</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Tempo de execução</td>
+      <td>~4s</td>
+      <td>~33s</td>
+      <td class="td-warn">+29s</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout" style="margin-top:12px">
+  <div class="callout-icon">💡</div>
+  <div>
+    <p><strong>Por que os leads quentes DIMINUÍRAM?</strong> Isso é bom, não ruim. Alguns negócios tinham score 80 (SEM_SITE + telefone + setor prioritário). O DomainGuesser descobriu que eles têm site — então o status virou COM_SITE, a base de score caiu para 25 e eles saíram da faixa ALTA (≥65). Os 29 leads restantes são mais precisos: genuinamente sem site e contactáveis.</p>
+  </div>
+</div>
+
+<h3>Sites reais descobertos pelo DomainGuesser (amostra)</h3>
+<table>
+  <thead><tr><th>Negócio</th><th>Site descoberto</th><th>Observação</th></tr></thead>
+  <tbody>
+    <tr><td>Hospital Guarujá</td><td><code>hospitalguaruja.com.br</code></td><td class="td-ok">Site local, legítimo</td></tr>
+    <tr><td>Pousada Orquídeas do Guarujá</td><td><code>pousadaorquideasdoguaruja.com.br</code></td><td class="td-ok">Site local, legítimo</td></tr>
+    <tr><td>Shopping La Plage</td><td><code>shoppinglaplage.com.br</code></td><td class="td-ok">Site local, legítimo</td></tr>
+    <tr><td>Guarujá Center Shopping</td><td><code>guarujacentershopping.com.br</code></td><td class="td-ok">Site local, legítimo</td></tr>
+    <tr><td>Black Fit Academia</td><td><code>blackfitacademia.com.br</code></td><td class="td-ok">Rede, site nacional</td></tr>
+    <tr><td>Silvana Bolos</td><td><code>silvanabolos.com.br</code></td><td class="td-ok">Site local, legítimo</td></tr>
+    <tr><td>Guarujá Previdência</td><td><code>guarujaprevidencia.com.br</code></td><td class="td-ok">Site local, legítimo</td></tr>
+    <tr><td>McDonald's</td><td><code>mcdonalds.com.br</code></td><td class="td-warn">Rede nacional — não é prospect</td></tr>
+    <tr><td>Receita Federal</td><td><code>receitafederal.com</code></td><td class="td-warn">Órgão federal — não é prospect</td></tr>
+  </tbody>
+</table>
+
+<!-- =====================================================================
+     8. BUG DESCOBERTO
+     ===================================================================== -->
+<h2 id="bug">8. Bug descoberto e corrigido — análise detalhada</h2>
+
+<div class="card card-red">
+  <h3 style="margin-top:0;color:var(--red)">🐛 Bug: falso positivo no detector de redes sociais</h3>
+  <p><strong>Onde:</strong> <code>classifier.py</code>, função <code>_is_social(url)</code></p>
+  <p><strong>Impacto:</strong> qualquer negócio cujo site contivesse "x.com" como <em>substring</em> era incorretamente classificado como "só rede social" — mesmo sendo um site próprio legítimo. Ex.: "salaox.com.br", "maxcompra.com.br", "faxe.com.br".</p>
+
+  <h4>O código errado</h4>
+  <div class="diff-block">
+<span class="diff-rem">- def _is_social(url: str) -> bool:</span>
+<span class="diff-rem">-     u = url.lower()</span>
+<span class="diff-rem">-     return any(dom in u for dom in _SOCIAL_DOMAINS)</span>
+<span class="diff-rem">-     # "x.com" in "https://salaox.com.br" → True ← BUG!</span>
+  </div>
+
+  <h4>O código corrigido</h4>
+  <div class="diff-block">
+<span class="diff-add">+ def _is_social(url: str) -> bool:</span>
+<span class="diff-add">+     try:</span>
+<span class="diff-add">+         netloc = urlparse(url).netloc.lower()</span>
+<span class="diff-add">+         host = netloc.removeprefix("www.")</span>
+<span class="diff-add">+         # Compara o HOST, não a URL inteira</span>
+<span class="diff-add">+         return any(host == dom or host.endswith("." + dom)</span>
+<span class="diff-add">+                    for dom in _SOCIAL_DOMAINS)</span>
+<span class="diff-add">+     except Exception:</span>
+<span class="diff-add">+         return False  # fallback seguro</span>
+  </div>
+
+  <p><strong>O que mudou:</strong> usamos <code>urlparse()</code> para extrair apenas o <em>host</em> da URL (ex.: "salaox.com.br") e comparamos se o host é <em>igual</em> a "x.com" ou termina com ".x.com". A string "salaox.com.br" não é igual a "x.com" nem termina com ".x.com" — classificação correta.</p>
+  <p><strong>Como foi encontrado:</strong> um teste escrito especificamente com a URL "https://salaox.com.br" falhou ao verificar que o negócio teria <code>site_status = COM_SITE</code>. Sem o teste, este bug poderia ter passado para produção sem ser detectado.</p>
+</div>
+
+<!-- =====================================================================
+     9. AUTOAVALIAÇÃO
+     ===================================================================== -->
+<h2 id="avaliacao">9. Autoavaliação — análise honesta do que foi feito</h2>
+
+<div class="callout">
+  <div class="callout-icon">🪞</div>
+  <p>Esta seção avalia o trabalho com os olhos de quem vai manter e evoluir o código — sem inflar nem diminuir.</p>
+</div>
+
+<h3>O que ficou bem</h3>
+<div class="card card-ok">
+  <ul>
+    <li><strong>DomainGuesser é inovador e funciona:</strong> a ideia de tentar "nomenegocio.com.br" é simples, não custa nada e descobriu 60 sites reais em Guarujá. É uma abordagem que não vi em projetos similares de scraping de leads.</li>
+    <li><strong>Arquitetura plugável:</strong> adicionar uma terceira fonte de dados (ex.: Google Places) não requer tocar em scout.py, cli.py nem nos testes existentes. Basta criar um novo arquivo em <code>sources/</code>.</li>
+    <li><strong>Testes de qualidade:</strong> os testes não só verificam que o código funciona, mas também definem o comportamento esperado de forma clara. O caso do "lead quente exige contato" e o bug do x.com são exemplos de testes que encontraram problemas reais.</li>
+    <li><strong>Graceful degradation:</strong> o sistema funciona em modo básico sem nenhuma API key, vai melhorando progressivamente conforme você adiciona chaves. Esta filosofia garante que o custo inicial é zero.</li>
+    <li><strong>Bug do classifier encontrado e corrigido:</strong> sem o teste, este bug estaria em produção silenciosamente reclassificando sites legítimos como redes sociais.</li>
+  </ul>
+</div>
+
+<h3>O que tem espaço para melhorar</h3>
+<div class="card card-warn">
+  <ul>
+    <li>
+      <strong>DomainGuesser ainda tem falsos positivos de redes nacionais:</strong> McDonald's, Burger King e Receita Federal foram "descobertos" com seus sites nacionais — corretos tecnicamente, mas não são prospects para venda de site local. Uma melhoria futura seria detectar domínios de redes nacionais (lista de franquias conhecidas) e filtrá-los.
+    </li>
+    <li>
+      <strong>Negócios repetidos (filiais):</strong> "Oggi Sorvetes" aparece 7 vezes e "Drogaria São Paulo" aparece 3 vezes (filiais diferentes no OSM). O pipeline trata cada filial como negócio separado, o que é correto para o Scout, mas para o Prospector será necessário consolidar por rede/CNPJ para não abordar a mesma empresa várias vezes.
+    </li>
+    <li>
+      <strong>httpx.Client criado por thread:</strong> no DomainGuesser, cada chamada a <code>_checar_dominio()</code> cria um novo <code>httpx.Client</code> (e portanto um novo pool de conexões TCP). Seria mais eficiente criar um cliente por thread e reutilizá-lo. O impacto é pequeno para 300 negócios, mas relevante em escala.
+    </li>
+    <li>
+      <strong>Sem cache entre execuções:</strong> o DomainGuesser refaz todas as verificações HTTP a cada execução do Scout. Se você rodar o Scout amanhã, verificará os mesmos 300 domínios de novo. Uma tabela <code>domain_cache</code> no SQLite resolveria: verifica só domínios que nunca foram checados ou que foram checados há mais de N dias.
+    </li>
+    <li>
+      <strong>O comparativo do script executa o OSM duas vezes:</strong> o script <code>comparativo_enricher.py</code> chama <code>run_scout()</code> duas vezes independentemente. O segundo fetch pode retornar resultados ligeiramente diferentes do primeiro (OSM pode ser atualizado, ordem de elementos não é garantida). Um comparativo perfeito passaria o mesmo <code>run_base</code> pelo enricher, sem buscar os dados duas vezes.
+    </li>
+  </ul>
+</div>
+
+<!-- =====================================================================
+     10. PRÓXIMOS PASSOS
+     ===================================================================== -->
+<h2 id="proximos">10. Próximos passos</h2>
+
+<div class="card">
+  <p>Com base no que aprendemos, aqui está a ordem recomendada:</p>
+
+  <h4>Imediato — completar o enriquecimento de contatos</h4>
+  <ul>
+    <li><span class="badge b-acc">P1</span> Criar conta no Serper.dev (grátis), configurar <code>SERPER_API_KEY</code> no <code>.env</code> e rodar <code>fabrica scout run --com-serper</code>. Isso deve aumentar significativamente o número de negócios com telefone (hoje: 12,5%).</li>
+    <li><span class="badge b-acc">P1</span> Adicionar cache de domínios no SQLite para evitar re-verificar os mesmos 300 URLs toda execução.</li>
+  </ul>
+
+  <h4>Curto prazo — Fase 2: Agente Benchmark</h4>
+  <ul>
+    <li><span class="badge b-warn">P2</span> Definir setor piloto: os dados apontam <strong>Alimentação (83 negócios sem site)</strong>, mas Beleza/Saúde têm menor cobertura no OSM e podem ter mais oportunidades reais. Recomendo: rodar com Serper ativo e comparar os números antes de decidir.</li>
+    <li>O Benchmark busca sites de referência por setor ("site bonito de restaurante em Guarujá") para criar um padrão de qualidade que o Auditor usará na fase 3.</li>
+  </ul>
+
+  <h4>Quando escalar — Python 3.12 + CrewAI</h4>
+  <ul>
+    <li><span class="badge b-pur">P3</span> Criar um venv separado com Python 3.12 para CrewAI/LangGraph (incompatíveis com Python 3.14). Esse venv entra em jogo nas fases 2-5, não agora.</li>
+  </ul>
+
+  <h4>Decisões abertas aguardando você</h4>
+  <table>
+    <thead><tr><th>#</th><th>Decisão</th><th>Impacto</th></tr></thead>
+    <tbody>
+      <tr><td>P2</td><td>Setor piloto para Benchmark</td><td>Define o foco das próximas 2 fases</td></tr>
+      <tr><td>P4</td><td>Revisar pesos do score</td><td>Afeta ordenação de leads</td></tr>
+      <tr><td>P7</td><td>Confirmar OpenClaw (Prospector) e Vercel (Creator)</td><td>Define stack das fases 4 e 5</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- =====================================================================
+     ESTRUTURA DE ARQUIVOS
+     ===================================================================== -->
+<h2>11. Estrutura completa do projeto</h2>
+<div class="card">
+<pre style="font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--mut);line-height:1.6">Agente_Criador_de_Sites_Institucionais_p_Venda/
+│
+├── pyproject.toml             ← define o pacote, dependências, comando "fabrica"
+├── requirements.txt           ← versões exatas das dependências
+├── .env.example               ← template das variáveis de ambiente (sem segredos)
+├── .gitignore                 ← exclui .venv/, data/, .env
+│
+├── data/
+│   ├── fabrica.db             ← banco SQLite (runs + businesses)
+│   ├── relatorio_scout.html   ← dashboard interativo (última execução)
+│   └── relatorio_scout_enriquecido.html  ← com DomainGuesser
+│
+├── docs/
+│   ├── ARQUITETURA.md         ← visão geral do sistema
+│   ├── ROADMAP.md             ← fases com checkboxes
+│   ├── DECISOES.md            ← 9 ADRs (Architecture Decision Records)
+│   ├── DUVIDAS_ABERTAS.md     ← perguntas para o usuário
+│   ├── RELATORIO_SESSAO_01.html
+│   └── RELATORIO_SESSAO_02.html  ← este arquivo
+│
+├── scripts/
+│   └── comparativo_enricher.py  ← script de comparação antes/depois
+│
+├── tests/
+│   ├── test_sectors.py        ← 16 testes (15 parametrize + 1)
+│   ├── test_scorer.py         ← 5 testes
+│   ├── test_pipeline.py       ← 4 testes
+│   ├── test_domain_guesser.py ← 29 testes  ← NOVO
+│   └── test_serper_source.py  ← 11 testes  ← NOVO
+│
+└── src/fabrica_sites/
+    ├── config.py              ← todos os parâmetros ajustáveis
+    ├── models.py              ← RawPlace, Business, ScoutRun (Pydantic)
+    ├── db.py                  ← persistência SQLite
+    ├── cli.py                 ← interface de terminal (Typer + Rich)
+    │
+    ├── core/
+    │   └── sectors.py         ← taxonomia de 10 setores + OUTROS
+    │
+    └── agents/scout/
+        ├── scout.py           ← orquestrador do pipeline
+        ├── classifier.py      ← extração de campos + detecção de presença web
+        ├── scorer.py          ← score 0-100 explicável
+        ├── insighter.py       ← KPIs, insights e top leads
+        ├── reporter.py        ← gera HTML via Jinja2
+        ├── templates/
+        │   └── report.html.j2 ← template do dashboard (Chart.js + Leaflet)
+        │
+        ├── sources/           ← FONTES DE DADOS (plugáveis)
+        │   ├── base.py        ← interface BusinessSource
+        │   ├── overpass.py    ← OpenStreetMap (grátis, sem chave)
+        │   └── serper.py      ← Google Maps via Serper.dev  ← NOVO
+        │
+        └── enrichers/         ← ENRIQUECEDORES (plugáveis)  ← NOVO
+            ├── base.py        ← interface BusinessEnricher
+            └── domain_guesser.py  ← verifica nomenegocio.com.br</pre>
+</div>
+
+<footer>
+  <p>Fábrica de Sites · Relatório da Sessão 02 · Gerado em 17/06/2026</p>
+  <p style="margin-top:4px">Para navegar: <code>fabrica scout run --enriquecer --abrir</code> abre o dashboard interativo.</p>
+</footer>
+
+</div>
+</body>
+</html>

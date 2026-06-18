@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scout — {{ cidade }}</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root{
+    --bg:#0f172a; --bg2:#1e293b; --bg3:#334155; --line:#334155;
+    --txt:#e2e8f0; --mut:#94a3b8; --acc:#38bdf8;
+    --altissima:#16a34a; --alta:#84cc16; --media:#d97706; --baixa:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+  a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{max-width:1200px;margin:0 auto;padding:24px}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:24px}
+  h1{margin:0 0 4px;font-size:26px}
+  h2{font-size:18px;margin:32px 0 12px;border-left:3px solid var(--acc);padding-left:10px}
+  .sub{color:var(--mut);font-size:14px}
+  .badge{display:inline-block;background:#064e3b;color:#6ee7b7;border:1px solid #065f46;
+    padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;margin-left:8px}
+  .grid{display:grid;gap:16px}
+  .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .kpi .num{font-size:30px;font-weight:700;line-height:1}
+  .kpi .lbl{color:var(--mut);font-size:13px;margin-top:6px}
+  .kpi .hl{color:var(--acc)}
+  .two{grid-template-columns:1fr 1fr}
+  .panel ul{margin:0;padding-left:4px;list-style:none}
+  .panel li{padding:7px 0;border-bottom:1px dashed var(--line)}
+  .panel li:last-child{border:0}
+  #map{height:420px;border-radius:12px;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}
+  th{color:var(--mut);cursor:pointer;user-select:none;white-space:nowrap}
+  th:hover{color:var(--txt)}
+  tbody tr:hover{background:#1b2536}
+  .tag{display:inline-block;padding:1px 8px;border-radius:6px;font-size:11px;font-weight:700;color:#0b1220}
+  .ALTÍSSIMA{background:var(--altissima);color:#fff}
+  .ALTA{background:var(--alta)} .MÉDIA{background:var(--media);color:#fff}
+  .BAIXA{background:var(--baixa);color:#fff}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .filters input,.filters select{background:var(--bg);color:var(--txt);
+    border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px}
+  .filters input{flex:1;min-width:200px}
+  .chart-box{position:relative;height:300px}
+  .sec-pri{color:#6ee7b7;font-weight:600}
+  footer{margin-top:40px;color:var(--mut);font-size:12px;text-align:center;
+    border-top:1px solid var(--line);padding-top:16px}
+  .count{color:var(--mut);font-weight:400;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🔭 Agente Scout — {{ cidade }} <span class="badge">100% grátis · OpenStreetMap</span></h1>
+    <div class="sub">Gerado em {{ gerado_em }} · Fonte: {{ fonte }}</div>
+  </header>
+
+  <!-- KPIs -->
+  <div class="grid kpis">
+    <div class="card kpi"><div class="num">{{ kpis.total }}</div><div class="lbl">Negócios mapeados</div></div>
+    <div class="card kpi"><div class="num hl">{{ kpis.sem_site_proprio }}</div><div class="lbl">Sem site próprio ({{ kpis.pct_sem_site_proprio }}%)</div></div>
+    <div class="card kpi"><div class="num">{{ kpis.so_social }}</div><div class="lbl">🔥 Só rede social</div></div>
+    <div class="card kpi"><div class="num">{{ kpis.com_site }}</div><div class="lbl">Têm site (auditar)</div></div>
+    <div class="card kpi"><div class="num">{{ kpis.contactavel }}</div><div class="lbl">Com contato ({{ kpis.pct_contactavel }}%)</div></div>
+    <div class="card kpi"><div class="num hl">{{ kpis.leads_quentes }}</div><div class="lbl">⭐ Quentes (oport.+contato)</div></div>
+  </div>
+
+  <!-- Insights -->
+  <h2>💡 Insights do Scout</h2>
+  <div class="card panel">
+    <ul>
+      {% for ins in insights %}<li>{{ ins }}</li>{% endfor %}
+    </ul>
+  </div>
+
+  <!-- Gráficos -->
+  <h2>📊 Análise por setor e por situação de site</h2>
+  <div class="grid two">
+    <div class="card"><div class="chart-box"><canvas id="chSetor"></canvas></div></div>
+    <div class="card"><div class="chart-box"><canvas id="chStatus"></canvas></div></div>
+  </div>
+
+  <!-- Ranking de setores -->
+  <h2>🏆 Ranking de setores por oportunidade</h2>
+  <div class="card" style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Setor</th><th>Total</th><th>Sem site</th><th>Só rede social</th>
+        <th>Tem site</th><th>Oportunidade</th><th>% oport.</th>
+        <th>Score médio</th><th>Leads quentes</th>
+      </tr></thead>
+      <tbody>
+      {% for s in por_setor %}
+        <tr>
+          <td><span class="dot" style="background:{{ s.cor }}"></span>{{ s.emoji }} {{ s.nome }}
+            {% if s.prioritario %}<span class="sec-pri">★</span>{% endif %}</td>
+          <td>{{ s.total }}</td><td>{{ s.sem_site }}</td><td>{{ s.so_social }}</td>
+          <td>{{ s.com_site }}</td><td><b>{{ s.oportunidade }}</b></td>
+          <td>{{ s.oportunidade_pct }}%</td><td>{{ s.score_medio }}</td><td>{{ s.leads_quentes }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div class="sub" style="margin-top:8px">★ = setor prioritário (foco inicial do negócio)</div>
+  </div>
+
+  <!-- Mapa -->
+  <h2>🗺️ Mapa de oportunidades</h2>
+  <div class="sub" style="margin-bottom:10px">Cor = setor · Tamanho do ponto = score de oportunidade. Clique para ver detalhes.</div>
+  <div id="map"></div>
+
+  <!-- Tabela -->
+  <h2>📋 Todos os negócios <span class="count" id="tcount"></span></h2>
+  <div class="filters">
+    <input id="fBusca" placeholder="🔎 Buscar por nome...">
+    <select id="fStatus">
+      <option value="">Todos os status</option>
+      <option value="SEM_SITE">Sem site</option>
+      <option value="SO_REDE_SOCIAL">Só rede social</option>
+      <option value="COM_SITE">Tem site</option>
+    </select>
+    <select id="fSetor"><option value="">Todos os setores</option></select>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <table id="tbl">
+      <thead><tr>
+        <th data-k="nome">Nome</th><th data-k="setor">Setor</th>
+        <th data-k="status_legivel">Situação</th><th data-k="score">Score ▼</th>
+        <th data-k="label">Oportunidade</th><th data-k="telefone">Telefone</th>
+        <th>Links</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <footer>
+    Fábrica de Sites · Agente Scout (Fase 1) · dados © OpenStreetMap contributors (ODbL).
+  </footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const NEGOCIOS = {{ negocios_json | safe }};
+  const CENTRO = {{ centro_json | safe }};
+
+  // ---- Gráfico: oportunidade por setor ----
+  new Chart(document.getElementById('chSetor'), {
+    type:'bar',
+    data:{ labels:{{ setor_labels | safe }},
+      datasets:[
+        {label:'Oportunidade (sem site próprio)', data:{{ setor_oportunidade | safe }},
+         backgroundColor:{{ setor_cores | safe }}},
+        {label:'Total no setor', data:{{ setor_total | safe }},
+         backgroundColor:'rgba(148,163,184,.25)'}
+      ]},
+    options:{maintainAspectRatio:false, plugins:{legend:{labels:{color:'#e2e8f0'}}},
+      scales:{x:{ticks:{color:'#94a3b8'}},y:{ticks:{color:'#94a3b8'},beginAtZero:true}}}
+  });
+
+  // ---- Gráfico: distribuição de situação de site ----
+  new Chart(document.getElementById('chStatus'), {
+    type:'doughnut',
+    data:{ labels:{{ status_labels | safe }},
+      datasets:[{ data:{{ status_valores | safe }},
+        backgroundColor:['#16a34a','#f59e0b','#64748b'] }]},
+    options:{maintainAspectRatio:false, plugins:{legend:{labels:{color:'#e2e8f0'}}}}
+  });
+
+  // ---- Mapa ----
+  const map = L.map('map').setView(CENTRO, 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {attribution:'© OpenStreetMap', maxZoom:19}).addTo(map);
+  NEGOCIOS.forEach(n=>{
+    if(n.lat==null||n.lon==null) return;
+    const r = 4 + (n.score/100)*9;
+    L.circleMarker([n.lat,n.lon], {radius:r, color:n.cor, fillColor:n.cor,
+      fillOpacity:.7, weight:1}).addTo(map)
+      .bindPopup('<b>'+n.nome+'</b><br>'+n.setor+'<br>'+n.status_legivel+
+        ' · score '+n.score+' ('+n.label+')'+
+        (n.maps_url?'<br><a href="'+n.maps_url+'" target="_blank">Ver no Maps</a>':''));
+  });
+
+  // ---- Tabela filtrável/ordenável ----
+  const tbody=document.getElementById('tbody'), tcount=document.getElementById('tcount');
+  const fBusca=document.getElementById('fBusca'), fStatus=document.getElementById('fStatus'),
+        fSetor=document.getElementById('fSetor');
+  let ordCol='score', ordDir=-1;
+
+  // popular filtro de setor
+  [...new Set(NEGOCIOS.map(n=>n.setor))].sort().forEach(s=>{
+    const o=document.createElement('option'); o.value=s; o.textContent=s; fSetor.appendChild(o);
+  });
+
+  function linha(n){
+    const site = n.website ? '<a href="'+(n.website.startsWith('http')?n.website:'http://'+n.website)+
+      '" target="_blank">site</a>' : '';
+    const maps = n.maps_url ? '<a href="'+n.maps_url+'" target="_blank">maps</a>' : '';
+    const osm  = '<a href="'+n.osm_url+'" target="_blank">osm</a>';
+    return '<tr>'+
+      '<td>'+n.nome+'</td>'+
+      '<td><span class="dot" style="background:'+n.cor+'"></span>'+n.setor+'</td>'+
+      '<td>'+n.status_legivel+'</td>'+
+      '<td>'+n.score+'</td>'+
+      '<td><span class="tag '+n.label+'">'+n.label+'</span></td>'+
+      '<td>'+(n.telefone||'—')+'</td>'+
+      '<td>'+[site,maps,osm].filter(Boolean).join(' · ')+'</td>'+
+      '</tr>';
+  }
+  function render(){
+    const q=fBusca.value.toLowerCase(), st=fStatus.value, se=fSetor.value;
+    let arr=NEGOCIOS.filter(n=>
+      (!q||n.nome.toLowerCase().includes(q)) &&
+      (!st||n.status===st) && (!se||n.setor===se));
+    arr.sort((a,b)=>{
+      let x=a[ordCol], y=b[ordCol];
+      if(typeof x==='string'){x=x.toLowerCase();y=(y||'').toLowerCase();}
+      return (x>y?1:x<y?-1:0)*ordDir;
+    });
+    tbody.innerHTML=arr.map(linha).join('');
+    tcount.textContent='('+arr.length+' de '+NEGOCIOS.length+')';
+  }
+  document.querySelectorAll('#tbl th[data-k]').forEach(th=>{
+    th.addEventListener('click',()=>{
+      const k=th.dataset.k;
+      if(ordCol===k) ordDir*=-1; else {ordCol=k; ordDir=(k==='score')?-1:1;}
+      render();
+    });
+  });
+  [fBusca,fStatus,fSetor].forEach(e=>e.addEventListener('input',render));
+  render();
+</script>
+</body>
+</html>

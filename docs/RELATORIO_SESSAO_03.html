@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatório Sessão 03 — Fábrica de Sites | Deep Dive em Código e Bibliotecas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>hljs.highlightAll();</script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b22;
+    --bg3: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text2: #8b949e;
+    --text3: #6e7681;
+    --accent: #58a6ff;
+    --accent2: #79c0ff;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --orange: #f0883e;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --pink: #ff7b72;
+    --sidebar-w: 260px;
+    --header-h: 56px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  /* ── HEADER ── */
+  .site-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--header-h);
+    background: rgba(15,17,23,.95);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 24px;
+    gap: 16px;
+  }
+  .site-header .badge {
+    background: linear-gradient(135deg, #1f6feb 0%, #58a6ff 100%);
+    color: #fff; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px; letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .site-header h1 { font-size: 15px; font-weight: 600; color: var(--text2); }
+  .site-header .session-num { font-size: 20px; font-weight: 700; color: var(--accent); }
+  /* ── LAYOUT ── */
+  .layout { display: flex; padding-top: var(--header-h); min-height: 100vh; }
+  /* ── SIDEBAR ── */
+  nav.sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    position: fixed; top: var(--header-h); bottom: 0; left: 0;
+    overflow-y: auto; padding: 20px 0;
+    border-right: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  nav.sidebar::-webkit-scrollbar { width: 4px; }
+  nav.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .nav-section { margin-bottom: 8px; }
+  .nav-section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text3);
+    padding: 8px 20px 4px;
+  }
+  .nav-section a {
+    display: block; padding: 5px 20px;
+    color: var(--text2); text-decoration: none;
+    font-size: 13px; border-left: 2px solid transparent;
+    transition: all .15s;
+  }
+  .nav-section a:hover { color: var(--accent); border-color: var(--accent); background: rgba(88,166,255,.06); }
+  .nav-section a.sub { padding-left: 34px; font-size: 12px; color: var(--text3); }
+  .nav-section a.sub:hover { color: var(--accent2); }
+  /* ── MAIN ── */
+  main { margin-left: var(--sidebar-w); padding: 40px 48px; max-width: 1000px; }
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 64px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 28px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    color: var(--text3); background: var(--bg3);
+    padding: 3px 8px; border-radius: 4px;
+  }
+  .section-header h2 { font-size: 22px; font-weight: 700; }
+  .subsection { margin: 32px 0; }
+  .subsection h3 {
+    font-size: 17px; font-weight: 600; margin-bottom: 14px;
+    color: var(--accent2);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .subsection h4 { font-size: 14px; font-weight: 600; color: var(--orange); margin: 18px 0 8px; }
+  p { margin-bottom: 14px; color: var(--text); }
+  /* ── CODE ── */
+  pre {
+    border-radius: 8px; margin: 16px 0;
+    border: 1px solid var(--border);
+    overflow-x: auto;
+    font-size: 13px;
+    position: relative;
+  }
+  pre code { font-family: 'JetBrains Mono', monospace !important; }
+  .code-label {
+    font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace;
+    padding: 6px 14px 0;
+    display: block;
+  }
+  code:not(pre code) {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 4px; padding: 1px 6px; font-size: 12.5px; color: var(--orange);
+  }
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 8px; padding: 14px 18px; margin: 16px 0;
+    border-left: 3px solid;
+    background: var(--bg3);
+  }
+  .callout.info { border-color: var(--accent); }
+  .callout.tip { border-color: var(--green); }
+  .callout.warn { border-color: var(--yellow); }
+  .callout.ref { border-color: var(--purple); }
+  .callout-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 6px; }
+  .callout.info .callout-title { color: var(--accent); }
+  .callout.tip .callout-title { color: var(--green); }
+  .callout.warn .callout-title { color: var(--yellow); }
+  .callout.ref .callout-title { color: var(--purple); }
+  /* ── LINKS ── */
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; color: var(--accent2); }
+  .doc-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; background: rgba(88,166,255,.1);
+    border: 1px solid rgba(88,166,255,.2); border-radius: 4px;
+    padding: 2px 8px; color: var(--accent);
+    transition: all .15s; margin: 2px;
+  }
+  .doc-link:hover { background: rgba(88,166,255,.2); text-decoration: none; }
+  .doc-link::before { content: "↗"; font-size: 10px; }
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { background: var(--bg3); padding: 9px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text2); border-bottom: 1px solid var(--border); }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  td code { font-size: 11.5px; }
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #1a2332 50%, #0d1117 100%);
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 40px; margin-bottom: 48px;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 70% 30%, rgba(88,166,255,.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-tag { font-size: 11px; font-weight: 700; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; margin-bottom: 12px; }
+  .hero h1 { font-size: 30px; font-weight: 700; line-height: 1.25; margin-bottom: 12px; }
+  .hero p { font-size: 15px; color: var(--text2); margin-bottom: 0; }
+  .hero-meta { display: flex; gap: 24px; margin-top: 24px; flex-wrap: wrap; }
+  .hero-stat { text-align: center; }
+  .hero-stat .n { font-size: 26px; font-weight: 700; color: var(--accent); }
+  .hero-stat .l { font-size: 11px; color: var(--text3); }
+  /* ── LIB CARD ── */
+  .lib-card {
+    border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 40px; overflow: hidden;
+  }
+  .lib-header {
+    display: flex; align-items: center; gap: 14px;
+    padding: 16px 20px; background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .lib-icon { font-size: 24px; }
+  .lib-name { font-size: 18px; font-weight: 700; }
+  .lib-version { font-size: 11px; color: var(--text3); background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; margin-left: 4px; }
+  .lib-body { padding: 20px; }
+  .lib-links { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 16px; }
+  /* ── USAGE CHIPS ── */
+  .chip { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+  .chip-blue { background: rgba(88,166,255,.15); color: var(--accent); }
+  .chip-green { background: rgba(63,185,80,.15); color: var(--green); }
+  .chip-orange { background: rgba(240,136,62,.15); color: var(--orange); }
+  .chip-purple { background: rgba(188,140,255,.15); color: var(--purple); }
+  /* ── REVIEW ── */
+  .review-item { display: flex; gap: 10px; margin: 10px 0; align-items: flex-start; }
+  .review-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+  .review-text { font-size: 14px; color: var(--text2); }
+  /* ── PIPELINE ── */
+  .pipeline { display: flex; gap: 0; margin: 24px 0; overflow-x: auto; }
+  .pipeline-step {
+    flex: 1; min-width: 120px; text-align: center;
+    padding: 16px 12px; background: var(--bg3);
+    border: 1px solid var(--border); border-right: none;
+    position: relative;
+  }
+  .pipeline-step:first-child { border-radius: 8px 0 0 8px; }
+  .pipeline-step:last-child { border-right: 1px solid var(--border); border-radius: 0 8px 8px 0; }
+  .pipeline-step::after {
+    content: '→'; position: absolute; right: -14px; top: 50%;
+    transform: translateY(-50%); color: var(--text3); font-size: 18px; z-index: 1;
+  }
+  .pipeline-step:last-child::after { display: none; }
+  .pipeline-step .n { font-size: 22px; }
+  .pipeline-step .t { font-size: 11px; font-weight: 600; color: var(--accent); margin-top: 4px; }
+  .pipeline-step .d { font-size: 10px; color: var(--text3); margin-top: 3px; }
+  /* ── RESULT TABLE ── */
+  .result-good { color: var(--green); font-weight: 700; }
+  .result-bad { color: var(--red); }
+  .result-neutral { color: var(--text2); }
+  /* ── DIVIDER ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+  /* ── TOC indicator  ── */
+  .toc-count { font-size: 11px; color: var(--text3); float: right; }
+  ul, ol { padding-left: 24px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; color: var(--text2); }
+  strong { color: var(--text); }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <span class="badge">Sessão 03</span>
+  <span class="session-num">S3</span>
+  <h1>Deep Dive — Código, Bibliotecas e Arquitetura</h1>
+</header>
+
+<div class="layout">
+<nav class="sidebar">
+  <div class="nav-section">
+    <div class="nav-section-label">Visão Geral</div>
+    <a href="#intro">Introdução e Resultados</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Bibliotecas</div>
+    <a href="#libs">2. Todas as Bibliotecas</a>
+    <a href="#httpx" class="sub">2.1 httpx</a>
+    <a href="#pydantic" class="sub">2.2 Pydantic v2</a>
+    <a href="#typer" class="sub">2.3 Typer</a>
+    <a href="#rich" class="sub">2.4 Rich</a>
+    <a href="#jinja2" class="sub">2.5 Jinja2</a>
+    <a href="#dotenv" class="sub">2.6 python-dotenv</a>
+    <a href="#pytest" class="sub">2.7 pytest</a>
+    <a href="#stdlib" class="sub">2.8 Stdlib Essencial</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Arquitetura</div>
+    <a href="#arch">3. Arquitetura</a>
+    <a href="#src-layout" class="sub">3.1 src layout</a>
+    <a href="#plugin-pattern" class="sub">3.2 Plugin Pattern</a>
+    <a href="#pipeline" class="sub">3.3 O Pipeline</a>
+    <a href="#modules" class="sub">3.4 Módulo a Módulo</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Código</div>
+    <a href="#conventions">4. Convenções</a>
+    <a href="#naming" class="sub">4.1 Nomenclatura</a>
+    <a href="#typehints" class="sub">4.2 Type Hints</a>
+    <a href="#pep8" class="sub">4.3 PEP 8</a>
+    <a href="#patterns" class="sub">4.4 Padrões Usados</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Testes</div>
+    <a href="#tests">5. Testes em Profundidade</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Resultados</div>
+    <a href="#ab">6. A/B Test — Análise</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Avaliação</div>
+    <a href="#review">7. Autoavaliação</a>
+    <a href="#next">8. Próximas Fases</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<div class="hero" id="intro">
+  <div class="hero-tag">Fábrica de Sites · Fase 1 — Agente Scout · Sessão 03</div>
+  <h1>Deep Dive:<br>Código, Bibliotecas e Arquitetura</h1>
+  <p>Este relatório vai mais fundo do que os anteriores. Em vez de apenas listar o que foi feito, examinamos
+  <em>como</em> cada peça funciona: cada biblioteca com exemplos reais do projeto, a teoria por trás da
+  estrutura de arquivos, as convenções de código seguidas — e onde ainda há espaço para melhorar.</p>
+  <div class="hero-meta">
+    <div class="hero-stat"><div class="n">8</div><div class="l">Bibliotecas<br>analisadas</div></div>
+    <div class="hero-stat"><div class="n">77</div><div class="l">Testes<br>passando</div></div>
+    <div class="hero-stat"><div class="n">513</div><div class="l">Negócios<br>mapeados</div></div>
+    <div class="hero-stat"><div class="n">145</div><div class="l">Leads quentes<br>(vs 34 baseline)</div></div>
+    <div class="hero-stat"><div class="n">+327%</div><div class="l">Leads com<br>Serper ativo</div></div>
+  </div>
+  <div class="callout ref" style="margin-top:20px">
+    <div class="callout-title">📋 Relatórios anteriores</div>
+    <a href="RELATORIO_SESSAO_02.html" target="_blank">Sessão 02 — Relatório educacional (visão geral)</a> &nbsp;·&nbsp;
+    <a href="../data/relatorio_scout_enriquecido.html" target="_blank">Dashboard — Scout ao vivo (dados reais de Guarujá)</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SEÇÃO 2: BIBLIOTECAS ═══════════════════════════ -->
+<div class="section" id="libs">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>Bibliotecas — Deep Dive</h2>
+  </div>
+  <p>O projeto usa uma stack deliberadamente enxuta: cada biblioteca foi escolhida por ter uma razão clara para existir. A tabela abaixo serve de mapa; as seções seguintes entram em detalhe em cada uma.</p>
+
+  <table>
+    <tr><th>Biblioteca</th><th>Versão</th><th>Categoria</th><th>Onde é usada</th></tr>
+    <tr><td><strong>httpx</strong></td><td>&ge;0.28</td><td><span class="chip chip-blue">rede</span></td><td>Overpass, Serper, DomainGuesser</td></tr>
+    <tr><td><strong>pydantic</strong></td><td>&ge;2.0</td><td><span class="chip chip-green">dados</span></td><td>Todos os modelos (RawPlace, Business, ScoutRun)</td></tr>
+    <tr><td><strong>typer</strong></td><td>&ge;0.12</td><td><span class="chip chip-orange">CLI</span></td><td>cli.py — interface de linha de comando</td></tr>
+    <tr><td><strong>rich</strong></td><td>&ge;13.0</td><td><span class="chip chip-orange">CLI</span></td><td>cli.py — tabelas, painéis, status no terminal</td></tr>
+    <tr><td><strong>jinja2</strong></td><td>&ge;3.1</td><td><span class="chip chip-purple">template</span></td><td>reporter.py — geração do HTML de relatório</td></tr>
+    <tr><td><strong>python-dotenv</strong></td><td>&ge;1.0</td><td><span class="chip chip-blue">config</span></td><td>config.py — lê SERPER_API_KEY do .env</td></tr>
+    <tr><td><strong>pytest</strong></td><td>&ge;8.0</td><td><span class="chip chip-green">testes</span></td><td>tests/ — 77 testes (unit, integração, perf)</td></tr>
+    <tr><td><strong>stdlib variada</strong></td><td>built-in</td><td><span class="chip chip-blue">misc</span></td><td>abc, concurrent.futures, tracemalloc, re, hashlib…</td></tr>
+  </table>
+
+  <!-- ─── 2.1 httpx ─── -->
+  <div class="lib-card" id="httpx">
+    <div class="lib-header">
+      <span class="lib-icon">🌐</span>
+      <div>
+        <span class="lib-name">httpx</span>
+        <span class="lib-version">&ge;0.28</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">Cliente HTTP moderno para Python</span>
+    </div>
+    <div class="lib-body">
+      <div class="lib-links">
+        <a class="doc-link" href="https://www.python-httpx.org/" target="_blank" rel="noopener">Documentação oficial</a>
+        <a class="doc-link" href="https://www.python-httpx.org/quickstart/" target="_blank" rel="noopener">Quickstart</a>
+        <a class="doc-link" href="https://www.python-httpx.org/advanced/clients/" target="_blank" rel="noopener">Client avançado</a>
+        <a class="doc-link" href="https://www.python-httpx.org/api/#httpx.head" target="_blank" rel="noopener">httpx.head()</a>
+        <a class="doc-link" href="https://www.python-httpx.org/api/#httpx.post" target="_blank" rel="noopener">httpx.post()</a>
+      </div>
+
+      <p><strong>Por que httpx e não requests?</strong> O <code>requests</code> é a biblioteca HTTP mais popular em Python, mas o <code>httpx</code> foi escolhido por três razões:</p>
+      <ul>
+        <li><strong>API idêntica ao requests</strong> — zero curva de aprendizado para quem já conhece requests</li>
+        <li><strong>Suporte a HTTP/2 nativo</strong> — melhor desempenho em APIs modernas</li>
+        <li><strong>Suporte assíncrono built-in</strong> — se o projeto crescer para async (FastAPI, etc.), não precisamos trocar a biblioteca</li>
+        <li><strong>Timeout granular</strong> — permite controlar connect_timeout, read_timeout e write_timeout separadamente</li>
+      </ul>
+
+      <h4>Como usamos: httpx.post() — Overpass API</h4>
+      <p>A Overpass API (OpenStreetMap) aceita a query OverpassQL via POST. Usamos o método síncrono simples:</p>
+      <span class="code-label">src/fabrica_sites/agents/scout/sources/overpass.py</span>
+<pre><code class="language-python">def _post(self, query: str) -> list[dict]:
+    """Tenta cada espelho da Overpass até um responder."""
+    ultimo_erro: Exception | None = None
+    for url in self.endpoints:
+        try:
+            resp = httpx.post(
+                url,
+                data={"data": query},      # form-data, não JSON
+                timeout=self.timeout,       # 90s — a Overpass pode demorar
+                headers={"User-Agent": config.USER_AGENT},
+            )
+            resp.raise_for_status()        # lança HTTPStatusError se 4xx/5xx
+            return resp.json().get("elements", [])
+        except Exception as exc:
+            ultimo_erro = exc
+            continue                       # tenta o próximo espelho
+    raise RuntimeError(f"Todos os espelhos falharam. Último: {ultimo_erro}")</code></pre>
+
+      <div class="callout info">
+        <div class="callout-title">Por que data= e não json=?</div>
+        A Overpass API foi projetada nos anos 2000 e aceita a query como <strong>form data</strong> (application/x-www-form-urlencoded), não JSON. O parâmetro <code>data={"data": query}</code> envia exatamente isso. <code>json=</code> mandaria Content-Type: application/json, que a Overpass não entende.
+      </div>
+
+      <h4>Como usamos: httpx.post() — Serper API</h4>
+      <p>O Serper usa JSON moderno. A diferença está no <code>json=</code> e nos headers de autenticação:</p>
+      <span class="code-label">src/fabrica_sites/agents/scout/sources/serper.py</span>
+<pre><code class="language-python">def _search(self, query: str) -> list[dict]:
+    resp = httpx.post(
+        _SERPER_URL,          # "https://google.serper.dev/maps"
+        headers={
+            "X-API-KEY": self._api_key,         # autenticação via header
+            "Content-Type": "application/json",
+        },
+        json={                                   # serializa dict para JSON
+            "q": query,
+            "gl": "br",      # geolocalização: Brasil
+            "hl": "pt-br",   # idioma da resposta
+            "num": self._max_results,
+        },
+        timeout=15.0,
+    )
+    resp.raise_for_status()
+    return resp.json().get("places", [])</code></pre>
+
+      <h4>Como usamos: httpx.head() — DomainGuesser</h4>
+      <p>Para verificar se um domínio existe sem baixar o corpo da página, usamos HEAD. É ~10× mais rápido que GET:</p>
+      <span class="code-label">src/fabrica_sites/agents/scout/enrichers/domain_guesser.py</span>
+<pre><code class="language-python">def _checar_dominio(dominio: str, timeout: float) -> bool:
+    """HEAD request; True se responder com status &lt; 400."""
+    for scheme in ("https", "http"):     # tenta HTTPS primeiro
+        try:
+            resp = httpx.head(
+                f"{scheme}://{dominio}",
+                headers={"User-Agent": _UA},
+                follow_redirects=True,   # segue 301/302 — importante!
+                timeout=timeout,         # 3s por padrão
+            )
+            if resp.status_code &lt; 400:
+                return True
+        except Exception:
+            continue                     # qualquer erro = domínio não responde
+    return False</code></pre>
+
+      <div class="callout tip">
+        <div class="callout-title">Por que follow_redirects=True?</div>
+        Muitos sites respondem ao domínio raiz com redirect 301 para www.dominio.com.br. Sem <code>follow_redirects=True</code>, o HEAD retornaria 301 que não passaria no teste <code>&lt; 400</code>... e classificaríamos como "não existe". Com o follow ativo, seguimos até o destino final.
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-title">O que poderia melhorar</div>
+        Criamos um novo cliente httpx por chamada de <code>_checar_dominio</code>. O ideal seria um <strong>Client compartilhado</strong> por thread, pois o Client mantém um pool de conexões e reutiliza conexões TCP. Para a escala atual (300 negócios) é aceitável. Em escala maior, mudaria para <code>httpx.Client()</code> como context manager dentro do ThreadPoolExecutor.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.2 Pydantic ─── -->
+  <div class="lib-card" id="pydantic">
+    <div class="lib-header">
+      <span class="lib-icon">🛡️</span>
+      <div>
+        <span class="lib-name">Pydantic v2</span>
+        <span class="lib-version">&ge;2.0</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">Validação de dados e tipagem em runtime</span>
+    </div>
+    <div class="lib-body">
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.pydantic.dev/latest/" target="_blank" rel="noopener">Documentação v2</a>
+        <a class="doc-link" href="https://docs.pydantic.dev/latest/concepts/models/" target="_blank" rel="noopener">BaseModel</a>
+        <a class="doc-link" href="https://docs.pydantic.dev/latest/api/fields/" target="_blank" rel="noopener">Field()</a>
+        <a class="doc-link" href="https://docs.pydantic.dev/latest/concepts/serialization/" target="_blank" rel="noopener">Serialização</a>
+        <a class="doc-link" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel.model_copy" target="_blank" rel="noopener">model_copy()</a>
+      </div>
+
+      <p>Pydantic transforma dicionários (dados brutos de API) em objetos Python com tipos validados. No Pydantic v2, o mecanismo interno foi reescrito em Rust — a validação é ~5-50× mais rápida que v1.</p>
+
+      <h4>Nosso modelo central: Business</h4>
+      <span class="code-label">src/fabrica_sites/models.py</span>
+<pre><code class="language-python">class Business(BaseModel):
+    """Negócio classificado e pontuado — a unidade central do Scout."""
+
+    # Identidade (vinda do OSM)
+    osm_type: str
+    osm_id: int
+    nome: str | None = None
+
+    # Classificação de setor
+    setor: str = "outros"
+    setor_nome: str = "Outros"
+
+    # Localização
+    lat: float | None = None
+    lon: float | None = None
+    endereco: str | None = None
+
+    # Contato
+    telefone: str | None = None
+    email: str | None = None
+    website: str | None = None
+    website_kind: WebsiteKind = WebsiteKind.NENHUM
+
+    # Avaliação de oportunidade
+    site_status: SiteStatus = SiteStatus.DESCONHECIDO
+    score: int = 0
+    score_label: str = "BAIXA"
+    score_motivos: list[str] = Field(default_factory=list)
+    contactavel: bool = False
+
+    raw_tags: dict[str, str] = Field(default_factory=dict)
+
+    @property
+    def osm_url(self) -> str:
+        return f"https://www.openstreetmap.org/{self.osm_type}/{self.osm_id}"</code></pre>
+
+      <div class="callout info">
+        <div class="callout-title">Por que Field(default_factory=list) e não = []?</div>
+        Em Python, um argumento padrão mutável (como <code>= []</code>) é compartilhado entre TODAS as instâncias da classe — um bug clássico. <code>Field(default_factory=list)</code> instrui o Pydantic a chamar <code>list()</code> para cada nova instância, garantindo listas independentes. O Pydantic v2 já detectaria a lista muda e jogaria erro, mas é boa prática explicitar.
+      </div>
+
+      <h4>Enums como tipos de dado</h4>
+      <p>Usamos <code>str, Enum</code> — os enums herdam de str para ser serializáveis sem conversão extra:</p>
+<pre><code class="language-python">class SiteStatus(str, Enum):
+    SEM_SITE = "SEM_SITE"
+    SO_REDE_SOCIAL = "SO_REDE_SOCIAL"
+    COM_SITE = "COM_SITE"
+    DESCONHECIDO = "DESCONHECIDO"</code></pre>
+      <p>Herdar de <code>str</code> significa que <code>SiteStatus.SEM_SITE == "SEM_SITE"</code> é <code>True</code> e o JSON gerado usa a string, não o objeto enum. Isso simplifica banco de dados, templates Jinja2 e comparações em testes.</p>
+
+      <h4>model_copy() — imutabilidade nos enriquecedores</h4>
+      <p>O DomainGuesser descobre um site e precisa atualizar o Business. Em vez de mutar o objeto existente, criamos uma <em>cópia atualizada</em>:</p>
+      <span class="code-label">src/fabrica_sites/agents/scout/enrichers/domain_guesser.py</span>
+<pre><code class="language-python">def _rescore(b: Business, novo_website: str) -> Business:
+    """Cria nova instância de Business com site descoberto e score recalculado."""
+    campos = {
+        "website_kind": WebsiteKind.PROPRIO,
+        "setor": b.setor,
+        "telefone": b.telefone,
+        "email": b.email,
+        "horario": b.horario,
+        "endereco": b.endereco,
+    }
+    nova_aval = scorer_module.score(campos)
+    return b.model_copy(update={        # cria nova instância, b original intacto
+        "website": novo_website,
+        "website_kind": WebsiteKind.PROPRIO,
+        **nova_aval,                    # spread do dict de pontuação
+    })</code></pre>
+
+      <div class="callout tip">
+        <div class="callout-title">Por que imutabilidade aqui?</div>
+        O <code>enrich()</code> recebe uma lista e a devolve modificada. Se mutarmos os objetos no lugar, o chamador original vê mudanças inesperadas (side effects). Com <code>model_copy()</code>, o Business original fica intacto e a função é previsível — característica de funções <em>puras</em>. Facilita testar, depurar e raciocinar.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.3 Typer ─── -->
+  <div class="lib-card" id="typer">
+    <div class="lib-header">
+      <span class="lib-icon">⌨️</span>
+      <div>
+        <span class="lib-name">Typer</span>
+        <span class="lib-version">&ge;0.12</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">CLI declarativo baseado em type hints</span>
+    </div>
+    <div class="lib-body">
+      <div class="lib-links">
+        <a class="doc-link" href="https://typer.tiangolo.com/" target="_blank" rel="noopener">Documentação</a>
+        <a class="doc-link" href="https://typer.tiangolo.com/tutorial/subcommands/add-typer/" target="_blank" rel="noopener">Sub-comandos</a>
+        <a class="doc-link" href="https://typer.tiangolo.com/tutorial/options/" target="_blank" rel="noopener">Options</a>
+      </div>
+
+      <p>Typer usa os <strong>type hints das funções Python</strong> para gerar automaticamente um parser de linha de comando com help, validação de tipos e autocompletar. Foi criado pelo mesmo autor do FastAPI.</p>
+
+      <h4>Sub-comandos: app e scout_app</h4>
+      <span class="code-label">src/fabrica_sites/cli.py</span>
+<pre><code class="language-python">app = typer.Typer(help="Fábrica de Sites — sistema multiagente.",
+                  no_args_is_help=True)
+scout_app = typer.Typer(help="Agente Scout — prospecção e contexto.",
+                        no_args_is_help=True)
+app.add_typer(scout_app, name="scout")  # aninha: "fabrica scout ..."
+
+@scout_app.command("run")
+def scout_run(
+    cidade: str = typer.Option(config.DEFAULT_CITY, "--cidade", "-c"),
+    limit: Optional[int] = typer.Option(None, "--limit", "-l",
+        help="Limita o nº de negócios (útil para teste rápido)."),
+    enriquecer: bool = typer.Option(False, "--enriquecer", "-e",
+        help="Ativa enriquecedores pós-coleta: DomainGuesser, Serper."),
+    com_serper: bool = typer.Option(False, "--com-serper",
+        help="Adiciona Serper.dev como fonte secundária."),
+) -> None:
+    ...</code></pre>
+
+      <p>Typer lê a assinatura e gera automaticamente:</p>
+      <ul>
+        <li><code>--cidade</code> / <code>-c</code> com valor padrão da config</li>
+        <li><code>--limit</code> / <code>-l</code> como inteiro opcional</li>
+        <li><code>--enriquecer</code> / <code>-e</code> como flag booleana</li>
+        <li><code>--help</code> com o texto do docstring da função</li>
+      </ul>
+
+      <div class="callout info">
+        <div class="callout-title">no_args_is_help=True</div>
+        Sem essa opção, rodar <code>fabrica</code> sem argumentos não faz nada. Com ela, exibe o help automaticamente — comportamento esperado por qualquer CLI profissional.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.4 Rich ─── -->
+  <div class="lib-card" id="rich">
+    <div class="lib-header">
+      <span class="lib-icon">🎨</span>
+      <div>
+        <span class="lib-name">Rich</span>
+        <span class="lib-version">&ge;13.0</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">Saída bonita no terminal (tabelas, cores, status)</span>
+    </div>
+    <div class="lib-body">
+      <div class="lib-links">
+        <a class="doc-link" href="https://rich.readthedocs.io/" target="_blank" rel="noopener">Documentação</a>
+        <a class="doc-link" href="https://rich.readthedocs.io/en/stable/panel.html" target="_blank" rel="noopener">Panel</a>
+        <a class="doc-link" href="https://rich.readthedocs.io/en/stable/tables.html" target="_blank" rel="noopener">Table</a>
+        <a class="doc-link" href="https://rich.readthedocs.io/en/stable/console.html#status" target="_blank" rel="noopener">Status spinner</a>
+      </div>
+
+      <p>Rich transforma o terminal em uma interface visual. Usamos três recursos principais:</p>
+
+      <h4>Panel.fit() — painel de contexto</h4>
+<pre><code class="language-python">from rich.panel import Panel
+from rich.console import Console
+
+console = Console()
+console.print(Panel.fit(
+    f"[bold]🔭 Agente Scout[/]\n"
+    f"Cidade: [cyan]{cidade}[/]\n"
+    f"Fontes: [dim]{fontes_str}[/]\n"
+    f"Enriquecedores: [dim]{enriq_str}[/]",
+    border_style="cyan",
+))</code></pre>
+      <p>A <strong>markup Rich</strong> usa colchetes: <code>[bold]texto[/bold]</code>, <code>[cyan]texto[/]</code>. O <code>[/]</code> fecha qualquer tag aberta.</p>
+
+      <h4>Table — top 10 leads</h4>
+<pre><code class="language-python">from rich.table import Table
+
+tabela = Table(title="\n⭐ Top 10 leads", header_style="bold")
+tabela.add_column("Nome")
+tabela.add_column("Setor")
+tabela.add_column("Score", justify="right")   # alinhamento por coluna
+for b in dados["top_leads"][:10]:
+    tabela.add_row(
+        b.nome or "(sem nome)",
+        b.setor_nome,
+        str(b.score),
+    )</code></pre>
+
+      <h4>console.status() — spinner de loading</h4>
+<pre><code class="language-python">with console.status("[cyan]Consultando fontes de dados...[/]"):
+    run = run_scout(cidade, ...)
+# O spinner desaparece automaticamente ao sair do bloco with</code></pre>
+
+      <div class="callout warn">
+        <div class="callout-title">Windows e encoding UTF-8</div>
+        No Windows, o terminal usa CP1252 por padrão e não renderiza emojis. A solução: <code>$env:PYTHONIOENCODING="utf-8"</code> antes de rodar. O Rich detecta automaticamente se o terminal suporta unicode e degrada graciosamente, mas no PowerShell antigo às vezes é necessário forçar.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.5 Jinja2 ─── -->
+  <div class="lib-card" id="jinja2">
+    <div class="lib-header">
+      <span class="lib-icon">📄</span>
+      <div>
+        <span class="lib-name">Jinja2</span>
+        <span class="lib-version">&ge;3.1</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">Motor de templates (gera os relatórios HTML)</span>
+    </div>
+    <div class="lib-body">
+      <div class="lib-links">
+        <a class="doc-link" href="https://jinja.palletsprojects.com/" target="_blank" rel="noopener">Documentação</a>
+        <a class="doc-link" href="https://jinja.palletsprojects.com/en/stable/templates/" target="_blank" rel="noopener">Sintaxe de templates</a>
+        <a class="doc-link" href="https://jinja.palletsprojects.com/en/stable/api/#jinja2.Environment" target="_blank" rel="noopener">Environment</a>
+        <a class="doc-link" href="https://jinja.palletsprojects.com/en/stable/api/#jinja2.FileSystemLoader" target="_blank" rel="noopener">FileSystemLoader</a>
+      </div>
+
+      <p>Jinja2 é o mesmo motor de templates do Flask e do Django (com sintaxe ligeiramente diferente). Permite misturar HTML com lógica Python de forma limpa e segura.</p>
+
+      <h4>Como usamos: Environment e render_template</h4>
+<pre><code class="language-python"># src/fabrica_sites/agents/scout/reporter.py (simplificado)
+from jinja2 import Environment, FileSystemLoader
+from pathlib import Path
+
+_TEMPLATES_DIR = Path(__file__).parent / "templates"
+
+def render(run: ScoutRun, out: Path) -> Path:
+    env = Environment(
+        loader=FileSystemLoader(_TEMPLATES_DIR),
+        autoescape=True,       # escapa &lt;, &gt;, &amp; automaticamente — previne XSS
+    )
+    template = env.get_template("relatorio.html.j2")
+    dados = insighter.compute(run)
+    html = template.render(run=run, **dados)    # injeta variáveis no template
+    out.write_text(html, encoding="utf-8")
+    return out</code></pre>
+
+      <h4>Sintaxe Jinja2 usada no template</h4>
+<pre><code class="language-python">{# Template: templates/relatorio.html.j2 #}
+
+{# {{ }} para imprimir valor #}
+&lt;h1&gt;{{ run.cidade }}&lt;/h1&gt;
+
+{# {% %} para lógica de controle #}
+{% for b in top_leads[:10] %}
+  &lt;tr&gt;
+    &lt;td&gt;{{ b.nome or "(sem nome)" }}&lt;/td&gt;
+    &lt;td&gt;{{ b.score }}&lt;/td&gt;
+    &lt;td style="color: {% if b.score >= 80 %}#3fb950{% else %}#f59e0b{% endif %}"&gt;
+      {{ b.score_label }}
+    &lt;/td&gt;
+  &lt;/tr&gt;
+{% endfor %}
+
+{# Filtros Jinja2 #}
+{{ run.gerado_em | datetimeformat }}   {# filtro customizado #}
+{{ texto | truncate(50) }}             {# filtro built-in #}</code></pre>
+
+      <div class="callout tip">
+        <div class="callout-title">autoescape=True é importante</div>
+        Sem autoescape, se um negócio tiver nome como <code>Loja &lt;Especial&gt;</code>, o HTML gerado quebraria. Com autoescape, o Jinja2 converte automaticamente para <code>&amp;lt;Especial&amp;gt;</code>, mantendo a exibição correta e segura.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.6 python-dotenv ─── -->
+  <div class="lib-card" id="dotenv">
+    <div class="lib-header">
+      <span class="lib-icon">🔑</span>
+      <div>
+        <span class="lib-name">python-dotenv</span>
+        <span class="lib-version">&ge;1.0</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">Carrega variáveis de ambiente do arquivo .env</span>
+    </div>
+    <div class="lib-body">
+      <div class="lib-links">
+        <a class="doc-link" href="https://saurabh-kumar.com/python-dotenv/" target="_blank" rel="noopener">Documentação</a>
+        <a class="doc-link" href="https://github.com/theskumar/python-dotenv" target="_blank" rel="noopener">GitHub</a>
+      </div>
+
+      <p>Chaves de API não devem ir no código — vão no ambiente. O <code>python-dotenv</code> carrega um arquivo <code>.env</code> para variáveis de ambiente antes de qualquer acesso via <code>os.getenv()</code>.</p>
+
+      <h4>A ordem importa: load_dotenv() antes de tudo</h4>
+      <span class="code-label">src/fabrica_sites/config.py</span>
+<pre><code class="language-python">from dotenv import load_dotenv
+from pathlib import Path
+import os
+
+# Carrega .env da raiz do projeto.
+# override=False: se a variável JÁ estiver no ambiente (ex: CI), não sobrescreve.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env", override=False)
+
+# Agora os os.getenv() leem tanto o ambiente real quanto o .env
+SERPER_API_KEY: str | None = os.getenv("SERPER_API_KEY") or None
+DEFAULT_CITY: str = os.getenv("CIDADE_ALVO", "Guarujá")</code></pre>
+
+      <h4>O arquivo .env</h4>
+<pre><code class="language-bash">SERPER_API_KEY=sua_chave_aqui
+CIDADE_ALVO=Guarujá
+# GOOGLE_MAPS_API_KEY=
+# GEMINI_API_KEY=</code></pre>
+
+      <div class="callout warn">
+        <div class="callout-title">.env no .gitignore — SEMPRE</div>
+        O arquivo <code>.env</code> contém chaves privadas e <strong>nunca</strong> deve ir para o repositório. O projeto já tem <code>.gitignore</code> com <code>.env</code> listado. Para outros colaboradores, existe um <code>.env.example</code> com as chaves mas sem os valores.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 2.7 pytest ─── -->
+  <div class="lib-card" id="pytest">
+    <div class="lib-header">
+      <span class="lib-icon">🧪</span>
+      <div>
+        <span class="lib-name">pytest</span>
+        <span class="lib-version">&ge;8.0</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">Framework de testes — 77 testes, 0.70s</span>
+    </div>
+    <div class="lib-body">
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.pytest.org/" target="_blank" rel="noopener">Documentação</a>
+        <a class="doc-link" href="https://docs.pytest.org/en/stable/reference/fixtures.html" target="_blank" rel="noopener">Fixtures</a>
+        <a class="doc-link" href="https://docs.pytest.org/en/stable/how-to/monkeypatch.html" target="_blank" rel="noopener">monkeypatch</a>
+        <a class="doc-link" href="https://docs.pytest.org/en/stable/how-to/parametrize.html" target="_blank" rel="noopener">parametrize</a>
+        <a class="doc-link" href="https://docs.pytest.org/en/stable/how-to/capture.html" target="_blank" rel="noopener">capsys</a>
+      </div>
+
+      <h4>@pytest.mark.parametrize — testes em série</h4>
+      <p>Permite rodar o mesmo teste com múltiplos inputs sem repetir código:</p>
+      <span class="code-label">tests/test_domain_guesser.py</span>
+<pre><code class="language-python">@pytest.mark.parametrize("nome, esperado", [
+    ("Pousada", False),
+    ("Bar", False),
+    ("Lan House", False),
+    ("Hotel Ilhas da Grécia", True),
+    ("Pousada Caiçara", True),
+    ("McDonald's", True),
+    ("Drogaria São Paulo", True),
+])
+def test_nome_vale_tentar(nome, esperado):
+    assert _nome_vale_tentar(nome) == esperado</code></pre>
+      <p>Isso gera 7 testes independentes, cada um com seu nome descritivo no output. Se um falhar, os outros continuam.</p>
+
+      <h4>monkeypatch — substituir rede por mock</h4>
+      <p>O <code>monkeypatch</code> é uma fixture especial que substitui funções/atributos durante o teste e desfaz a substituição automaticamente ao final. Essencial para testes sem rede:</p>
+<pre><code class="language-python">def test_checar_dominio_verdadeiro_para_status_200(monkeypatch):
+    # Cria uma resposta falsa que sempre retorna 200
+    class _FakeResp:
+        status_code = 200
+
+    # Substitui httpx.head pelo nosso mock (só durante este teste)
+    monkeypatch.setattr(
+        "fabrica_sites.agents.scout.enrichers.domain_guesser.httpx.head",
+        lambda *a, **kw: _FakeResp(),
+    )
+
+    assert _checar_dominio("qualquerdominio.com.br", timeout=1.0) is True
+    # Após o teste: httpx.head é restaurado ao original automaticamente</code></pre>
+
+      <div class="callout info">
+        <div class="callout-title">Por que monkeypatch em vez de unittest.mock?</div>
+        O <code>monkeypatch</code> do pytest é mais simples para casos comuns. <code>unittest.mock</code> tem mais poder (verify call counts, assert_called_with, etc.) mas exige mais boilerplate. Para este projeto, monkeypatch é suficiente e mais legível.
+      </div>
+
+      <h4>capsys — capturar saída do terminal em testes</h4>
+<pre><code class="language-python">def test_imprimir_baseline_de_desempenho(capsys):
+    """Imprime métricas de referência. Sempre passa — serve como documentação."""
+    # ... mede e acumula resultados ...
+    with capsys.disabled():    # permite que print() apareça mesmo com -s
+        print("\n--- Baseline de desempenho ---")
+        # ...</code></pre>
+
+      <h4>Como os 77 testes estão organizados</h4>
+      <table>
+        <tr><th>Arquivo</th><th>Foco</th><th>Testes</th></tr>
+        <tr><td><code>test_sectors.py</code></td><td>Classificação de setor (tags OSM → setor)</td><td>16</td></tr>
+        <tr><td><code>test_scorer.py</code></td><td>Cálculo do score de oportunidade</td><td>5</td></tr>
+        <tr><td><code>test_pipeline.py</code></td><td>Pipeline completo do Scout (integração)</td><td>4</td></tr>
+        <tr><td><code>test_domain_guesser.py</code></td><td>DomainGuesser (geração, filtros, HTTP)</td><td>29</td></tr>
+        <tr><td><code>test_serper_source.py</code></td><td>SerperSource (parsing, dedup, sem-chave)</td><td>11</td></tr>
+        <tr><td><code>test_performance.py</code></td><td>Benchmarks (timing + memória, sem rede)</td><td>12</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── 2.8 Stdlib ─── -->
+  <div class="lib-card" id="stdlib">
+    <div class="lib-header">
+      <span class="lib-icon">🐍</span>
+      <div>
+        <span class="lib-name">Stdlib Essencial</span>
+        <span class="lib-version">built-in</span>
+      </div>
+      <span style="margin-left:auto;color:var(--text3);font-size:12px">Módulos da biblioteca padrão Python usados no projeto</span>
+    </div>
+    <div class="lib-body">
+
+      <h4>abc — Abstract Base Classes</h4>
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.python.org/3/library/abc.html" target="_blank" rel="noopener">Docs abc</a>
+      </div>
+      <p>Define as interfaces <code>BusinessSource</code> e <code>BusinessEnricher</code>. Qualquer classe que herdar e não implementar o método abstrato levanta <code>TypeError</code> na instanciação:</p>
+<pre><code class="language-python">from abc import ABC, abstractmethod
+
+class BusinessSource(ABC):
+    name: str = "desconhecida"
+
+    @abstractmethod
+    def fetch(self, cidade: str, admin_level: int = 8,
+              limit: int | None = None) -> Iterable[RawPlace]:
+        raise NotImplementedError
+        # Se uma subclasse não implementar fetch(), Python levanta:
+        # TypeError: Can't instantiate abstract class MinhaFonte
+        # without an implementation for abstract method 'fetch'</code></pre>
+
+      <h4>concurrent.futures — ThreadPoolExecutor</h4>
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.python.org/3/library/concurrent.futures.html" target="_blank" rel="noopener">Docs concurrent.futures</a>
+        <a class="doc-link" href="https://docs.python.org/3/library/concurrent.futures.html#threadpoolexecutor" target="_blank" rel="noopener">ThreadPoolExecutor</a>
+        <a class="doc-link" href="https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.as_completed" target="_blank" rel="noopener">as_completed()</a>
+      </div>
+      <p>O DomainGuesser verifica ~300 domínios em paralelo. Sem threads, seria sequencial e levaria minutos:</p>
+<pre><code class="language-python">from concurrent.futures import ThreadPoolExecutor, as_completed
+
+with ThreadPoolExecutor(max_workers=15) as pool:
+    # Submete todas as verificações ao pool
+    futures = {
+        pool.submit(_encontrar_site, b.nome, self.timeout): i
+        for i, b in alvos.items()
+    }
+    # as_completed() itera na ordem de conclusão (não de submissão)
+    for future in as_completed(futures):
+        idx = futures[future]
+        resultado = future.result()  # pode lançar exceção se a função falhou
+        if resultado:
+            encontrados[idx] = resultado</code></pre>
+
+      <div class="callout info">
+        <div class="callout-title">Thread vs Process</div>
+        Usamos <strong>Thread</strong>Pool (não Process). Tarefas I/O-bound (esperar resposta HTTP) se beneficiam de threads porque a thread fica bloqueada aguardando rede — liberando o GIL para outras. Para CPU-bound (cálculos pesados), ProcessPoolExecutor seria melhor. DomainGuesser é puramente I/O, então threads são a escolha certa.
+      </div>
+
+      <h4>tracemalloc — pico de memória RAM</h4>
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.python.org/3/library/tracemalloc.html" target="_blank" rel="noopener">Docs tracemalloc</a>
+      </div>
+<pre><code class="language-python">import tracemalloc
+
+tracemalloc.start()
+# ... código a medir ...
+_, pico_bytes = tracemalloc.get_traced_memory()
+# get_traced_memory() retorna (atual, pico_historico)
+tracemalloc.stop()
+pico_kb = pico_bytes / 1024</code></pre>
+      <p>Resultado medido: <strong>~3.2 KB por negócio</strong> no pipeline (100 negócios = 323 KB, 500 negócios = 1597 KB — crescimento linear, sem vazamento).</p>
+
+      <h4>urllib.parse — urlparse para domínios</h4>
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlparse" target="_blank" rel="noopener">urlparse()</a>
+      </div>
+      <p>Usado no <code>_is_social()</code> do classifier para extrair o domínio real de uma URL (evitando o bug com substring):</p>
+<pre><code class="language-python">from urllib.parse import urlparse
+
+def _is_social(url: str) -> bool:
+    try:
+        netloc = urlparse(url).netloc.lower()
+        # urlparse("https://www.salaox.com.br/page").netloc == "www.salaox.com.br"
+        host = netloc.removeprefix("www.")
+        # host == "salaox.com.br" — NÃO é x.com
+        return any(host == dom or host.endswith("." + dom)
+                   for dom in _SOCIAL_DOMAINS)
+    except Exception:
+        u = url.lower()
+        return any(dom in u for dom in _SOCIAL_DOMAINS)  # fallback</code></pre>
+
+      <div class="callout info">
+        <div class="callout-title">O bug que isso corrigiu</div>
+        O código original usava <code>any(dom in url)</code>. O domínio <code>"x.com"</code> (Twitter/X) é substring de <code>"salaox.com.br"</code> — então um salão de beleza estava sendo classificado como rede social! O <code>urlparse</code> extrai o domínio real e resolve o problema na raiz.
+      </div>
+
+      <h4>hashlib — IDs sintéticos para o Serper</h4>
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.python.org/3/library/hashlib.html" target="_blank" rel="noopener">Docs hashlib</a>
+      </div>
+<pre><code class="language-python">import hashlib
+
+def _serper_id(title: str, address: str) -> int:
+    """ID sintético estável: MD5 de (título+endereço), truncado a 31 bits."""
+    raw = f"{title}|{address}".encode("utf-8")
+    h = hashlib.md5(raw).hexdigest()
+    return int(h[:8], 16) & 0x7FFF_FFFF  # sempre positivo (bit de sinal zerado)</code></pre>
+      <p>O OSM usa IDs inteiros reais. O Serper não tem IDs — então geramos um ID determinístico: o mesmo negócio sempre produzirá o mesmo ID, permitindo deduplicação entre execuções.</p>
+
+      <h4>unicodedata + re — slugificação de texto</h4>
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.python.org/3/library/unicodedata.html" target="_blank" rel="noopener">unicodedata</a>
+        <a class="doc-link" href="https://docs.python.org/3/library/re.html" target="_blank" rel="noopener">re</a>
+      </div>
+<pre><code class="language-python">import unicodedata, re
+
+def _ascii_slug(text: str) -> str:
+    """Texto → slug ASCII: sem acentos, minúsculas, sem espaços."""
+    # NFKD decompõe "é" em "e" + combining accent
+    text = unicodedata.normalize("NFKD", text)
+    # encode/decode joga fora os combining accents
+    text = text.encode("ascii", "ignore").decode("ascii")
+    # remove qualquer coisa que não seja letra, número ou espaço
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
+    # remove espaços
+    return re.sub(r"\s+", "", text).lower()
+
+# "Hotel Ilhas da Grécia" → "hotelilhasdagrecia"
+# "Salão Beleza & Arte"   → "salaobelezaarte"</code></pre>
+
+      <h4>dataclasses — Sector imutável</h4>
+      <div class="lib-links">
+        <a class="doc-link" href="https://docs.python.org/3/library/dataclasses.html" target="_blank" rel="noopener">Docs dataclasses</a>
+      </div>
+<pre><code class="language-python">from dataclasses import dataclass, field
+
+@dataclass(frozen=True)     # frozen=True torna o objeto imutável (hashável)
+class Sector:
+    key: str
+    nome: str
+    emoji: str
+    cor: str
+    prioritario: bool
+    matchers: tuple[tuple[str, object], ...] = field(default_factory=tuple)</code></pre>
+      <p><code>frozen=True</code> significa que após criado, nenhum atributo pode ser alterado — um erro seria levantado. Faz sentido para setores, que são definidos uma vez e nunca mudam em runtime. Pydantic seria exagero aqui: não precisamos de validação, só de um container de dados imutável.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SEÇÃO 3: ARQUITETURA ═══════════════════════════ -->
+<div class="section" id="arch">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Arquitetura — Teoria e Prática</h2>
+  </div>
+
+  <!-- ─── 3.1 src layout ─── -->
+  <div class="subsection" id="src-layout">
+    <h3>3.1 src layout</h3>
+    <div class="lib-links">
+      <a class="doc-link" href="https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/" target="_blank" rel="noopener">PyPA: src vs flat layout</a>
+      <a class="doc-link" href="https://hynek.me/articles/testing-packaging/" target="_blank" rel="noopener">Hynek Schlawack — Testing &amp; Packaging</a>
+    </div>
+
+    <p>O projeto usa o <strong>src layout</strong>: o código do pacote vive em <code>src/fabrica_sites/</code>, não na raiz:</p>
+<pre><code class="language-bash">Agente_Criador_de_Sites/
+├── src/
+│   └── fabrica_sites/          # pacote Python principal
+│       ├── agents/
+│       │   └── scout/
+│       │       ├── sources/    # fontes de dados (OSM, Serper)
+│       │       ├── enrichers/  # enriquecedores (DomainGuesser)
+│       │       ├── classifier.py
+│       │       ├── scorer.py
+│       │       ├── scout.py    # orquestrador
+│       │       └── reporter.py
+│       ├── core/
+│       │   └── sectors.py
+│       ├── models.py           # tipos de dado (Pydantic)
+│       ├── config.py           # configurações centrais
+│       ├── db.py               # persistência SQLite
+│       └── cli.py              # interface de linha de comando
+├── tests/
+├── scripts/
+├── docs/
+└── data/</code></pre>
+
+    <p><strong>Por que colocar o código em src/ e não na raiz?</strong> Este é um debate antigo na comunidade Python, mas a resposta moderna é clara:</p>
+    <ul>
+      <li><strong>Evita importação acidental</strong>: se o código ficasse na raiz (ex.: <code>fabrica_sites/</code>), um <code>import fabrica_sites</code> rodado DA raiz importaria o código não-instalado. Com src/, Python só encontra o pacote se ele estiver instalado (via <code>pip install -e .</code>), garantindo que os testes usam exatamente o mesmo pacote que o usuário final usará.</li>
+      <li><strong>Separação clara</strong>: tests/, docs/, scripts/ ficam na raiz — fora do pacote. Não há risco de acidentalmente incluir arquivos de teste no pacote distribuível.</li>
+    </ul>
+  </div>
+
+  <!-- ─── 3.2 Plugin Pattern ─── -->
+  <div class="subsection" id="plugin-pattern">
+    <h3>3.2 Plugin Pattern com ABCs</h3>
+    <div class="lib-links">
+      <a class="doc-link" href="https://docs.python.org/3/library/abc.html" target="_blank" rel="noopener">ABC Python docs</a>
+      <a class="doc-link" href="https://refactoring.guru/design-patterns/strategy" target="_blank" rel="noopener">Strategy Pattern</a>
+      <a class="doc-link" href="https://en.wikipedia.org/wiki/Open%E2%80%93closed_principle" target="_blank" rel="noopener">Open/Closed Principle</a>
+    </div>
+
+    <p>O coração da arquitetura é o <strong>Plugin Pattern</strong> (também chamado de Strategy Pattern): definimos contratos abstratos que o pipeline usa, e qualquer implementação que respeite o contrato pode ser plugada sem mudar o código do pipeline.</p>
+
+    <p>Temos dois contratos principais:</p>
+
+<pre><code class="language-python"># CONTRATO 1: Fonte de dados
+class BusinessSource(ABC):
+    """De onde vêm os negócios."""
+    name: str = "desconhecida"
+
+    @abstractmethod
+    def fetch(self, cidade: str, admin_level: int = 8,
+              limit: int | None = None) -> Iterable[RawPlace]:
+        raise NotImplementedError
+
+# CONTRATO 2: Enriquecedor de dados
+class BusinessEnricher(ABC):
+    """Melhora negócios já encontrados."""
+    name: str = "desconhecido"
+
+    @abstractmethod
+    def enrich(self, businesses: list[Business], cidade: str) -> list[Business]:
+        raise NotImplementedError</code></pre>
+
+    <p>O orquestrador <code>run_scout()</code> trabalha <em>apenas com as interfaces</em> — nunca com implementações concretas:</p>
+<pre><code class="language-python">def run_scout(cidade: str, sources: list[BusinessSource] | None = None,
+              enrichers: list[BusinessEnricher] | None = None) -> ScoutRun:
+    # O scout não sabe se a fonte é Overpass, Serper, ou um CSV local
+    for src in lista_fontes:
+        raw_list = list(src.fetch(cidade, admin_level=admin_level, limit=limit))
+        brutos_por_fonte.append((src.name, raw_list))
+    # ...
+    for enricher in enrichers:
+        negocios = enricher.enrich(negocios, cidade)
+    # ...</code></pre>
+
+    <div class="callout tip">
+      <div class="callout-title">Open/Closed Principle</div>
+      O pipeline está <strong>aberto para extensão</strong> (posso adicionar GooglePlacesSource, CSVSource, LinkedInSource) mas <strong>fechado para modificação</strong> (o scout.py não precisa mudar). Isso é o Open/Closed Principle do SOLID, e é exatamente o que ABCs permitem.
+    </div>
+
+    <p>Para adicionar uma nova fonte de dados, basta criar uma classe que herde de <code>BusinessSource</code>:</p>
+<pre><code class="language-python">class GooglePlacesSource(BusinessSource):
+    name = "Google Places"
+
+    def fetch(self, cidade: str, admin_level: int = 8,
+              limit: int | None = None) -> list[RawPlace]:
+        # implementação usando Google Places API...
+        pass
+
+# E usar sem mudar nada no pipeline:
+run_scout("Guarujá", sources=[OverpassSource(), GooglePlacesSource()])</code></pre>
+  </div>
+
+  <!-- ─── 3.3 Pipeline ─── -->
+  <div class="subsection" id="pipeline">
+    <h3>3.3 O Pipeline em 5 Estágios</h3>
+
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="n">1️⃣</div>
+        <div class="t">COLETA</div>
+        <div class="d">Sources → RawPlace[]</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="n">2️⃣</div>
+        <div class="t">DEDUP</div>
+        <div class="d">por ID e nome</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="n">3️⃣</div>
+        <div class="t">CLASSIF</div>
+        <div class="d">RawPlace → Business</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="n">4️⃣</div>
+        <div class="t">ENRIQ</div>
+        <div class="d">Enrichers opcionais</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="n">5️⃣</div>
+        <div class="t">SORT</div>
+        <div class="d">score desc</div>
+      </div>
+    </div>
+
+<pre><code class="language-python">def run_scout(cidade, admin_level=8, limit=None,
+              source=None, sources=None, enrichers=None) -> ScoutRun:
+
+    # ── ESTÁGIO 1: COLETA ─────────────────────────────────────────────
+    brutos_por_fonte = []
+    for src in lista_fontes:
+        raw_list = list(src.fetch(cidade, admin_level=admin_level, limit=limit))
+        brutos_por_fonte.append((src.name, raw_list))
+
+    # ── ESTÁGIO 2: DEDUPLICAÇÃO ───────────────────────────────────────
+    # Primeira passagem: por (osm_type, osm_id) — exata
+    vistos_ids: set[tuple[str, int]] = set()
+    negocios: list[Business] = []
+    for _nome_fonte, brutos in brutos_por_fonte:
+        for raw in brutos:
+            chave = (raw.osm_type, raw.osm_id)
+            if chave in vistos_ids:
+                continue
+            vistos_ids.add(chave)
+            negocios.append(build_business(raw))    # classifica aqui
+
+    # Segunda passagem: por nome similar (multi-fonte)
+    if len(lista_fontes) > 1:
+        unicos: list[Business] = []
+        for b in negocios:
+            if not any(_similar(b.nome, u.nome) for u in unicos):
+                unicos.append(b)
+        negocios = unicos
+
+    # ── ESTÁGIO 3: ENRIQUECIMENTO ─────────────────────────────────────
+    if enrichers:
+        for enricher in enrichers:
+            negocios = enricher.enrich(negocios, cidade)
+
+    # ── ESTÁGIO 4: ORDENAÇÃO ──────────────────────────────────────────
+    negocios.sort(key=lambda b: b.score, reverse=True)
+
+    return ScoutRun(cidade=cidade, fonte=fonte_str, negocios=negocios)</code></pre>
+
+    <h4>Similaridade de nomes: Jaccard por bigramas</h4>
+    <p>Para deduplicar o mesmo negócio que aparece no OSM com nome "McDonald's" e no Serper com "McDonald's Guarujá Shopping", usamos a <strong>similaridade de Jaccard sobre bigramas de caracteres</strong>:</p>
+<pre><code class="language-python">def _bigrams(s: str) -> frozenset[str]:
+    """Gera todos os pares de caracteres consecutivos."""
+    # "bar" → {"ba", "ar"}
+    # "barra" → {"ba", "ar", "rr", "ra"}
+    s = re.sub(r"\s+", " ", s)
+    return frozenset(s[i : i + 2] for i in range(len(s) - 1))
+
+def _similar(a: str | None, b: str | None, threshold=0.45) -> bool:
+    if not a or not b:
+        return False
+    na, nb = _normalizar(a), _normalizar(b)
+    if na == nb:
+        return True                          # match exato: pulamos o cálculo
+    ba, bb = _bigrams(na), _bigrams(nb)
+    if not ba or not bb:
+        return False
+    inter = len(ba &amp; bb)                   # intersecção dos conjuntos
+    union = len(ba | bb)                   # união dos conjuntos
+    # Jaccard = |A ∩ B| / |A ∪ B|
+    return (inter / union) >= threshold if union else False</code></pre>
+
+    <p>Threshold de 0.45: permissivo o suficiente para pegar "Drogasil" ↔ "Farmácia Drogasil" mas estrito o suficiente para não confundir "Restaurante A" com "Restaurante B".</p>
+  </div>
+
+  <!-- ─── 3.4 Módulo a Módulo ─── -->
+  <div class="subsection" id="modules">
+    <h3>3.4 Módulo a Módulo — Responsabilidade Única</h3>
+
+    <p>Cada módulo tem uma responsabilidade declarada em sua docstring. Isso é o <strong>Single Responsibility Principle</strong>:</p>
+
+    <table>
+      <tr><th>Módulo</th><th>Responsabilidade única</th><th>Não faz</th></tr>
+      <tr><td><code>models.py</code></td><td>Define a forma dos dados</td><td>Não valida regras de negócio</td></tr>
+      <tr><td><code>config.py</code></td><td>Lê configurações do ambiente</td><td>Não tem lógica</td></tr>
+      <tr><td><code>classifier.py</code></td><td>Extrai campos de RawPlace</td><td>Não calcula score</td></tr>
+      <tr><td><code>scorer.py</code></td><td>Calcula o score de oportunidade</td><td>Não extrai campos</td></tr>
+      <tr><td><code>scout.py</code></td><td>Orquestra o pipeline</td><td>Não sabe de HTTP, HTML ou DB</td></tr>
+      <tr><td><code>insighter.py</code></td><td>Agrega KPIs e gera insights</td><td>Não gera HTML</td></tr>
+      <tr><td><code>reporter.py</code></td><td>Renderiza o HTML de relatório</td><td>Não calcula nada</td></tr>
+      <tr><td><code>db.py</code></td><td>Persiste no SQLite</td><td>Não tem lógica de negócio</td></tr>
+      <tr><td><code>cli.py</code></td><td>Interface usuário (terminal)</td><td>Não tem lógica de negócio</td></tr>
+    </table>
+
+    <div class="callout ref">
+      <div class="callout-title">📚 Referência: Clean Architecture</div>
+      Robert C. Martin ("Uncle Bob") descreve em <a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html" target="_blank" rel="noopener">Clean Architecture</a> a ideia de separar <em>regras de negócio</em> (models, scorer, classifier) de <em>mecanismos de entrega</em> (CLI, HTTP, banco). O Scout segue esse espírito: <code>run_scout()</code> não sabe se está sendo chamado pela CLI, por um script, ou por testes — e não precisa saber.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SEÇÃO 4: CONVENÇÕES ═══════════════════════════ -->
+<div class="section" id="conventions">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Convenções de Código</h2>
+  </div>
+
+  <div class="subsection" id="naming">
+    <h3>4.1 Nomenclatura</h3>
+    <div class="lib-links">
+      <a class="doc-link" href="https://peps.python.org/pep-0008/#naming-conventions" target="_blank" rel="noopener">PEP 8 — Naming</a>
+    </div>
+
+    <p>A nomenclatura segue PEP 8 com convenções adicionais consistentes em todo o projeto:</p>
+
+    <table>
+      <tr><th>Padrão</th><th>Uso</th><th>Exemplos no projeto</th></tr>
+      <tr><td><code>snake_case</code></td><td>funções, variáveis, parâmetros, módulos</td><td><code>run_scout</code>, <code>osm_type</code>, <code>build_business</code></td></tr>
+      <tr><td><code>PascalCase</code></td><td>classes</td><td><code>BusinessSource</code>, <code>DomainGuesser</code>, <code>ScoutRun</code></td></tr>
+      <tr><td><code>SCREAMING_SNAKE</code></td><td>constantes de módulo</td><td><code>SERPER_API_KEY</code>, <code>SCORE_WEIGHTS</code>, <code>_STOP_PT</code></td></tr>
+      <tr><td><code>_prefixo</code></td><td>privado ao módulo (convenção, não enforced)</td><td><code>_is_social</code>, <code>_checar_dominio</code>, <code>_SOCIAL_DOMAINS</code></td></tr>
+      <tr><td><code>_sufixo</code></td><td>evitar colisão com keyword</td><td><code>type_</code> (nunca usado aqui, mas é a convenção PEP 8)</td></tr>
+    </table>
+
+    <h4>Nomenclatura descritiva vs. curta</h4>
+<pre><code class="language-python"># ✅ Descritivo — o nome conta a história
+def _nome_vale_tentar(nome: str) -> bool: ...
+def gerar_candidatos(nome: str) -> list[str]: ...
+def detect_website(tags: dict[str, str]) -> tuple[str | None, WebsiteKind]: ...
+
+# ✅ Curto onde é óbvio pelo contexto
+for b in negocios:         # 'b' = Business, único tipo neste contexto
+    if b.score >= 65: ...
+
+# ✅ k para KPI dict (usado só localmente em _tabela_kpis)
+k = dados["kpis"]
+t.add_row(str(k["total"]), "negócios mapeados")
+
+# ❌ O que evitamos
+data = {}          # o que é 'data'? Use 'dados_kpi', 'raw_place', etc.
+process(x)         # o que 'x' representa?</code></pre>
+  </div>
+
+  <div class="subsection" id="typehints">
+    <h3>4.2 Type Hints e from __future__ import annotations</h3>
+    <div class="lib-links">
+      <a class="doc-link" href="https://peps.python.org/pep-0484/" target="_blank" rel="noopener">PEP 484 — Type Hints</a>
+      <a class="doc-link" href="https://peps.python.org/pep-0563/" target="_blank" rel="noopener">PEP 563 — Postponed Evaluation</a>
+      <a class="doc-link" href="https://mypy.readthedocs.io/" target="_blank" rel="noopener">mypy — verificador de tipos</a>
+    </div>
+
+    <p>Todo arquivo começa com:</p>
+<pre><code class="language-python">from __future__ import annotations</code></pre>
+
+    <p>Este import (PEP 563) faz com que todas as anotações de tipo sejam <strong>avaliadas de forma adiada</strong> — tratadas como strings em vez de código. Dois benefícios:</p>
+    <ul>
+      <li><strong>Referências circulares</strong>: <code>class A</code> pode ter <code>def metodo(self) -> B</code> mesmo que <code>B</code> seja definido depois de <code>A</code> no mesmo arquivo</li>
+      <li><strong>Sintaxe moderna no Python 3.9+</strong>: <code>list[str]</code> em vez de <code>List[str]</code>, <code>str | None</code> em vez de <code>Optional[str]</code> — funciona até em Python 3.8 com o import</li>
+    </ul>
+<pre><code class="language-python"># Com from __future__ import annotations, isso funciona em Python &lt; 3.10:
+def _similar(a: str | None, b: str | None, threshold: float = 0.45) -> bool:
+    ...
+
+# Sem o import, precisaria ser:
+from typing import Optional
+def _similar(a: Optional[str], b: Optional[str], threshold: float = 0.45) -> bool:
+    ...</code></pre>
+
+    <h4>Type hints em todo lugar</h4>
+<pre><code class="language-python"># Parâmetros e retorno
+def score(fields: dict) -> dict: ...
+def fetch(self, cidade: str, admin_level: int = 8,
+          limit: int | None = None) -> list[RawPlace]: ...
+
+# Variáveis locais onde o tipo não é óbvio
+vistos_ids: set[tuple[str, int]] = set()
+brutos_por_fonte: list[tuple[str, list[RawPlace]]] = []
+ultimo_erro: Exception | None = None
+
+# Constantes de módulo
+_W = config.SCORE_WEIGHTS  # type: dict[str, int] — inferido via mypy</code></pre>
+  </div>
+
+  <div class="subsection" id="pep8">
+    <h3>4.3 PEP 8, Formatação e Estilo</h3>
+    <div class="lib-links">
+      <a class="doc-link" href="https://peps.python.org/pep-0008/" target="_blank" rel="noopener">PEP 8</a>
+      <a class="doc-link" href="https://docs.astral.sh/ruff/" target="_blank" rel="noopener">Ruff (linter usado)</a>
+      <a class="doc-link" href="https://black.readthedocs.io/" target="_blank" rel="noopener">Black (formatter)</a>
+    </div>
+
+    <p>O projeto configura o <strong>Ruff</strong> como linter no <code>pyproject.toml</code>:</p>
+<pre><code class="language-toml">[tool.ruff]
+line-length = 99
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "BLE", "ARG"]
+# E/F = PEP 8 + erros básicos
+# I   = imports ordenados
+# UP  = usar sintaxe moderna (str | None em vez de Optional[str])
+# BLE = blind exception catch (noqa quando intencional)
+# ARG = argumentos não usados</code></pre>
+
+    <h4>Exceções silenciadas com noqa explícito</h4>
+<pre><code class="language-python"># Onde capturamos Exception ampla intencionalmente, documentamos:
+try:
+    resp = httpx.post(url, ...)
+except Exception as exc:  # noqa: BLE001 - tentamos o próximo espelho
+    ultimo_erro = exc
+    continue
+
+# No DomainGuesser: qualquer erro de rede = domínio não responde
+except Exception:  # noqa: BLE001
+    continue</code></pre>
+    <p>O comentário <code># noqa: BLE001</code> diz ao Ruff "sei que estou capturando Exception genérica, é intencional". Isso preserva o aviso para capturas realmente descuidadas e silencia só onde a intenção é clara.</p>
+
+    <h4>Imports em grupos (PEP 8 + isort)</h4>
+<pre><code class="language-python"># Grupo 1: stdlib
+from __future__ import annotations
+import re
+import unicodedata
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Grupo 2: terceiros
+import httpx
+
+# Grupo 3: projeto (relativos)
+from .... import config
+from ....models import Business, SiteStatus, WebsiteKind
+from .. import scorer as scorer_module
+from .base import BusinessEnricher</code></pre>
+  </div>
+
+  <div class="subsection" id="patterns">
+    <h3>4.4 Padrões de Código Notáveis</h3>
+
+    <h4>Tuplas de chaves para busca em dicionários</h4>
+    <p>Em vez de repetir a mesma lógica de "primeiro valor que existir", encapsulamos em <code>_first()</code>:</p>
+<pre><code class="language-python">_WEBSITE_TAGS = ("website", "contact:website", "url", "website:official")
+_PHONE_TAGS = ("contact:phone", "phone", "contact:mobile", "phone:mobile")
+
+def _first(tags: dict[str, str], chaves: tuple[str, ...]) -> str | None:
+    """Retorna o primeiro valor encontrado entre as chaves, ou None."""
+    for k in chaves:
+        v = tags.get(k)
+        if v:
+            return v.strip()
+    return None
+
+# Uso:
+telefone = _first(tags, _PHONE_TAGS)
+site = _first(tags, _WEBSITE_TAGS)</code></pre>
+
+    <h4>Frozensets para membership testing</h4>
+<pre><code class="language-python"># frozenset é O(1) para 'in' (hash table) vs list que é O(n)
+_STOP_PT = frozenset(
+    "de da do das dos e a o as os em no na nos nas para pro pra com "
+    "por um uma uns umas se é ao aos".split()
+)
+# frozenset de frozenset de str para os matchers de setores
+matchers: tuple[tuple[str, object], ...] = (
+    ("shop", frozenset({"hairdresser", "beauty", "cosmetics"})),
+    ...
+)</code></pre>
+
+    <h4>Dict comprehension para indexação</h4>
+<pre><code class="language-python"># Cria dicionário de índice → Business para atualização eficiente
+alvos: dict[int, Business] = {
+    i: b
+    for i, b in enumerate(businesses)
+    if b.site_status is SiteStatus.SEM_SITE
+    and b.nome
+    and _nome_vale_tentar(b.nome)
+}
+# Depois de processar, atualiza pelo índice (mantém a posição na lista)
+result = list(businesses)
+for idx, url in encontrados.items():
+    result[idx] = _rescore(result[idx], url)</code></pre>
+
+    <h4>Configurações centralizadas em config.py</h4>
+    <p>Nenhum "número mágico" espalhado pelo código. Tudo vai para config.py:</p>
+<pre><code class="language-python"># config.py — fonte única da verdade para todos os ajustes
+SCORE_WEIGHTS: dict[str, int] = {
+    "base_sem_site": 60,
+    "base_so_rede_social": 70,
+    "base_com_site": 25,
+    "tem_telefone": 20,
+    "tem_horario": 5,
+    "tem_endereco": 5,
+    "setor_prioritario": 10,
+}
+DOMAIN_GUESS_TIMEOUT: float = float(os.getenv("DOMAIN_GUESS_TIMEOUT", "3.0"))
+DOMAIN_GUESS_WORKERS: int = int(os.getenv("DOMAIN_GUESS_WORKERS", "15"))</code></pre>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SEÇÃO 5: TESTES ═══════════════════════════ -->
+<div class="section" id="tests">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>Testes em Profundidade</h2>
+  </div>
+
+  <p>O projeto tem <strong>77 testes rodando em 0.70s</strong> sem fazer nenhuma chamada real de rede. A filosofia central: <em>testes devem ser rápidos, confiáveis e independentes do ambiente externo.</em></p>
+
+  <div class="subsection">
+    <h3>Pirâmide de Testes</h3>
+    <div class="lib-links">
+      <a class="doc-link" href="https://martinfowler.com/bliki/TestPyramid.html" target="_blank" rel="noopener">Martin Fowler — Test Pyramid</a>
+    </div>
+    <p>Seguimos a pirâmide: mais testes unitários (rápidos, isolados), menos testes de integração (mais lentos, mais dependências), e testes de performance (sem limite estrito de contagem mas com ordens de grandeza definidas):</p>
+
+    <table>
+      <tr><th>Tipo</th><th>Característica</th><th>Testes</th><th>Tempo</th></tr>
+      <tr><td>Unitário</td><td>Uma função, sem dependências externas</td><td>~50</td><td>&lt; 0.1s</td></tr>
+      <tr><td>Integração</td><td>Múltiplos módulos juntos, com mocks de rede</td><td>~15</td><td>&lt; 0.5s</td></tr>
+      <tr><td>Performance</td><td>Pipeline completo com dados sintéticos</td><td>12</td><td>&lt; 0.7s</td></tr>
+    </table>
+  </div>
+
+  <div class="subsection">
+    <h3>Testes de Performance com tracemalloc</h3>
+    <p>Os testes de performance estabelecem <em>limites aceitáveis</em> — se uma mudança futura ultrapassar um limite, o teste falha e a regressão é detectada:</p>
+<pre><code class="language-python">from contextlib import contextmanager
+import tracemalloc, time
+
+@contextmanager
+def _medir():
+    """Mede tempo de parede e pico de memória."""
+    tracemalloc.start()
+    t0 = time.perf_counter()
+    yield
+    elapsed = time.perf_counter() - t0
+    _, pico = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    _medir.ultimo_tempo = elapsed
+    _medir.ultimo_mem_kb = pico / 1024
+
+def test_pipeline_500_negocios_abaixo_de_500ms():
+    places = _raw_sem_site(500)          # dados sintéticos, sem rede
+    source = _SyntheticSource(places)
+
+    with _medir():
+        run = run_scout("Teste", source=source)
+
+    assert run.total == 500
+    assert _medir.ultimo_tempo &lt; 0.5, (
+        f"Pipeline de 500 negócios demorou {_medir.ultimo_tempo:.3f}s "
+        f"(limite: 0.5s)."
+    )</code></pre>
+
+    <p><strong>Baseline medido</strong>: o pipeline processa negócios a <strong>0.04ms por negócio</strong>, consumindo <strong>~3.2 KB de RAM por negócio</strong>. Crescimento linear — sem vazamento de memória.</p>
+  </div>
+
+  <div class="subsection">
+    <h3>Testando o que não deveria mudar com monkeypatch</h3>
+<pre><code class="language-python">def test_filtro_genericos_reduz_trabalho(monkeypatch):
+    """Verifica que nomes genéricos NÃO disparam requisições HTTP."""
+    chamadas: list[str] = []
+
+    def rastrear(nome, timeout):
+        chamadas.append(nome)    # grava toda chamada
+        return None
+
+    monkeypatch.setattr(
+        "fabrica_sites.agents.scout.enrichers.domain_guesser._encontrar_site",
+        rastrear,
+    )
+
+    # Metade genéricos ("Bar"), metade específicos ("Restaurante Bela Vista X")
+    genericos = [RawPlace(..., tags={"name": "Bar"}) for i in range(50)]
+    especificos = [RawPlace(..., tags={"name": f"Restaurante Bela Vista {i}"})
+                   for i in range(50)]
+
+    run_scout("Teste", source=_SyntheticSource(genericos + especificos),
+              enrichers=[DomainGuesser()])
+
+    assert len(chamadas) == 50, "Só específicos devem ser verificados"
+    assert all("Bela Vista" in c for c in chamadas)</code></pre>
+    <p>Este teste verifica um <strong>comportamento implícito</strong>: o filtro de nomes genéricos deve reduzir o trabalho real. Sem o teste, poderíamos quebrar o filtro sem perceber.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SEÇÃO 6: A/B TEST ═══════════════════════════ -->
+<div class="section" id="ab">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>A/B Test — Análise dos Resultados</h2>
+  </div>
+
+  <table>
+    <tr><th>Config</th><th>Negócios</th><th>Sem site</th><th>Com site</th><th>Contactáveis</th><th>Leads quentes</th><th>Tempo</th></tr>
+    <tr>
+      <td>A — Só OSM</td>
+      <td>385</td><td>287</td><td>89</td><td>48</td>
+      <td class="result-neutral">34</td>
+      <td>2.6s</td>
+    </tr>
+    <tr>
+      <td>B — OSM + DomainGuesser</td>
+      <td>385</td><td>227</td><td>149</td><td>48</td>
+      <td class="result-bad">29 (-15%)</td>
+      <td>34.7s</td>
+    </tr>
+    <tr>
+      <td>C — OSM + Serper</td>
+      <td>518</td><td>326</td><td>123</td><td>246</td>
+      <td class="result-good">159 (+367%)</td>
+      <td>59.2s</td>
+    </tr>
+    <tr>
+      <td>D — Full (OSM+Serper+DG)</td>
+      <td>512</td><td>274</td><td>170</td><td>240</td>
+      <td class="result-good">144 (+324%)</td>
+      <td>92.8s</td>
+    </tr>
+  </table>
+
+  <div class="subsection">
+    <h3>Por que o DomainGuesser REDUZIU leads quentes?</h3>
+    <p>Config B tem <strong>menos</strong> leads quentes (29) que o baseline (34). Isso parece contra-intuitivo — o DomainGuesser descobriu 60 sites novos, o que deveria ser bom. Mas:</p>
+
+    <p>Quando o DomainGuesser descobre que "Restaurante X" tem site em <code>restaurantex.com.br</code>, ele muda o <code>site_status</code> de <code>SEM_SITE</code> para <code>COM_SITE</code>. O score base muda:</p>
+    <ul>
+      <li><strong>SEM_SITE</strong>: score base = +60 (melhor oportunidade de venda)</li>
+      <li><strong>COM_SITE</strong>: score base = +25 (já tem site — menos urgência)</li>
+    </ul>
+    <p>Resultado: 60 negócios que eram "leads quentes sem site" viraram "negócios com site a auditar". O dado ficou mais correto — esses negócios realmente têm site. Para leads de venda direta, eles saem do radar imediato. Para o <strong>Agente Auditor</strong> (fase 3), eles entram — e podem ser leads de <em>redesign</em>.</p>
+
+    <div class="callout tip">
+      <div class="callout-title">Insight sobre o produto</div>
+      O DomainGuesser não é para aumentar leads quentes — é para <strong>corrigir dados</strong>. O Auditor usará esses sites descobertos para avaliar qualidade e gerar leads de "seu site é ruim, posso melhorar". São produtos diferentes para o mesmo cliente.
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Por que o Serper foi o game-changer?</h3>
+    <p>O Serper adicionou <strong>133 negócios novos</strong> que o OSM não conhecia — e quase todos vieram com telefone. Isso explica o salto de 48 para 246 contactáveis.</p>
+
+    <p>O OpenStreetMap é mantido por voluntários. Negócios informais, novos ou em cidades menores simplesmente não estão mapeados. O Google Maps tem equipe profissional e indexa praticamente todo negócio com CNPJ ativo.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SEÇÃO 7: AUTOAVALIAÇÃO ═══════════════════════════ -->
+<div class="section" id="review">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>Autoavaliação Honesta</h2>
+  </div>
+
+  <div class="subsection">
+    <h3>O que foi bem feito</h3>
+
+    <div class="review-item">
+      <span class="review-icon">✅</span>
+      <div class="review-text"><strong>Plugin Pattern com ABCs</strong> — a arquitetura plugável foi a decisão mais importante. Adicionar o Serper exigiu zero mudanças no <code>scout.py</code>. Isso é o que "extensível" significa na prática.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">✅</span>
+      <div class="review-text"><strong>Bug fix com urlparse</strong> — o bug do <code>_is_social()</code> era sutil (falso positivo em "salaox.com.br"). A correção com <code>urlparse</code> é a abordagem correta: não parsear URL com string, usar a ferramenta certa.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">✅</span>
+      <div class="review-text"><strong>77 testes sem rede em 0.70s</strong> — o monkeypatch em todo lugar que toca rede significa que os testes são confiáveis e rápidos. Zero flakiness por dependência externa.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">✅</span>
+      <div class="review-text"><strong>model_copy() em vez de mutação</strong> — o DomainGuesser cria novas instâncias Business em vez de mutar as existentes. Isso torna o enriquecedor previsível e testável.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">✅</span>
+      <div class="review-text"><strong>Docstrings com PROBLEMA/ESTRATÉGIA/LIMITAÇÕES</strong> — o módulo <code>domain_guesser.py</code> tem um docstring que explica o problema que resolve, como faz, e onde falha. Isso é documentação que sobrevive ao tempo.</div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>O que pode melhorar</h3>
+
+    <div class="review-item">
+      <span class="review-icon">⚠️</span>
+      <div class="review-text"><strong>httpx.Client por chamada no DomainGuesser</strong> — cada <code>_checar_dominio()</code> cria um novo cliente. O ideal seria um Client por thread com connection pool. Impacto atual: pequeno (a latência de rede domina o tempo). Impacto em escala: significativo.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">⚠️</span>
+      <div class="review-text"><strong>Dedup por nome também aplica dentro da mesma fonte</strong> — a segunda passagem de dedup por bigrama Jaccard compara todos os negócios de todas as fontes. Isso é correto para cross-source mas pode deduplicar duas filiais legítimas com nomes parecidos ("McDonald's Enseada" e "McDonald's Pitangueiras"). Ideal: só checar cross-source.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">⚠️</span>
+      <div class="review-text"><strong>Sem cache de domínios</strong> — o mesmo negócio tem seus domínios re-verificados toda execução. Um cache em SQLite com TTL de 7 dias economizaria 90% das requests HTTP em re-execuções.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">⚠️</span>
+      <div class="review-text"><strong>O A/B test roda o OSM duas vezes</strong> — configs A e B fazem queries independentes à Overpass. Os resultados são comparáveis mas não idênticos (o OSM pode retornar dados ligeiramente diferentes). Para um A/B justo, deveríamos fixar os dados de entrada.</div>
+    </div>
+    <div class="review-item">
+      <span class="review-icon">⚠️</span>
+      <div class="review-text"><strong>reporter.py não foi mostrado aqui</strong> — o gerador de HTML usa Jinja2 com um template <code>.html.j2</code>, mas os detalhes do template ficaram fora deste relatório. Vale um estudo separado do template para quem quiser entender a geração do dashboard.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SEÇÃO 8: PRÓXIMAS FASES ═══════════════════════════ -->
+<div class="section" id="next">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>Próximas Fases</h2>
+  </div>
+
+  <table>
+    <tr><th>Fase</th><th>Agente</th><th>O que faz</th><th>Tecnologia provável</th></tr>
+    <tr><td>2</td><td>Benchmark</td><td>Define "site bom" por setor — coleta exemplos de referência</td><td>httpx + Pydantic + Claude API</td></tr>
+    <tr><td>3</td><td>Auditor</td><td>Avalia sites existentes contra os benchmarks</td><td>Playwright ou httpx + Claude Vision</td></tr>
+    <tr><td>4</td><td>Criador</td><td>Gera o site personalizado para o negócio</td><td>Next.js + Claude API + Vercel</td></tr>
+    <tr><td>5</td><td>Prospector</td><td>Contata o dono do negócio (WhatsApp/e-mail)</td><td>OpenClaw / WhatsApp API</td></tr>
+  </table>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠️ CrewAI não funciona no Python 3.14</div>
+    O Python 3.14 (usado neste projeto) tem mudanças internas que quebram o CrewAI. A solução planejada para as fases 2+: criar um <strong>venv separado com Python 3.12</strong> para os agentes que precisarem de LLM/CrewAI, mantendo o Scout no 3.14.
+  </div>
+
+  <div class="callout ref" style="margin-top:20px">
+    <div class="callout-title">📋 Melhorias priorizadas para Sessão 04</div>
+    <ul style="margin:0;padding-left:20px">
+      <li>Cache de domínios em SQLite com TTL (evitar re-verificação)</li>
+      <li>httpx.Client compartilhado no DomainGuesser (connection pooling)</li>
+      <li>Dedup cross-source apenas (não within-source)</li>
+      <li>Início da Fase 2: Agente Benchmark</li>
+    </ul>
+  </div>
+</div>
+
+<hr>
+<p style="text-align:center;color:var(--text3);font-size:12px;padding:20px 0">
+  Fábrica de Sites — Sessão 03 · Gerado em 17/06/2026 ·
+  <a href="RELATORIO_SESSAO_02.html" target="_blank">← Sessão 02</a> ·
+  <a href="../data/relatorio_scout_enriquecido.html" target="_blank">Dashboard ao vivo →</a>
+</p>
+
+</main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Highlight nav link on scroll
+  const sections = document.querySelectorAll('[id]');
+  const navLinks = document.querySelectorAll('nav.sidebar a');
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`nav.sidebar a[href="#${entry.target.id}"]`);
+        if (active) {
+          active.style.borderColor = 'var(--accent)';
+          active.style.color = 'var(--accent)';
+        }
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+});
+</script>
+</body>
+</html>

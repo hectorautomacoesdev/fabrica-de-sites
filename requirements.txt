@@ -1,0 +1,13 @@
+# Dependencias de runtime da Fase 1 (Agente Scout).
+# Fonte de verdade canonica: pyproject.toml. Este arquivo existe para
+# instalacao rapida com `pip install -r requirements.txt`.
+#
+# Stack deliberadamente LEVE e sem LLM: tudo roda de graca e offline-friendly
+# (exceto a chamada HTTP ao OpenStreetMap, que e gratuita e sem chave).
+
+httpx>=0.28        # cliente HTTP para a Overpass API (OpenStreetMap)
+pydantic>=2.0      # modelos de dados tipados e validados
+jinja2>=3.1        # template do relatorio HTML
+typer>=0.12        # interface de linha de comando
+rich>=13.0         # saida bonita no terminal (tabelas, progresso, paineis)
+python-dotenv>=1.0 # carrega variaveis do arquivo .env automaticamente

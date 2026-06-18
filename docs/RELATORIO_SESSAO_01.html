@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relatório da Sessão 01 — Fábrica de Sites</title>
+<style>
+  :root{--bg:#0f172a;--bg2:#1e293b;--line:#334155;--txt:#e2e8f0;--mut:#94a3b8;
+    --acc:#38bdf8;--ok:#16a34a;--warn:#f59e0b}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.6}
+  a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+  nav{position:sticky;top:0;background:rgba(15,23,42,.95);backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);padding:10px 16px;z-index:9;
+    display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
+  nav b{color:var(--acc)}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px}
+  h1{font-size:28px;margin:8px 0}
+  h2{font-size:20px;margin:34px 0 12px;border-left:3px solid var(--acc);padding-left:10px;scroll-margin-top:60px}
+  .sub{color:var(--mut)}
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;margin:10px 0}
+  .grid{display:grid;gap:14px}.k4{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+  .kpi .num{font-size:32px;font-weight:700;line-height:1}.kpi .lbl{color:var(--mut);font-size:13px;margin-top:6px}
+  .hl{color:var(--acc)}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600}
+  .b-ok{background:#064e3b;color:#6ee7b7;border:1px solid #065f46}
+  .b-warn{background:#3f2d09;color:#fcd34d;border:1px solid #92660b}
+  ul{margin:6px 0}li{margin:4px 0}
+  .tl{list-style:none;padding:0;margin:0}
+  .tl li{position:relative;padding:10px 0 10px 28px;border-left:2px solid var(--line);margin-left:6px}
+  .tl li::before{content:"";position:absolute;left:-7px;top:16px;width:12px;height:12px;
+    border-radius:50%;background:var(--acc)}
+  .tl b{color:#fff}
+  code{background:#0b1220;border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--mut)}
+  .tree{font-family:ui-monospace,Consolas,monospace;font-size:13px;color:var(--mut);white-space:pre;line-height:1.5}
+  .ok{color:var(--ok);font-weight:700}.warn{color:var(--warn);font-weight:700}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<nav>
+  <b>📄 Sessão 01</b>
+  <a href="#resumo">Resumo</a>
+  <a href="#resultados">Resultados</a>
+  <a href="#passos">Passo a passo</a>
+  <a href="#testes">Testes</a>
+  <a href="#arquivos">Arquivos</a>
+  <a href="#decisoes">Decisões</a>
+  <a href="#duvidas">Dúvidas</a>
+  <a href="#proximos">Próximos passos</a>
+</nav>
+<div class="wrap">
+
+  <h1>🏭 Fábrica de Sites — Relatório da Sessão 01</h1>
+  <p class="sub">Construção da <b>Fase 1: Agente Scout</b>. Tudo abaixo foi
+  implementado, instalado e <b>testado de verdade</b> (inclusive uma execução
+  real contra dados de Guarujá). Nenhum custo: zero chaves de API.</p>
+
+  <h2 id="resumo">1. Resumo executivo</h2>
+  <div class="card">
+    <p>Saímos de uma pasta vazia para um <b>Agente Scout funcional</b>: ele
+    mapeia negócios de uma cidade no OpenStreetMap, descobre quais não têm site
+    (ou só têm rede social), pontua a oportunidade de cada um e gera um
+    <b>dashboard HTML navegável</b> (mapa, gráficos, tabela filtrável).</p>
+    <p>Decisões-chave: começar <b>grátis</b> (OpenStreetMap), <b>sem LLM</b> no
+    núcleo (determinístico = testável e barato) e <b>sem CrewAI</b> por ora
+    (no Python 3.14 ele só resolve uma versão antiga — comprovado por teste).</p>
+    <p>
+      <span class="badge b-ok">✅ 25 testes passando</span>
+      <span class="badge b-ok">✅ Execução real: 385 negócios</span>
+      <span class="badge b-ok">✅ Dashboard gerado</span>
+      <span class="badge b-warn">⚠️ 7 dúvidas para você decidir</span>
+    </p>
+  </div>
+
+  <h2 id="resultados">2. Resultados reais — Guarujá</h2>
+  <div class="grid k4">
+    <div class="card kpi"><div class="num">385</div><div class="lbl">negócios mapeados</div></div>
+    <div class="card kpi"><div class="num hl">296</div><div class="lbl">sem site próprio (76,9%)</div></div>
+    <div class="card kpi"><div class="num">9</div><div class="lbl">🔥 só rede social</div></div>
+    <div class="card kpi"><div class="num">89</div><div class="lbl">têm site (auditar na fase 3)</div></div>
+    <div class="card kpi"><div class="num">48</div><div class="lbl">com contato (12,5%)</div></div>
+    <div class="card kpi"><div class="num hl">34</div><div class="lbl">⭐ leads quentes (oport.+contato)</div></div>
+  </div>
+  <div class="card">
+    <b>Funil honesto:</b> 385 mapeados → 296 sem site (mercado imediato) →
+    <b>34 prontos para abordar já</b> (alta oportunidade <i>e</i> com telefone/e-mail).
+    <table>
+      <thead><tr><th>Top setores por oportunidade</th><th>Negócios sem site</th><th>% do setor</th></tr></thead>
+      <tbody>
+        <tr><td>🍽️ Alimentação</td><td><b>105</b></td><td>89,0%</td></tr>
+        <tr><td>🛍️ Comércio &amp; Lojas</td><td>75</td><td>—</td></tr>
+        <tr><td>🩺 Saúde &amp; Clínicas</td><td>40</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="sub">👉 Dashboard completo e interativo: <code>data/relatorio_scout.html</code></p>
+  </div>
+
+  <h2 id="passos">3. Passo a passo do que fiz</h2>
+  <ul class="tl">
+    <li><b>Pesquisa de referências.</b> Comparei frameworks (CrewAI/LangGraph/AutoGen), fontes de dados (Places vs Overpass vs scraping), auditoria, geração de sites e prospecção. Achei projetos que fazem algo parecido (ex.: <code>b2b-leads-ai</code>) e validei a abordagem.</li>
+    <li><b>Reconhecimento do ambiente.</b> Confirmei Python 3.14, Node 24, git. Descobri que a pasta do projeto existia vazia → construí dentro dela.</li>
+    <li><b>Teste de risco do Python 3.14.</b> Instalei a stack leve (httpx, pydantic, jinja2, typer, rich) — todas funcionam. Dry-run do CrewAI mostrou que ele só resolve a versão 0.11.2 → <b>decisão: fora da Fase 1</b>.</li>
+    <li><b>Teste de conectividade + fonte.</b> Query real à Overpass para Guarujá retornou HTTP 200 com dados → fonte e internet validadas.</li>
+    <li><b>Scaffolding do projeto.</b> Estrutura <code>src/</code>, <code>pyproject.toml</code>, <code>.gitignore</code>, <code>.env.example</code>, README, venv.</li>
+    <li><b>Núcleo.</b> <code>config</code>, <code>models</code> (Pydantic), <code>db</code> (SQLite), taxonomia de <code>sectors</code>.</li>
+    <li><b>Pipeline do Scout.</b> Fonte plugável (Overpass) → classifier (setor + detecção de presença web) → scorer (score explicável) → insighter (KPIs + insights) → reporter (HTML).</li>
+    <li><b>CLI</b> com <code>fabrica scout run | setores | stats</code> (Typer + Rich).</li>
+    <li><b>Testes</b> (pytest): 25 casos. Instalação editável. Smoke test de imports.</li>
+    <li><b>Execução real</b> contra Guarujá → 385 negócios, banco + dashboard gerados e validados.</li>
+    <li><b>Reflexão e ajuste.</b> Redefini "lead quente" para exigir contato (268 → 34, número acionável). Re-rodei e re-testei.</li>
+    <li><b>Documentação.</b> Arquitetura, roadmap, decisões, dúvidas e este relatório.</li>
+  </ul>
+
+  <h2 id="testes">4. O que foi testado</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Teste</th><th>Resultado</th></tr></thead>
+      <tbody>
+        <tr><td>Stack leve instala no Python 3.14</td><td class="ok">OK (pydantic com core Rust inclusive)</td></tr>
+        <tr><td>Conectividade + query Overpass (Guarujá)</td><td class="ok">OK (HTTP 200)</td></tr>
+        <tr><td>CrewAI no Python 3.14 (dry-run)</td><td class="warn">só resolve 0.11.2 → evitado</td></tr>
+        <tr><td>Imports do pacote (smoke test)</td><td class="ok">OK</td></tr>
+        <tr><td>pytest — classificação de setores</td><td class="ok">passa</td></tr>
+        <tr><td>pytest — score de oportunidade</td><td class="ok">passa</td></tr>
+        <tr><td>pytest — pipeline (dedupe, ordenação, insights)</td><td class="ok">passa</td></tr>
+        <tr><td><b>Suíte completa</b></td><td class="ok"><b>25 passed in 0.22s</b></td></tr>
+        <tr><td>Execução real do Scout</td><td class="ok">385 negócios</td></tr>
+        <tr><td>Validação do HTML (estrutura + JSON embutido)</td><td class="ok">385 negócios, gráficos e mapa OK</td></tr>
+        <tr><td>Validação do banco SQLite</td><td class="ok">385 linhas; status batem</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="arquivos">5. Estrutura de arquivos criada</h2>
+  <div class="card"><div class="tree">Agente_Criador_de_Sites_Institucionais_p_Venda/
+├── README.md · pyproject.toml · requirements.txt · .env.example · .gitignore
+├── data/                      ← saída (fabrica.db, relatorio_scout.html)
+├── docs/                      ← ARQUITETURA, ROADMAP, DECISOES, DUVIDAS_ABERTAS, este relatório
+├── tests/                     ← 25 testes (sectors, scorer, pipeline)
+└── src/fabrica_sites/
+    ├── config.py · models.py · db.py · cli.py
+    ├── core/sectors.py        ← taxonomia + regras tag→setor
+    └── agents/scout/
+        ├── scout.py           ← orquestrador do pipeline
+        ├── classifier.py · scorer.py · insighter.py · reporter.py
+        ├── templates/report.html.j2
+        └── sources/           ← base.py (interface) + overpass.py</div></div>
+
+  <h2 id="decisoes">6. Decisões técnicas (resumo)</h2>
+  <div class="card">
+    <ul>
+      <li><b>Fonte grátis:</b> OpenStreetMap/Overpass (sem chave). Serper/Places entram depois como fontes plugáveis.</li>
+      <li><b>Determinístico primeiro:</b> núcleo sem LLM. IA entra onde agrega (agentes 2–5).</li>
+      <li><b>Sem CrewAI agora:</b> incompatível na prática com Python 3.14. Plano: venv 3.12 separado nas fases 2+.</li>
+      <li><b>Score explicável:</b> cada ponto tem motivo. "Só rede social" é o lead mais quente.</li>
+      <li><b>SQLite + HTML estático:</b> zero infra, zero custo.</li>
+    </ul>
+    <p class="sub">Detalhes completos em <code>docs/DECISOES.md</code>.</p>
+  </div>
+
+  <h2 id="duvidas">7. Dúvidas abertas (preciso de você)</h2>
+  <div class="card">
+    <ul>
+      <li><b>P1 — Contatos:</b> OSM só tem telefone em ~12,5%. Adicionar Serper.dev (grátis)? <i>(sugiro que sim)</i></li>
+      <li><b>P2 — Setor piloto:</b> dados apontam <b>Alimentação</b> (105). Você citou beleza/saúde/lojas. Seguimos pelos dados ou busco fonte mais rica para beleza/saúde?</li>
+      <li><b>P3 — Framework:</b> criar venv Python 3.12 para CrewAI/LangGraph nas fases 2+?</li>
+      <li><b>P4 — Pesos do score:</b> quer revisar comigo?</li>
+      <li><b>P5 — Próximo passo:</b> refinar Scout, ou começar o Benchmark (Fase 2)?</li>
+      <li><b>P6 — Dashboard React:</b> agora ou depois de mais agentes?</li>
+      <li><b>P7 — Rumo:</b> OpenClaw (Prospector) e Vercel (Criador) confirmados?</li>
+    </ul>
+    <p class="sub">Completo em <code>docs/DUVIDAS_ABERTAS.md</code>.</p>
+  </div>
+
+  <h2 id="proximos">8. Próximos passos sugeridos</h2>
+  <div class="card">
+    <ol>
+      <li>Você abre <code>data/relatorio_scout.html</code> e me dá sua impressão.</li>
+      <li>Responde as dúvidas P1–P7 (principalmente P2, o setor piloto).</li>
+      <li>Eu refino o Scout (2ª fonte de contatos) <b>ou</b> arranco a Fase 2 (Benchmark).</li>
+    </ol>
+  </div>
+
+  <footer>
+    Fábrica de Sites · Relatório da Sessão 01 · gerado durante a construção da Fase 1 (Agente Scout).
+  </footer>
+</div>
+</body>
+</html>

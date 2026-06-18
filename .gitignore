@@ -1,0 +1,33 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Dados gerados localmente (banco SQLite, relatorios HTML)
+data/*
+!data/.gitkeep
+
+# Segredos
+.env
+
+# Frontend (Node) e build da documentacao
+node_modules/
+frontend/dist/
+site/
+
+# Editores / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

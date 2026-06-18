@@ -1,0 +1,13 @@
+# Normaliza quebras de linha: armazena tudo como LF no repositorio.
+# Evita ruido de CRLF<->LF entre Windows (dev local) e Linux (CI/GitHub).
+* text=auto eol=lf
+
+# Arquivos binarios: nunca normalizar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.db binary
+*.woff binary
+*.woff2 binary
