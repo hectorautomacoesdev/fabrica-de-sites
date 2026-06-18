@@ -100,6 +100,7 @@ nav:
       - codigo/index.md
       - Convenções: codigo/convencoes.md
   - Testes: testes.md
+  - Publicação & CI/CD: publicacao-ci-cd.md
   - Escalando para a nuvem: escala-nuvem.md
   - Decisões (ADRs): decisoes.md
   - Roadmap: roadmap.md
