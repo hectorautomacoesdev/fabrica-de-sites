@@ -96,7 +96,12 @@ nav:
       - Design Patterns: arquitetura/design-patterns.md
       - Design de Banco: arquitetura/banco-de-dados.md
   - Bibliotecas: bibliotecas.md
+  - Código:
+      - codigo/index.md
+      - Convenções: codigo/convencoes.md
   - Testes: testes.md
   - Escalando para a nuvem: escala-nuvem.md
   - Decisões (ADRs): decisoes.md
   - Roadmap: roadmap.md
+  - Relatórios de Sessão: relatorios/index.md
+  - Referência de API: referencia-api.md

@@ -2,7 +2,11 @@
 
 Sistema que **encontra negócios locais sem site (ou com site fraco)**, **gera sites** sob medida e **oferece aos donos**. Mercado-alvo inicial: Guarujá, SP.
 
-> **Status:** Fase 1 em construção — o **Agente Scout** (prospecção/contexto). Veja [`docs/ROADMAP.md`](docs/ROADMAP.md).
+> **Status:** Fase 1 (Agente Scout) **concluída** — com enriquecimento de contatos e
+> descoberta de sites ocultos. Em andamento: reestruturação para app real (API + React +
+> banco com ORM) e documentação.
+>
+> 📚 **Documentação completa:** <https://hectorautomacoesdev.github.io/fabrica-de-sites/>
 
 ## Os 5 agentes
 
@@ -14,7 +18,8 @@ Sistema que **encontra negócios locais sem site (ou com site fraco)**, **gera s
 | 4 | **Criador** | Gera o site e publica | 4 |
 | 5 | **Prospector** | Entra em contato com o dono (WhatsApp/e-mail) | 5 |
 
-Arquitetura completa em [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md). Decisões técnicas e o porquê em [`docs/DECISOES.md`](docs/DECISOES.md).
+Arquitetura completa, decisões técnicas (ADRs), bibliotecas, código e testes na
+**[documentação online](https://hectorautomacoesdev.github.io/fabrica-de-sites/)**.
 
 ## Como rodar (Fase 1 — Scout)
 

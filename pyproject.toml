@@ -24,6 +24,7 @@ dev = ["pytest>=8.0"]
 docs = [
     "mkdocs-material>=9.5",
     "mkdocstrings[python]>=0.26",
+    "black>=24.0",            # formata as assinaturas na Referência de API
 ]
 
 # Comando de terminal: `fabrica ...`
