@@ -1,0 +1,104 @@
+.table-section { margin-top: 8px; }
+
+.table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.table-toolbar select,
+.search-input {
+  background: var(--card-bg);
+  color: var(--text-strong);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+}
+
+.search-input { min-width: 180px; }
+
+.table-count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.biz-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.biz-table th {
+  background: var(--card-bg);
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.biz-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-faint);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.biz-table tr:last-child td { border-bottom: none; }
+.biz-table tr:hover td { background: var(--hover-bg); }
+
+.td-nome { font-weight: 500; color: var(--text-strong); max-width: 200px; }
+.td-endereco { max-width: 200px; font-size: 0.78rem; color: var(--text-muted); }
+.sem-nome { color: var(--text-muted); font-style: italic; }
+.none { color: var(--text-muted); }
+.empty-row { text-align: center; padding: 32px; color: var(--text-muted); }
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-sem-site  { background: #fef3c7; color: #92400e; }
+.status-social    { background: #fce7f3; color: #9d174d; }
+.status-com-site  { background: #d1fae5; color: #065f46; }
+.status-desconh   { background: var(--border-faint); color: var(--text-muted); }
+
+/* Score badges */
+.score-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.score-badge small { font-weight: 400; font-size: 0.7rem; color: var(--text-muted); }
+.score-altissima { color: #dc2626; }
+.score-alta      { color: #d97706; }
+.score-media     { color: #2563eb; }
+.score-baixa     { color: var(--text-muted); }
+
+.site-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 1rem;
+}
+.site-link:hover { text-decoration: underline; }

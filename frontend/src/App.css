@@ -1,0 +1,95 @@
+.app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+
+/* ── Header ── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.app-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  letter-spacing: -0.02em;
+}
+
+.app-title span {
+  color: var(--accent);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ── Insights ── */
+.insights-section {
+  margin-bottom: 24px;
+}
+
+.insights-section h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.insights-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.insights-list li {
+  font-size: 0.85rem;
+  color: var(--text);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border-faint);
+}
+
+.insights-list li:last-child { border-bottom: none; }
+
+/* ── Section headers ── */
+.section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* ── State messages ── */
+.state-msg {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.error-msg {
+  text-align: center;
+  padding: 32px 20px;
+  color: #e74c3c;
+  font-size: 0.9rem;
+}
+
+.api-link {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}

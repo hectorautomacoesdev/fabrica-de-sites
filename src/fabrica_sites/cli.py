@@ -19,10 +19,12 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from . import config, db
-from .agents.scout import insighter, reporter
-from .agents.scout.scout import run_scout
+from . import config
+from .agents.scout import reporter
 from .core.sectors import all_sectors
+from .db import repository
+from .db.engine import get_engine
+from .services import scout_service
 
 app = typer.Typer(help="Fábrica de Sites — sistema multiagente (Fase 1: Scout).",
                   no_args_is_help=True)
@@ -108,7 +110,7 @@ def scout_run(
 
     try:
         with console.status("[cyan]Consultando fontes de dados...[/]"):
-            run = run_scout(
+            run_id, run = scout_service.run_and_save(
                 cidade,
                 admin_level=admin_level,
                 limit=limit,
@@ -126,12 +128,9 @@ def scout_run(
                       "Confira o nome da cidade (ex.: \"Guarujá\").[/]")
         raise typer.Exit(code=0)
 
-    # Persiste e gera o relatório.
-    conn = db.connect(config.DB_PATH)
-    run_id = db.save_run(conn, run)
-    conn.close()
+    # Gera relatório e calcula insights.
     caminho = reporter.render(run, out)
-    dados = insighter.compute(run)
+    dados = scout_service.get_insights(run)
 
     console.print(_tabela_kpis(dados))
     console.print()
@@ -173,16 +172,16 @@ def scout_stats() -> None:
     if not config.DB_PATH.exists():
         console.print("[yellow]Nenhuma execução ainda. Rode `fabrica scout run`.[/]")
         raise typer.Exit(code=0)
-    conn = db.connect(config.DB_PATH)
-    run = db.latest_run(conn)
-    conn.close()
+    from sqlmodel import Session
+    with Session(get_engine()) as session:
+        run = repository.latest_run(session)
     if run is None:
         console.print("[yellow]Banco vazio.[/]")
         raise typer.Exit(code=0)
     console.print(Panel.fit(
         f"Última execução · [cyan]{run.cidade}[/] · "
         f"{run.gerado_em.strftime('%d/%m/%Y %H:%M')}", border_style="cyan"))
-    console.print(_tabela_kpis(insighter.compute(run)))
+    console.print(_tabela_kpis(scout_service.get_insights(run)))
 
 
 def main() -> None:
