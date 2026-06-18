@@ -65,7 +65,7 @@ WhatsApp/e-mail. (OpenClaw — WhatsApp nativo e grátis.)
 ## Fase 6+ — Escala e automação
 
 Centenas de negócios por rodada, sites Tier 2/3 (agendamento, cardápio, e-commerce),
-deploy na nuvem e auto-monitoramento da taxa de aceite. Ver [Escalando para a nuvem](#).
+deploy na nuvem e auto-monitoramento da taxa de aceite. Ver [Escalando para a nuvem](escala-nuvem.md).
 
 ## Orquestração multiagente (fases 2+)
 

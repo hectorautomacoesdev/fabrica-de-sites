@@ -106,7 +106,7 @@ alembic downgrade -1     # reverte a última, se preciso
 | Quando | Dev local, 1 usuário | Escala, colaboração, nuvem |
 
 Como o SQLModel abstrai o dialeto, a migração é incremental e de baixo risco — ver
-[Escalando para a nuvem](#).
+[Escalando para a nuvem](../escala-nuvem.md).
 
 ## Referências
 

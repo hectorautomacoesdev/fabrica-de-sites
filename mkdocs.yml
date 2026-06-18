@@ -95,5 +95,8 @@ nav:
       - arquitetura/index.md
       - Design Patterns: arquitetura/design-patterns.md
       - Design de Banco: arquitetura/banco-de-dados.md
+  - Bibliotecas: bibliotecas.md
+  - Testes: testes.md
+  - Escalando para a nuvem: escala-nuvem.md
   - Decisões (ADRs): decisoes.md
   - Roadmap: roadmap.md
