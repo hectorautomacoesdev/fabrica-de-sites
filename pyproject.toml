@@ -21,6 +21,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.26",
+]
 
 # Comando de terminal: `fabrica ...`
 [project.scripts]

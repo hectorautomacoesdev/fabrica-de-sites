@@ -1,0 +1,99 @@
+site_name: Fábrica de Sites — Documentação
+site_description: >-
+  Sistema multiagente que prospecta negócios locais sem site, gera sites sob
+  medida e oferece aos donos. Documentação técnica e base de conhecimento.
+site_url: https://hectorautomacoesdev.github.io/fabrica-de-sites/
+site_author: Hector
+
+repo_name: hectorautomacoesdev/fabrica-de-sites
+repo_url: https://github.com/hectorautomacoesdev/fabrica-de-sites
+edit_uri: edit/main/docs/
+
+copyright: Proprietário © Hector — Fábrica de Sites
+
+# Markdown legado (conteúdo já migrado) fica fora do build; originais preservados no repo.
+exclude_docs: |
+  _legado/
+
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/weather-night
+        name: Mudar para o tema claro
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Mudar para o tema escuro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search:
+      lang: pt
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            members_order: source
+            separate_signature: true
+
+nav:
+  - Início: index.md
+  - Plano — Base Sólida: plano-base-solida.md
+  - Arquitetura:
+      - arquitetura/index.md
+      - Design Patterns: arquitetura/design-patterns.md
+      - Design de Banco: arquitetura/banco-de-dados.md
+  - Decisões (ADRs): decisoes.md
+  - Roadmap: roadmap.md
