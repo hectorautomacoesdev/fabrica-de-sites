@@ -18,8 +18,21 @@ Sistema que **encontra negócios locais sem site (ou com site fraco)**, **gera s
 | 4 | **Criador** | Gera o site e publica | 4 |
 | 5 | **Prospector** | Entra em contato com o dono (WhatsApp/e-mail) | 5 |
 
-Arquitetura completa, decisões técnicas (ADRs), bibliotecas, código e testes na
-**[documentação online](https://hectorautomacoesdev.github.io/fabrica-de-sites/)**.
+## Documentação
+
+📚 **Site publicado:** <https://hectorautomacoesdev.github.io/fabrica-de-sites/> — arquitetura, decisões técnicas (ADRs), bibliotecas, código e testes.
+
+A doc tem **fonte única**: o conteúdo em Markdown vive na pasta [`docs/`](docs/) e é lido por dois renderizadores — o site **MkDocs** (acima) e um app **React** rico (`docs-app/`). Edita-se num lugar só e os dois atualizam. Detalhe em [Documentação de fonte única](docs/fonte-unica.md).
+
+**Publicação automática (CI/CD).** A cada `git push` na `main`, o **GitHub Actions** ([`.github/workflows/docs.yml`](.github/workflows/docs.yml)) republica o site MkDocs no GitHub Pages **e** builda o app React — sem deploy manual.
+
+**Rodar a documentação React localmente:**
+
+```powershell
+cd docs-app
+npm install      # uma vez
+npm run dev      # abre em http://localhost:5173
+```
 
 ## Como rodar (Fase 1 — Scout)
 
