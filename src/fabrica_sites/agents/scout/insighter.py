@@ -9,7 +9,7 @@ enriquecer esses insights — bastará trocar/empilhar a geração de texto.
 from __future__ import annotations
 
 from ...core.sectors import all_sectors, get_sector
-from ...models import ScoutRun, SiteStatus
+from ...models import OrgTipo, ScoutRun, SiteStatus
 
 # Score a partir do qual consideramos um lead "quente" (ALTA/ALTÍSSIMA).
 LEAD_QUENTE = 65
@@ -29,7 +29,8 @@ def compute(run: ScoutRun) -> dict:
     n_contactavel = sum(1 for b in negocios if b.contactavel)
     # Lead "quente" = alta oportunidade E contactável (acionável já).
     n_leads_quentes = sum(
-        1 for b in negocios if b.score >= LEAD_QUENTE and b.contactavel
+        1 for b in negocios
+        if b.score >= LEAD_QUENTE and b.contactavel and b.org_tipo is OrgTipo.INDEPENDENTE
     )
     sem_site_proprio = n_sem_site + n_so_social  # o mercado imediato
 
@@ -57,7 +58,9 @@ def compute(run: ScoutRun) -> dict:
             "oportunidade_pct": _pct(sem + soc, t),
             "score_medio": round(sum(b.score for b in do_setor) / t, 1),
             "leads_quentes": sum(
-                1 for b in do_setor if b.score >= LEAD_QUENTE and b.contactavel
+                1 for b in do_setor
+                if b.score >= LEAD_QUENTE and b.contactavel
+                and b.org_tipo is OrgTipo.INDEPENDENTE
             ),
         })
 

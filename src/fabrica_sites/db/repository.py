@@ -12,7 +12,7 @@ from datetime import datetime
 from sqlalchemy import func
 from sqlmodel import Session, col, select
 
-from ..models import Business, ScoutRun, SiteStatus, WebsiteKind
+from ..models import Business, OrgTipo, ScoutRun, SiteStatus, WebsiteKind
 from .models import BusinessTable, RunTable
 
 
@@ -92,6 +92,7 @@ def _aplicar_filtros(
     contactavel: bool | None,
     score_min: int | None,
     busca: str | None,
+    org_tipo: str | None,
 ):
     """Aplica os filtros opcionais — compartilhado entre listagem e contagem."""
     if setor:
@@ -104,6 +105,8 @@ def _aplicar_filtros(
         stmt = stmt.where(col(BusinessTable.score) >= score_min)
     if busca:
         stmt = stmt.where(col(BusinessTable.nome).like(f"%{busca}%"))
+    if org_tipo:
+        stmt = stmt.where(BusinessTable.org_tipo == org_tipo)
     return stmt
 
 
@@ -116,6 +119,7 @@ def get_businesses(
     contactavel: bool | None = None,
     score_min: int | None = None,
     busca: str | None = None,
+    org_tipo: str | None = None,
     order_by: str = "score",
     order_dir: str = "desc",
     offset: int = 0,
@@ -127,7 +131,7 @@ def get_businesses(
     stmt = select(BusinessTable).where(BusinessTable.run_id == run_id)
     stmt = _aplicar_filtros(
         stmt, setor=setor, site_status=site_status, contactavel=contactavel,
-        score_min=score_min, busca=busca,
+        score_min=score_min, busca=busca, org_tipo=org_tipo,
     )
     # Desempate estável por id → paginação determinística mesmo com empates.
     stmt = stmt.order_by(ordenacao, col(BusinessTable.id).asc()).offset(offset).limit(limit)
@@ -143,6 +147,7 @@ def count_businesses(
     contactavel: bool | None = None,
     score_min: int | None = None,
     busca: str | None = None,
+    org_tipo: str | None = None,
 ) -> int:
     """Conta os negócios que casam com os filtros (ignora offset/limit)."""
     stmt = select(func.count(col(BusinessTable.id))).where(
@@ -150,7 +155,7 @@ def count_businesses(
     )
     stmt = _aplicar_filtros(
         stmt, setor=setor, site_status=site_status, contactavel=contactavel,
-        score_min=score_min, busca=busca,
+        score_min=score_min, busca=busca, org_tipo=org_tipo,
     )
     return int(session.exec(stmt).one())
 
@@ -165,6 +170,7 @@ def _business_to_table(b: Business, run_id: int) -> BusinessTable:
         osm_type=b.osm_type,
         osm_id=b.osm_id,
         nome=b.nome,
+        org_tipo=b.org_tipo.value,
         setor=b.setor,
         setor_nome=b.setor_nome,
         lat=b.lat,
@@ -189,6 +195,7 @@ def _table_to_business(row: BusinessTable) -> Business:
         osm_type=row.osm_type or "node",
         osm_id=row.osm_id or 0,
         nome=row.nome,
+        org_tipo=OrgTipo(row.org_tipo),
         setor=row.setor,
         setor_nome=row.setor_nome,
         lat=row.lat,

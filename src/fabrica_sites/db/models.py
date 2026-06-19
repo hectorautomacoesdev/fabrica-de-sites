@@ -36,6 +36,9 @@ class BusinessTable(SQLModel, table=True):
     osm_id: Optional[int] = None
     nome: Optional[str] = None
 
+    # Tipo de organização
+    org_tipo: str = "independente"  # valor de OrgTipo
+
     # Setor
     setor: str = "outros"
     setor_nome: str = "Outros"

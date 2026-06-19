@@ -66,6 +66,7 @@ def get_businesses(
     contactavel: bool | None = Query(None),
     score_min: int | None = Query(None, ge=0, le=100),
     busca: str | None = Query(None, min_length=2),
+    org_tipo: str | None = Query(None, pattern="^(independente|publico|rede)$"),
     order_by: str = Query(
         "score",
         pattern="^(score|nome|setor|setor_nome|site_status|score_label|contactavel)$",
@@ -87,6 +88,7 @@ def get_businesses(
         contactavel=contactavel,
         score_min=score_min,
         busca=busca,
+        org_tipo=org_tipo,
     )
     response.headers["X-Total-Count"] = str(
         repository.count_businesses(run_id, session, **filtros)
@@ -105,6 +107,7 @@ def get_businesses(
             id=r.id,  # type: ignore[arg-type]
             run_id=r.run_id,
             nome=r.nome,
+            org_tipo=r.org_tipo,
             setor=r.setor,
             setor_nome=r.setor_nome,
             lat=r.lat,

@@ -12,6 +12,14 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 
+class OrgTipo(str, Enum):
+    """Tipo de organização — determina se é um lead válido para a Fábrica."""
+
+    INDEPENDENTE = "independente"  # negócio local/independente — nosso mercado
+    PUBLICO = "publico"            # órgão público (UPA, prefeitura, escola) — fora
+    REDE = "rede"                  # rede/franquia com site corporativo — fora
+
+
 class SiteStatus(str, Enum):
     """Situação do negócio quanto a ter site."""
 
@@ -46,6 +54,9 @@ class Business(BaseModel):
     osm_type: str
     osm_id: int
     nome: str | None = None
+
+    # Tipo de organização
+    org_tipo: OrgTipo = OrgTipo.INDEPENDENTE
 
     # Classificação de setor
     setor: str = "outros"

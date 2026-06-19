@@ -28,6 +28,7 @@ class BusinessRead(BaseModel):
     id: int
     run_id: int
     nome: str | None
+    org_tipo: str
     setor: str
     setor_nome: str
     lat: float | None

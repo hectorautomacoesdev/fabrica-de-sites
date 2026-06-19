@@ -33,8 +33,27 @@ def score(fields: dict) -> dict:
     motivos: list[str] = []
     pontos = 0
 
+    org_tipo: str = fields.get("org_tipo", "independente")
+
+    # Órgão público: score zero — não é nosso mercado.
+    if org_tipo == "publico":
+        kind: WebsiteKind = fields["website_kind"]
+        status = (
+            SiteStatus.SEM_SITE if kind is WebsiteKind.NENHUM
+            else SiteStatus.SO_REDE_SOCIAL if kind is WebsiteKind.REDE_SOCIAL
+            else SiteStatus.COM_SITE
+        )
+        motivos.append("Órgão público — fora do escopo da Fábrica de Sites (0)")
+        return {
+            "site_status": status,
+            "score": 0,
+            "score_label": _label(0),
+            "score_motivos": motivos,
+            "contactavel": False,
+        }
+
     # 1) Base pela presença web.
-    kind: WebsiteKind = fields["website_kind"]
+    kind = fields["website_kind"]
     if kind is WebsiteKind.NENHUM:
         status = SiteStatus.SEM_SITE
         pontos += _W["base_sem_site"]
@@ -65,6 +84,11 @@ def score(fields: dict) -> dict:
     if get_sector(fields["setor"]).prioritario:
         pontos += _W["setor_prioritario"]
         motivos.append(f"Setor prioritário (+{_W['setor_prioritario']})")
+
+    # Rede/franquia: cap em base_com_site (25) — tem site corporativo, oportunidade baixa.
+    if org_tipo == "rede":
+        pontos = min(pontos, _W["base_com_site"])
+        motivos.append("Rede/franquia — site corporativo já existe (cap 25)")
 
     pontos = min(pontos, 100)
     contactavel = bool(fields.get("telefone") or fields.get("email"))

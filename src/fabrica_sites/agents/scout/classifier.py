@@ -12,6 +12,7 @@ entenderam que precisam estar online, mas não têm um site de verdade.
 from __future__ import annotations
 from urllib.parse import urlparse
 
+from ...core.org import classify_org
 from ...core.sectors import classify_sector
 from ...models import RawPlace, WebsiteKind
 
@@ -97,6 +98,7 @@ def extract(raw: RawPlace) -> dict:
         "osm_type": raw.osm_type,
         "osm_id": raw.osm_id,
         "nome": _first(tags, ("name", "brand", "operator")),
+        "org_tipo": classify_org(tags),
         "setor": setor.key,
         "setor_nome": setor.nome,
         "lat": raw.lat,
