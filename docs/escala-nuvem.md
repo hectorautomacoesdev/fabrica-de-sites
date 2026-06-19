@@ -1,9 +1,8 @@
 # Escalando para a Nuvem (futuro)
 
-!!! note "Status"
-    Esta página é **planejamento documentado**, não implementação. Hoje tudo roda **local**.
-    O objetivo é mostrar que as escolhas atuais já preparam o terreno para escalar quando
-    fizer sentido — sem reescrever o sistema.
+> **Status** — esta página é **planejamento documentado**, não implementação. Hoje tudo roda **local**.
+> O objetivo é mostrar que as escolhas atuais já preparam o terreno para escalar quando
+> fizer sentido — sem reescrever o sistema.
 
 ## Estado atual (local)
 
@@ -28,16 +27,14 @@ que escalam. Já aplicamos vários:
 
 ## Caminho de escala (quando necessário)
 
-```mermaid
-flowchart LR
-    subgraph Hoje["Local"]
-        L1["SQLite"] --- L2["uvicorn"] --- L3["vite dev"]
-    end
-    subgraph Nuvem["Nuvem (futuro)"]
-        C1[("PostgreSQL<br/>gerenciado")] --- C2["FastAPI<br/>containerizado"] --- C3["Frontend<br/>em CDN"]
-        C2 --- Q["Fila + Worker<br/>(scout assíncrono)"]
-    end
-    Hoje -->|migração incremental| Nuvem
+```text
+Hoje (Local):      SQLite ─── uvicorn ─── vite dev
+                      │
+                      │  migração incremental
+                      ▼
+Nuvem (futuro):    PostgreSQL gerenciado ─── FastAPI containerizado ─── Frontend em CDN
+                                                      │
+                                                      └── Fila + Worker (scout assíncrono)
 ```
 
 ### 1. Banco: SQLite → PostgreSQL gerenciado

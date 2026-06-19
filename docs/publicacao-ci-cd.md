@@ -3,14 +3,12 @@
 Esta página explica **como o projeto vive no GitHub** e **como esta documentação se publica
 sozinha** a cada alteração — o que foi configurado, para que serve e como usar no dia a dia.
 
-!!! abstract "Resumo em uma frase"
-    Você edita um arquivo Markdown em `docs/` e dá `git push`; o **GitHub Actions** republica
-    o site MkDocs **e** builda o app React (que lê o mesmo `docs/`), automaticamente. Sem
-    deploy manual.
+> **▣ Resumo em uma frase** — você edita um arquivo Markdown em `docs/` e dá `git push`; o **GitHub Actions** republica
+> o site MkDocs **e** builda o app React (que lê o mesmo `docs/`), automaticamente. Sem
+> deploy manual.
 
-!!! info "Fonte única"
-    O conteúdo Markdown é **uma fonte só** (`docs/`), lida pelo MkDocs e pelo app React.
-    Entenda o desenho em [Documentação de fonte única](fonte-unica.md).
+> **ℹ Fonte única** — o conteúdo Markdown é **uma fonte só** (`docs/`), lida pelo MkDocs e pelo app React.
+> Entenda o desenho em [Documentação de fonte única](fonte-unica.md).
 
 ## Onde tudo vive
 
@@ -20,13 +18,15 @@ sozinha** a cada alteração — o que foi configurado, para que serve e como us
 | Documentação publicada | **GitHub Pages** → <https://hectorautomacoesdev.github.io/fabrica-de-sites/> |
 | Segredos (chaves de API) | Apenas no `.env` **local** (nunca no repositório) |
 
-```mermaid
-flowchart LR
-    DEV["Você edita<br/>docs/*.md + mkdocs.yml"] --> PUSH["git push (branch main)"]
-    PUSH --> GHA["GitHub Actions<br/>(workflow docs.yml)"]
-    GHA --> BUILD["mkdocs build --strict"]
-    BUILD --> PAGES["GitHub Pages<br/>publica o site"]
-    PAGES --> URL["site no ar 🌐"]
+```text
+Você edita docs/*.md ──▶ git push (main) ──▶ GitHub Actions (docs.yml)
+                                                    │
+                                    ┌───────────────┴────────────────┐
+                                    ▼                                 ▼
+                           mkdocs build --strict            build do app React
+                                    │                      (valida a fonte única)
+                                    ▼
+                           GitHub Pages publica ──▶ site no ar 🌐
 ```
 
 ## Configuração do GitHub
@@ -55,10 +55,9 @@ node_modules/
 site/               # build local do MkDocs
 ```
 
-!!! danger "Antes de cada publicação"
-    Fazemos uma **varredura de segredos**: confirmar que a chave não aparece em nenhum
-    arquivo rastreado (`git ls-files`). Num repo público, um segredo commitado deve ser
-    considerado **vazado** — mesmo que removido depois, fica no histórico e em caches.
+> **⛔ Antes de cada publicação** — fazemos uma **varredura de segredos**: confirmar que a chave não aparece em nenhum
+> arquivo rastreado (`git ls-files`). Num repo público, um segredo commitado deve ser
+> considerado **vazado** — mesmo que removido depois, fica no histórico e em caches.
 
 ### `.gitattributes`
 Normaliza as quebras de linha como **LF** no repositório, evitando ruído de CRLF↔LF entre
@@ -130,9 +129,8 @@ jobs:
 inexistente ou página fora do nav. Assim, um erro na doc barra o deploy em vez de publicar
 algo quebrado — é a nossa rede de segurança.
 
-!!! note "Aviso de 'Node.js 20' no log"
-    O GitHub mostra um aviso transitório de que as actions estão sendo forçadas a rodar em
-    Node 24. É um comunicado da plataforma, **não um erro** — o deploy conclui normalmente.
+> **Aviso de "Node.js 20" no log** — o GitHub mostra um aviso transitório de que as actions estão sendo forçadas a rodar em
+> Node 24. É um comunicado da plataforma, **não um erro** — o deploy conclui normalmente.
 
 ## GitHub Pages
 
@@ -164,9 +162,8 @@ Como adicionar ou editar uma página, do começo ao ar:
    ```
 4. **Publicar**: `git push` na `main` → o GitHub Actions builda e publica em ~30–40 s.
 
-!!! tip "Convenção do projeto"
-    Todo **plano** e **relatório de sessão** relevante vira página desta documentação — ela
-    é a base de conhecimento viva e versionada do projeto.
+> **Convenção do projeto** — todo **plano** e **relatório de sessão** relevante vira página desta documentação — ela
+> é a base de conhecimento viva e versionada do projeto.
 
 ### Como editar uma página direto pelo GitHub
 Cada página tem um ícone de **lápis** (canto superior) que abre o arquivo no editor do

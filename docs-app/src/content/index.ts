@@ -18,6 +18,9 @@ import decisoes from '../../../docs/decisoes.md?raw'
 import roadmap from '../../../docs/roadmap.md?raw'
 import relatorios from '../../../docs/relatorios/index.md?raw'
 import fonteUnica from '../../../docs/fonte-unica.md?raw'
+import planoBaseSolida from '../../../docs/plano-base-solida.md?raw'
+import publicacaoCicd from '../../../docs/publicacao-ci-cd.md?raw'
+import escalaNuvem from '../../../docs/escala-nuvem.md?raw'
 
 // Junta vários arquivos numa única página React (com separador visual).
 const join = (...parts: string[]) => parts.join('\n\n---\n\n')
@@ -33,4 +36,7 @@ export const MD_CONTENT: Record<string, string> = {
   decisoes,
   roadmap,
   relatorios,
+  'plano-base-solida': planoBaseSolida,
+  'publicacao-ci-cd': publicacaoCicd,
+  'escala-nuvem': escalaNuvem,
 }

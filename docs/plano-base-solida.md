@@ -1,12 +1,11 @@
 # Plano — Base Sólida (Documentação + Reestruturação do Scout)
 
-!!! abstract "Por que esta fase existe"
-    O Agente Scout é o **coração** do projeto — é dele que saem as oportunidades. Antes de
-    avançar para os próximos agentes, vamos **solidificar a base**: transformar o Scout de
-    um script local (CLI + HTML estático + SQLite cru) em uma **aplicação real** — backend
-    com API, frontend React, banco com ORM/migrations — e construir esta documentação de
-    referência. Tudo roda **local** por enquanto (sem nuvem), mas estruturado como app de
-    produção, pronto para escalar depois.
+> **▣ Por que esta fase existe** — o Agente Scout é o **coração** do projeto — é dele que saem as oportunidades. Antes de
+> avançar para os próximos agentes, vamos **solidificar a base**: transformar o Scout de
+> um script local (CLI + HTML estático + SQLite cru) em uma **aplicação real** — backend
+> com API, frontend React, banco com ORM/migrations — e construir esta documentação de
+> referência. Tudo roda **local** por enquanto (sem nuvem), mas estruturado como app de
+> produção, pronto para escalar depois.
 
 ## Progresso
 
@@ -33,13 +32,14 @@
 
 ## Arquitetura-alvo
 
-```mermaid
-flowchart LR
-    React["React (Vite + TS)<br/>dashboard / relatórios"] -->|HTTP / JSON| API["FastAPI<br/>(routers + DTOs)"]
-    CLI["CLI (fabrica)"] --> SVC
-    API --> SVC["Service layer<br/>run_scout, insights, persistência"]
-    SVC --> ORM["SQLModel"]
-    ORM --> DB[("SQLite → Postgres")]
+```text
+React (Vite + TS) ──HTTP/JSON──▶ FastAPI (routers + DTOs) ─┐
+                                                            ▼
+CLI (fabrica) ──────────────────────────────────▶ Service layer
+                                          (run_scout, insights, persistência)
+                                                            │
+                                                            ▼
+                                                  SQLModel ──▶ SQLite → Postgres
 ```
 
 A CLI atual e a nova API consomem **o mesmo** service layer — sem duplicar lógica.

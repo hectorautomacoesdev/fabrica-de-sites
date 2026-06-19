@@ -40,7 +40,7 @@ const MKDOCS_SITE = 'https://hectorautomacoesdev.github.io/fabrica-de-sites/'
 const REACT_ROUTES = new Set([
   '', 'fonte-unica', 'estrutura', 'arquitetura', 'bibliotecas', 'react', 'evolucao',
   'resumo', 'boas-praticas', 'custos', 'codigo', 'testes', 'decisoes',
-  'roadmap', 'relatorios',
+  'roadmap', 'relatorios', 'plano-base-solida', 'publicacao-ci-cd', 'escala-nuvem',
 ])
 
 // Sub-arquivos que no React são concatenados na página-pai. Links relativos do tipo

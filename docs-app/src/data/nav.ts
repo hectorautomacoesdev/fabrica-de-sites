@@ -5,6 +5,7 @@ export interface NavItem {
   slug: string // rota relativa (sem barra). '' = Início.
   title: string
   status: NavStatus
+  href?: string // se presente, é link EXTERNO (abre em nova aba) em vez de rota interna
 }
 
 export interface NavGroup {
@@ -44,6 +45,22 @@ export const NAV: NavGroup[] = [
       { slug: 'decisoes', title: 'Decisões (ADRs)', status: 'ready' },
       { slug: 'roadmap', title: 'Roadmap', status: 'ready' },
       { slug: 'relatorios', title: 'Relatórios de sessão', status: 'ready' },
+      {
+        slug: 'referencia-api',
+        title: 'Referência de API ↗',
+        status: 'ready',
+        // Gerada por Python (mkdocstrings) no build do MkDocs — não roda no React.
+        // Abre a página gerada no site publicado, mantendo a fonte única (os docstrings).
+        href: 'https://hectorautomacoesdev.github.io/fabrica-de-sites/referencia-api/',
+      },
+    ],
+  },
+  {
+    group: 'Projeto & infra',
+    items: [
+      { slug: 'plano-base-solida', title: 'Plano — Base Sólida', status: 'ready' },
+      { slug: 'publicacao-ci-cd', title: 'Publicação & CI/CD', status: 'ready' },
+      { slug: 'escala-nuvem', title: 'Escalando para a nuvem', status: 'ready' },
     ],
   },
 ]
