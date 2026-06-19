@@ -7,28 +7,14 @@ Como os dados do Scout são modelados e persistidos — do esquema atual (SQLite
 
 Uma execução do Scout (`Run`) tem muitos negócios (`Business`) — relação **1 : N**.
 
-```mermaid
-erDiagram
-    RUN ||--o{ BUSINESS : "tem"
-    RUN {
-        int id PK
-        string cidade
-        int admin_level
-        string fonte
-        string gerado_em
-        int total
-    }
-    BUSINESS {
-        int id PK
-        int run_id FK
-        string nome
-        string setor
-        string site_status
-        string telefone
-        int score
-        string score_motivos "JSON"
-        string raw_tags "JSON"
-    }
+```text
+RUN  1 ─────< N  BUSINESS
+ id (PK)          id (PK)
+ cidade           run_id (FK → RUN.id, ON DELETE CASCADE)
+ admin_level      nome, setor, site_status, telefone
+ fonte            score, score_motivos (JSON)
+ gerado_em        raw_tags (JSON)
+ total
 ```
 
 ## Esquema atual (SQLite, SQL cru)

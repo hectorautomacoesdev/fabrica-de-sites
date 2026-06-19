@@ -35,9 +35,8 @@ for src in lista_fontes:                 # (1)!
 1.  `lista_fontes` pode conter `OverpassSource`, `SerperSource` ou qualquer futura
     implementação — o laço não muda.
 
-!!! success "Open/Closed Principle"
-    O pipeline está **aberto para extensão** (nova fonte = nova classe) e **fechado para
-    modificação** (`scout.py` não muda). É o "O" do SOLID, viabilizado por ABCs.
+> **✓ Open/Closed Principle** — o pipeline está **aberto para extensão** (nova fonte = nova classe) e **fechado para
+> modificação** (`scout.py` não muda). É o "O" do SOLID, viabilizado por ABCs.
 
 ### Repository Pattern — isolar o acesso a dados *(reestruturação)*
 

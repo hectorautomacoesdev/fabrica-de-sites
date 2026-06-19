@@ -4,9 +4,8 @@ Testes existem para uma coisa: **confiança para mudar o código sem medo**. Um 
 testado pode ser refatorado, otimizado e estendido — porque uma regressão acende uma luz
 vermelha na hora. Esta página explica os **tipos de teste**, **quais adotamos** e **por quê**.
 
-!!! quote "Filosofia do projeto"
-    Testes devem ser **rápidos**, **confiáveis** e **independentes do ambiente externo**.
-    Os 77 testes atuais rodam em **~0,7 s** sem fazer nenhuma chamada de rede real.
+> **❝ Filosofia do projeto** — testes devem ser **rápidos**, **confiáveis** e **independentes do ambiente externo**.
+> Os 77 testes atuais rodam em **~0,7 s** sem fazer nenhuma chamada de rede real.
 
 ## A pirâmide de testes
 
@@ -14,17 +13,14 @@ A heurística clássica (Mike Cohn, popularizada por Martin Fowler): **muitos** 
 unitários na base (rápidos, baratos), **menos** de integração no meio, **poucos** de ponta
 a ponta (e2e) no topo (lentos, caros, frágeis).
 
-```mermaid
-flowchart TB
-    E2E["🔺 E2E (poucos)<br/>lentos, alto nível, frágeis"]
-    INT["🔷 Integração (médios)<br/>módulos juntos, com mocks de rede"]
-    UNIT["🟩 Unitários (muitos)<br/>rápidos, isolados, baratos"]
-    E2E --- INT --- UNIT
+```text
+        🔺 E2E (poucos) — lentos, alto nível, frágeis
+      🔷 Integração (médios) — módulos juntos, com mocks de rede
+    🟩 Unitários (muitos) — rápidos, isolados, baratos
 ```
 
-!!! warning "Anti-padrão: o 'cone de sorvete'"
-    Inverter a pirâmide — muitos e2e, poucos unitários — gera uma suíte **lenta e instável**.
-    Preferimos empurrar a verificação para o nível mais baixo que ainda dê confiança.
+> **⚠ Anti-padrão: o "cone de sorvete"** — inverter a pirâmide — muitos e2e, poucos unitários — gera uma suíte **lenta e instável**.
+> Preferimos empurrar a verificação para o nível mais baixo que ainda dê confiança.
 
 ## Tipos de teste e como usamos
 

@@ -1,0 +1,213 @@
+/* ── Shell: sidebar fixa + área principal ── */
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ─────────────── Sidebar (a "barrinha") ─────────────── */
+.sidebar {
+  width: 264px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 14px 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 10px 16px;
+  color: var(--text-strong) !important;
+}
+.brand:hover {
+  text-decoration: none;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+  color: #fff;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px var(--accent-faint);
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+.brand-text small {
+  font-weight: 500;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 6px;
+}
+.nav-group-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 0 10px 6px;
+}
+.nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.86rem;
+  border: 1px solid transparent;
+  transition: background 0.12s, color 0.12s;
+}
+.nav-link:hover {
+  background: var(--hover-bg);
+  text-decoration: none;
+}
+.nav-link.active {
+  background: var(--accent-faint);
+  color: var(--text-strong);
+  border-color: var(--border);
+  font-weight: 600;
+}
+.nav-link.active::before {
+  content: '';
+  position: absolute;
+}
+.badge-soon {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+.sidebar-foot {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  padding: 14px 10px 4px;
+  border-top: 1px solid var(--border-faint);
+  margin-top: 10px;
+}
+
+/* ─────────────── Área principal ─────────────── */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 28px;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-faint);
+}
+.topbar-crumb {
+  font-weight: 600;
+  color: var(--text-strong);
+  font-size: 0.9rem;
+}
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.topbar-link {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.theme-toggle,
+.nav-toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-strong);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.12s;
+}
+.theme-toggle:hover,
+.nav-toggle:hover {
+  background: var(--hover-bg);
+}
+.nav-toggle {
+  display: none;
+}
+
+.content {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 36px 28px 90px;
+}
+
+.scrim {
+  display: none;
+}
+
+/* ─────────────── Responsivo ─────────────── */
+@media (max-width: 860px) {
+  .sidebar {
+    position: fixed;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.22s ease;
+    box-shadow: var(--shadow);
+  }
+  .nav-open .sidebar {
+    transform: translateX(0);
+  }
+  .nav-toggle {
+    display: grid;
+  }
+  .nav-open .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .content {
+    padding: 28px 20px 80px;
+  }
+}

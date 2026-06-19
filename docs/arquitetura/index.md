@@ -4,22 +4,22 @@ Esta seção explica **como o sistema é organizado** e **por quê**. Começamos
 alto nível (os 5 agentes em esteira), descemos para a arquitetura interna atual do Scout
 e terminamos na **arquitetura-alvo full-stack** para onde estamos evoluindo.
 
-!!! tip "Páginas desta seção"
-    - **Visão geral** (esta página) — camadas, pipeline e arquitetura-alvo.
-    - **Design Patterns** — os padrões usados no backend e no frontend.
-    - **Design de Banco** — modelagem, índices e migrations.
+> **Páginas desta seção**
+>
+> - **Visão geral** (esta página) — camadas, pipeline e arquitetura-alvo.
+> - **Design Patterns** — os padrões usados no backend e no frontend.
+> - **Design de Banco** — modelagem, índices e migrations.
 
 ## Visão de alto nível — 5 agentes em esteira
 
 Cada agente entrega um artefato consumido pelo próximo. O fio condutor é o **banco**: o
 Scout grava negócios; os demais agentes leem e enriquecem esses registros.
 
-```mermaid
-flowchart LR
-    A["1. Scout<br/>mapeia negócios sem site"] --> B["2. Benchmark<br/>define 'site bom' por setor"]
-    B --> C["3. Auditor<br/>audita sites existentes"]
-    C --> D["4. Criador<br/>gera e publica o site"]
-    D --> E["5. Prospector<br/>contata o dono"]
+```text
+1. Scout ──▶ 2. Benchmark ──▶ 3. Auditor ──▶ 4. Criador ──▶ 5. Prospector
+mapeia        define "site      audita os      gera e         contata
+negócios      bom" por setor    sites          publica        o dono
+sem site                        existentes     o site
 ```
 
 | # | Agente | Entrada | Saída | Stack prevista |
@@ -46,19 +46,25 @@ O Scout é um **pipeline de dados** em estágios. A função orquestradora
 é **pura**: não sabe de HTTP, de HTML nem de banco. Recebe fontes e enrichers, devolve um
 `ScoutRun`.
 
-```mermaid
-flowchart TB
-    subgraph Coleta
-        S1["BusinessSource<br/>(Overpass, Serper)"] --> RP["RawPlace[]"]
-    end
-    RP --> DD["Deduplicação<br/>(por ID e por nome via Jaccard)"]
-    DD --> CL["classifier.extract()<br/>setor + contato + tipo de presença web"]
-    CL --> SC["scorer.score()<br/>score 0–100 + motivos"]
-    SC --> EN["BusinessEnricher<br/>(DomainGuesser)"]
-    EN --> SR["ScoutRun (ordenado por score)"]
-    SR --> DB[("db.py<br/>SQLite")]
-    SR --> IN["insighter.compute()<br/>KPIs + insights"]
-    IN --> RPT["reporter.render()<br/>dashboard HTML"]
+```text
+BusinessSource (Overpass, Serper) ──▶ RawPlace[]
+        │
+        ▼
+  Deduplicação (por ID e por nome via Jaccard)
+        │
+        ▼
+  classifier.extract()  setor + contato + tipo de presença web
+        │
+        ▼
+  scorer.score()        score 0–100 + motivos
+        │
+        ▼
+  BusinessEnricher (DomainGuesser)
+        │
+        ▼
+  ScoutRun (ordenado por score) ──▶ db (SQLite)
+        │
+        └──▶ insighter.compute() ──▶ reporter.render() (dashboard HTML)
 ```
 
 ### Responsabilidade de cada módulo
@@ -91,21 +97,20 @@ O mesmo vale para `BusinessEnricher` (pós-processamento). Detalhe em
 Para virar a base sólida dos próximos agentes, o Scout evolui de "script + HTML estático"
 para uma aplicação real, em **camadas**:
 
-```mermaid
-flowchart LR
-    subgraph Cliente
-        R["React (Vite + TS)<br/>dashboard, filtros, mapa"]
-    end
-    subgraph Servidor
-        API["FastAPI<br/>routers + DTOs (Pydantic)"]
-        SVC["Service layer<br/>orquestra run_scout + persistência + insights"]
-        REPO["Repositórios<br/>(SQLModel)"]
-    end
-    CLI["CLI (fabrica)"] --> SVC
-    R -->|HTTP / JSON| API
-    API --> SVC
-    SVC --> REPO
-    REPO --> DB[("SQLite → PostgreSQL")]
+```text
+  React (Vite + TS)            ← apresentação (dashboard, filtros, mapa)
+        │  HTTP / JSON
+        ▼
+  FastAPI (routers + DTOs)     ← traduz HTTP ⇄ chamadas de serviço
+        │
+        ▼
+  Service layer                ← orquestra run_scout + persistência + insights
+        │                         (consumido TAMBÉM pela CLI)
+        ▼
+  Repositórios (SQLModel)      ← isolam o acesso ao banco
+        │
+        ▼
+  SQLite → PostgreSQL
 ```
 
 ### O que cada camada faz (e por que separar)
@@ -121,11 +126,10 @@ flowchart LR
   ao repositório. Trocar SQLite por Postgres não afeta as camadas de cima.
 - **Banco** — SQLite local agora; Postgres depois (mesmo código SQLModel).
 
-!!! info "A 'regra de dependência'"
-    As setas apontam **para dentro**: o frontend depende da API, a API depende do serviço,
-    o serviço depende do repositório. As camadas internas (regra de negócio) **não** conhecem
-    as externas (HTTP, framework web, banco específico). É a ideia central da *Clean
-    Architecture* — o que torna o núcleo testável e estável enquanto as bordas mudam.
+> **ℹ A "regra de dependência"** — as setas apontam **para dentro**: o frontend depende da API, a API depende do serviço,
+> o serviço depende do repositório. As camadas internas (regra de negócio) **não** conhecem
+> as externas (HTTP, framework web, banco específico). É a ideia central da *Clean
+> Architecture* — o que torna o núcleo testável e estável enquanto as bordas mudam.
 
 ### Por que a CLI e a API compartilham o service layer
 

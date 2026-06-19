@@ -1,0 +1,54 @@
+.callout {
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin: 18px 0;
+  background: var(--card-bg);
+}
+.callout-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.callout-icon {
+  font-size: 0.95rem;
+}
+.callout-title {
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 0.9rem;
+}
+.callout-body {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+.callout-body :last-child {
+  margin-bottom: 0;
+}
+
+.callout-info {
+  border-left-color: var(--accent);
+}
+.callout-info .callout-icon {
+  color: var(--accent);
+}
+.callout-tip {
+  border-left-color: #36c08a;
+}
+.callout-tip .callout-icon {
+  color: #36c08a;
+}
+.callout-warning {
+  border-left-color: #e0a93b;
+}
+.callout-warning .callout-icon {
+  color: #e0a93b;
+}
+.callout-note {
+  border-left-color: var(--text-muted);
+}
+.callout-note .callout-icon {
+  color: var(--text-muted);
+}

@@ -1,0 +1,36 @@
+// Registro do conteúdo Markdown.
+// FONTE ÚNICA: a pasta `docs/` na raiz do repositório — a MESMA que alimenta o site MkDocs.
+// Cada .md é importado como string crua (?raw do Vite). Não há mais cópias aqui: editar em
+// `docs/` atualiza tanto o site MkDocs quanto esta documentação React.
+// Páginas que no MkDocs são divididas em vários arquivos (arquitetura, código) são
+// concatenadas aqui numa página só. Páginas visuais (Estrutura, Evolução, Bibliotecas) são
+// componentes React e não passam por aqui.
+import arquiteturaIndex from '../../../docs/arquitetura/index.md?raw'
+import arquiteturaPatterns from '../../../docs/arquitetura/design-patterns.md?raw'
+import arquiteturaBanco from '../../../docs/arquitetura/banco-de-dados.md?raw'
+import frontendReact from '../../../docs/frontend.md?raw'
+import resumo from '../../../docs/resumo.md?raw'
+import boasPraticas from '../../../docs/boas-praticas.md?raw'
+import codigoIndex from '../../../docs/codigo/index.md?raw'
+import codigoConvencoes from '../../../docs/codigo/convencoes.md?raw'
+import testes from '../../../docs/testes.md?raw'
+import decisoes from '../../../docs/decisoes.md?raw'
+import roadmap from '../../../docs/roadmap.md?raw'
+import relatorios from '../../../docs/relatorios/index.md?raw'
+import fonteUnica from '../../../docs/fonte-unica.md?raw'
+
+// Junta vários arquivos numa única página React (com separador visual).
+const join = (...parts: string[]) => parts.join('\n\n---\n\n')
+
+export const MD_CONTENT: Record<string, string> = {
+  'fonte-unica': fonteUnica,
+  arquitetura: join(arquiteturaIndex, arquiteturaPatterns, arquiteturaBanco),
+  react: frontendReact,
+  resumo,
+  'boas-praticas': boasPraticas,
+  codigo: join(codigoIndex, codigoConvencoes),
+  testes,
+  decisoes,
+  roadmap,
+  relatorios,
+}

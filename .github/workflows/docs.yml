@@ -1,11 +1,14 @@
 name: Deploy da documentação
 
-# Publica o site MkDocs no GitHub Pages a cada push em main.
+# Publica o site MkDocs no GitHub Pages a cada push em main e valida o build da doc React.
+# Como o conteúdo Markdown agora é fonte única (pasta docs/), uma mudança em docs/ dispara
+# os dois: redeploy do MkDocs e build do app React que lê os mesmos arquivos.
 on:
   push:
     branches: [main]
     paths:
       - "docs/**"
+      - "docs-app/**"
       - "mkdocs.yml"
       - "src/**"
       - ".github/workflows/docs.yml"
@@ -40,6 +43,24 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
+
+  # Valida que o app React (documentação que as pessoas baixam e rodam local) continua
+  # compilando ao ler o conteúdo da fonte única docs/. Não publica — roda só como checagem.
+  react-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: docs-app/package-lock.json
+      - name: Instalar dependências da doc React
+        run: npm ci
+        working-directory: docs-app
+      - name: Build da doc React (valida a fonte única docs/)
+        run: npm run build
+        working-directory: docs-app
 
   deploy:
     needs: build

@@ -4,9 +4,8 @@ Um tour pelo código do Scout. Cada módulo tem **uma responsabilidade** (ver
 [Arquitetura](../arquitetura/index.md)). Os títulos linkam para o arquivo no GitHub, onde
 você vê o código completo — aqui mostramos só o trecho mais ilustrativo.
 
-!!! tip "Como ler"
-    O fluxo de dados é: `RawPlace` (cru) → `classifier.extract` → `scorer.score` →
-    `Business` (classificado/pontuado) → `insighter` → `reporter`/`db`.
+> **Como ler** — o fluxo de dados é: `RawPlace` (cru) → `classifier.extract` → `scorer.score` →
+> `Business` (classificado/pontuado) → `insighter` → `reporter`/`db`.
 
 ## Estrutura do pacote
 

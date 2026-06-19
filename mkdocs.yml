@@ -90,19 +90,29 @@ plugins:
 
 nav:
   - Início: index.md
-  - Plano — Base Sólida: plano-base-solida.md
-  - Arquitetura:
-      - arquitetura/index.md
-      - Design Patterns: arquitetura/design-patterns.md
-      - Design de Banco: arquitetura/banco-de-dados.md
-  - Bibliotecas: bibliotecas.md
-  - Código:
-      - codigo/index.md
-      - Convenções: codigo/convencoes.md
-  - Testes: testes.md
-  - Publicação & CI/CD: publicacao-ci-cd.md
-  - Escalando para a nuvem: escala-nuvem.md
-  - Decisões (ADRs): decisoes.md
-  - Roadmap: roadmap.md
-  - Relatórios de Sessão: relatorios/index.md
-  - Referência de API: referencia-api.md
+  - Documentação de fonte única: fonte-unica.md
+  - Entender o projeto:
+      - Estrutura do projeto: estrutura.md
+      - Arquitetura:
+          - arquitetura/index.md
+          - Design Patterns: arquitetura/design-patterns.md
+          - Design de Banco: arquitetura/banco-de-dados.md
+      - Bibliotecas: bibliotecas.md
+      - Frontend & React: frontend.md
+  - Evolução & meta:
+      - Evolução do projeto: evolucao.md
+      - Resumo & ponderações: resumo.md
+      - Boas práticas do Claude: boas-praticas.md
+  - Referência:
+      - Código:
+          - codigo/index.md
+          - Convenções: codigo/convencoes.md
+      - Testes: testes.md
+      - Decisões (ADRs): decisoes.md
+      - Roadmap: roadmap.md
+      - Relatórios de Sessão: relatorios/index.md
+      - Referência de API: referencia-api.md
+  - Projeto & infra:
+      - Plano — Base Sólida: plano-base-solida.md
+      - Publicação & CI/CD: publicacao-ci-cd.md
+      - Escalando para a nuvem: escala-nuvem.md

@@ -4,8 +4,13 @@ Esta página explica **como o projeto vive no GitHub** e **como esta documentaç
 sozinha** a cada alteração — o que foi configurado, para que serve e como usar no dia a dia.
 
 !!! abstract "Resumo em uma frase"
-    Você edita um arquivo Markdown e dá `git push`; o **GitHub Actions** builda a doc e a
-    **GitHub Pages** publica automaticamente em ~30–40 segundos. Sem deploy manual.
+    Você edita um arquivo Markdown em `docs/` e dá `git push`; o **GitHub Actions** republica
+    o site MkDocs **e** builda o app React (que lê o mesmo `docs/`), automaticamente. Sem
+    deploy manual.
+
+!!! info "Fonte única"
+    O conteúdo Markdown é **uma fonte só** (`docs/`), lida pelo MkDocs e pelo app React.
+    Entenda o desenho em [Documentação de fonte única](fonte-unica.md).
 
 ## Onde tudo vive
 
@@ -73,6 +78,7 @@ on:
     branches: [main]          # roda a cada push na main...
     paths:                    # ...mas só se algo de doc/código mudou
       - "docs/**"
+      - "docs-app/**"         # o app React lê docs/ — mudou um ou outro, valida os dois
       - "mkdocs.yml"
       - "src/**"
       - ".github/workflows/docs.yml"
@@ -100,7 +106,18 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
 
-  deploy:                     # 2) publica o que foi construído
+  react-docs:                 # 1b) valida que o app React compila lendo a fonte única docs/
+    runs-on: ubuntu-latest    #     (não publica — é só uma checagem; ver Fonte única)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: npm, cache-dependency-path: docs-app/package-lock.json }
+      - run: npm ci
+        working-directory: docs-app
+      - run: npm run build       # builda lendo ../docs — quebra se a fonte sair do lugar
+        working-directory: docs-app
+
+  deploy:                     # 2) publica o site MkDocs construído
     needs: build
     runs-on: ubuntu-latest
     environment: { name: github-pages, url: "${{ steps.deployment.outputs.page_url }}" }

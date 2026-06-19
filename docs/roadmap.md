@@ -3,14 +3,9 @@
 Construção por fases, do simples ao complexo. Cada fase entrega algo que funciona sozinho
 e gera valor.
 
-```mermaid
-flowchart LR
-    F1["Fase 1<br/>Scout ✅"] --> F15["Base Sólida<br/>API+React+DB ✅"]
-    F15 --> F2["Fase 2<br/>Benchmark"]
-    F2 --> F3["Fase 3<br/>Auditor"]
-    F3 --> F4["Fase 4<br/>Criador"]
-    F4 --> F5["Fase 5<br/>Prospector"]
-    F5 --> F6["Fase 6+<br/>Escala"]
+```text
+Fase 1 (Scout ✅) ──▶ Base Sólida (API + React + DB ✅) ──▶ Fase 2 (Benchmark)
+  ──▶ Fase 3 (Auditor) ──▶ Fase 4 (Criador) ──▶ Fase 5 (Prospector) ──▶ Fase 6+ (Escala)
 ```
 
 ## ✅ Fase 1 — Agente Scout

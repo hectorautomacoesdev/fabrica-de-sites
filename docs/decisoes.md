@@ -3,10 +3,9 @@
 Registro no estilo **ADR leve** (*Architecture Decision Record*). Cada decisão tem
 contexto, escolha e alternativas, para podermos revisitar com clareza no futuro.
 
-!!! note "O que é um ADR"
-    Um *Architecture Decision Record* é um documento curto que captura **uma** decisão
-    arquitetural importante: o contexto que a motivou, a opção escolhida e as alternativas
-    consideradas. Referência: [adr.github.io](https://adr.github.io/).
+> **O que é um ADR** — um *Architecture Decision Record* é um documento curto que captura **uma** decisão
+> arquitetural importante: o contexto que a motivou, a opção escolhida e as alternativas
+> consideradas. Referência: [adr.github.io](https://adr.github.io/).
 
 ---
 
@@ -165,3 +164,28 @@ sem SSR). TanStack Query cuida de cache, revalidação e estados de loading/erro
 habilitado para prod. Em prod, um reverse proxy (nginx) faz o mesmo.
 **`verbatimModuleSyntax`:** o `tsconfig` do Vite exige `import type` para importações
 que são só tipos — padrão moderno que evita imports circulares e clarifica intenção.
+
+---
+
+## D18 — Documentação de fonte única (MkDocs + React lêem o mesmo `docs/`)
+
+**Contexto:** passamos a ter duas documentações — o site **MkDocs** (publicado no GitHub
+Pages) e um app **React** rico (`docs-app/`, rodado local). Elas tinham conteúdo
+**duplicado** (o React mantinha cópias em `docs-app/src/content/`) e divergiram: editar uma
+não mexia na outra.
+**Escolha:** **uma fonte única** — o conteúdo Markdown vive só em `docs/`, e o app React o
+**lê diretamente** (import `?raw` do Vite). Nada de cópias. Editar `docs/` atualiza os dois.
+**Por quê:** elimina a divergência ("uma fonte da verdade", como já fazemos com o service
+layer). O Markdown é o denominador comum: o MkDocs só renderiza Markdown, o React renderiza
+Markdown **e** componentes — logo a fonte tem de ser Markdown.
+**Como:** sintaxe **portável** (ASCII + citação) nas páginas que os dois renderizam; Mermaid
+e admonitions ficam nas páginas só-MkDocs; um reescritor de links converte `.md` → rota do
+React; páginas visuais (gráficos) ganham um `.md` estático equivalente para o site público;
+o CI passa a buildar também o app React. Detalhe em
+[Documentação de fonte única](fonte-unica.md).
+**Alternativas:** (a) manter as duas à mão — rejeitada (divergência garantida); (b) ensinar
+o React a renderizar Mermaid/admonitions (rejeitada — somaria ~500 KB ao bundle do React,
+que já tem nota de peso).
+**Papel de cada um:** o **MkDocs** é a vitrine pública ("clica e vê" no GitHub, sem baixar);
+o **React** é a versão rica para baixar e rodar. Ainda **não** publicamos o React (decisão
+em aberto — é só um ajuste no CI quando fizer sentido).
