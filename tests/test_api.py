@@ -132,6 +132,10 @@ def test_get_businesses_retorna_lista(first_run_id):
         assert "site_status" in b
         assert "score" in b
         assert "contactavel" in b
+        # Campos ricos para o painel de detalhe (visão 360 do lead)
+        assert "horario" in b
+        assert "score_motivos" in b
+        assert isinstance(b["score_motivos"], list)
 
 
 def test_filtro_contactavel(first_run_id):
