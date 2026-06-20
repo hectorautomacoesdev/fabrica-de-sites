@@ -211,3 +211,39 @@ contador; o CNPJ **não** diz se o negócio tem site (isso continua vindo do OSM
 não para **descobrir** todos os negócios de uma cidade; ficam como camada futura de frescor.
 **Status:** estudado e recomendado; implementação proposta como `feat/scout-fonte-cnpj` após o
 trabalho de frontend/API.
+
+## D20 — Auditor: determinístico-primeiro, Lighthouse depois, visão por IA opcional
+
+**Contexto:** o agente Auditor precisa dar nota a "site bom ou ruim?". A pesquisa (jun/2026) mostrou
+três camadas possíveis: heurísticas próprias (HTTP+HTML), ferramentas de mercado (Lighthouse/axe via
+subprocess) e avaliação de design por IA com visão. Ver o [Plano](plano-auditor-benchmark.md) e o
+[Dossiê](auditor-benchmark-pesquisa.md).
+**Escolha:** **começar pela Alternativa A** (Python puro: `httpx`+`BeautifulSoup`+Playwright, sem
+Node) e ter a **Alternativa B como destino da v1** (acrescentar Lighthouse/axe via `subprocess` só
+nos candidatos). A camada de **visão por IA (Alternativa C)** entra na **v2**, atrás de uma interface
+plugável (`VisionScorer`) **desligada por padrão**.
+**Por quê:** entrega valor em dias sem infra Node/Chromium, escala para muitos sites e segue
+"determinístico primeiro" (D2). Lighthouse dá a nota "de mercado" para o pitch, mas como reforço, não
+pré-requisito. A visão é a única camada paga/não-determinística — só liga quando o ganho compensa
+(leads quentes), no mesmo espírito de "começar grátis".
+**Trade-offs honestos:** heurísticas próprias reinventam parte do Lighthouse e dão a11y fraca até a
+Alt. B entrar; a camada de visão tem variância entre execuções (exige cache e rubrica fixa).
+**Alternativas descartadas para já:** PageSpeed Insights API (nuvem, cota — ruim para varredura em
+massa) e WAVE/BuiltWith (pagos). Reaproveitar lógica do web-check (Lissy93, MIT) e a lista de campos
+do site-audit-seo/OSAT como referência.
+**Status:** decidido no planejamento; implementação na Fase 3.
+
+## D21 — Benchmark é dado versionado (YAML/JSON), não código
+
+**Contexto:** o agente Benchmark define "o que um site deveria ter" por setor. Isso pode morar no
+código (constantes/classes) ou como dados externos.
+**Escolha:** guardar a régua como **YAML/JSON versionado** em `agents/benchmark/data/` — um arquivo
+por setor (`base`, `alimentacao`, `beleza`, `saude`, `turismo`, `fitness`), cada item com rótulo,
+peso e um "sinal detectável" (regex/seletor/heurística, ou pergunta para a IA quando regex não basta).
+O código só **interpreta** o dado.
+**Por quê:** o Hector edita a régua **sem programar**; mudanças de critério ficam versionadas e
+auditáveis no git; separa o ciclo de vida lento da régua do ciclo rápido do Auditor (código).
+**Trade-offs:** validar o schema do YAML passa a ser responsabilidade nossa (teste de carga + schema).
+**Alternativas:** régua em código (mais rígida, exige PR para cada ajuste) — descartada por engessar
+a evolução do que é, na prática, conhecimento de negócio.
+**Status:** decidido no planejamento; implementação na Fase 2.

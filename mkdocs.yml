@@ -122,3 +122,7 @@ nav:
       - Download & atualização: cnpj-download.md
       - ETL, Big Data & ferramentas: cnpj-etl-ferramentas.md
       - Arquitetura & integração: cnpj-arquitetura.md
+  - "Próximos agentes: Auditor & Benchmark":
+      - Plano — Benchmark + Auditor: plano-auditor-benchmark.md
+      - Dossiê — pesquisa do Auditor: auditor-benchmark-pesquisa.md
+      - Dossiê — referências de design: design-referencias-pesquisa.md
