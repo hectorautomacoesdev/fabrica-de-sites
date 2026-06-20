@@ -4,8 +4,8 @@ Esta página explica **como o projeto vive no GitHub** e **como esta documentaç
 sozinha** a cada alteração — o que foi configurado, para que serve e como usar no dia a dia.
 
 > **▣ Resumo em uma frase** — você edita um arquivo Markdown em `docs/` e dá `git push`; o **GitHub Actions** republica
-> o site MkDocs **e** builda o app React (que lê o mesmo `docs/`), automaticamente. Sem
-> deploy manual.
+> **os dois sites** a partir da mesma fonte: o **MkDocs** na raiz (`/`) e o **app React** em
+> `/app/`, automaticamente. Sem deploy manual.
 
 > **ℹ Fonte única** — o conteúdo Markdown é **uma fonte só** (`docs/`), lida pelo MkDocs e pelo app React.
 > Entenda o desenho em [Documentação de fonte única](fonte-unica.md).
@@ -23,10 +23,14 @@ Você edita docs/*.md ──▶ git push (main) ──▶ GitHub Actions (docs.y
                                                     │
                                     ┌───────────────┴────────────────┐
                                     ▼                                 ▼
-                           mkdocs build --strict            build do app React
-                                    │                      (valida a fonte única)
-                                    ▼
-                           GitHub Pages publica ──▶ site no ar 🌐
+                           mkdocs build --strict            npm run build (React)
+                                    │                                 │
+                                    ▼                                 ▼
+                              site/ (raiz)                       site/app/  (cópia)
+                                    └───────────────┬────────────────┘
+                                                    ▼
+                          GitHub Pages publica os dois ──▶ no ar 🌐
+                          MkDocs em /  ·  React em /app/
 ```
 
 ## Configuração do GitHub
@@ -94,29 +98,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:                      # 1) constrói o site
+  build:                      # constrói os DOIS sites num artefato só
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # MkDocs (vitrine pública) -> site/
       - uses: actions/setup-python@v5
         with: { python-version: "3.12", cache: pip }
       - run: pip install -e ".[docs]"      # instala MkDocs + plugins (extra 'docs')
       - run: mkdocs build --strict         # FALHA em qualquer aviso (ex.: link quebrado)
-      - uses: actions/upload-pages-artifact@v3
-        with: { path: site }
-
-  react-docs:                 # 1b) valida que o app React compila lendo a fonte única docs/
-    runs-on: ubuntu-latest    #     (não publica — é só uma checagem; ver Fonte única)
-    steps:
-      - uses: actions/checkout@v4
+      # App React (doc rica) -> site/app/  (o build TAMBÉM valida a fonte única)
       - uses: actions/setup-node@v4
         with: { node-version: "20", cache: npm, cache-dependency-path: docs-app/package-lock.json }
       - run: npm ci
         working-directory: docs-app
-      - run: npm run build       # builda lendo ../docs — quebra se a fonte sair do lugar
+      - run: npm run build                 # builda lendo ../docs — quebra se a fonte sair do lugar
         working-directory: docs-app
+      - run: |                             # copia o build do React para o subcaminho /app
+          mkdir -p site/app
+          cp -r docs-app/dist/. site/app/
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }              # empacota MkDocs (raiz) + React (/app)
 
-  deploy:                     # 2) publica o site MkDocs construído
+  deploy:                     # publica o artefato no GitHub Pages
     needs: build
     runs-on: ubuntu-latest
     environment: { name: github-pages, url: "${{ steps.deployment.outputs.page_url }}" }
@@ -124,6 +128,11 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 ```
+
+> **ℹ Por que num job só** — o React precisa ser **copiado para dentro de `site/`** antes do
+> empacotamento. Como cada job roda numa máquina separada, juntar MkDocs e React no **mesmo
+> job** é o jeito simples de ter os dois no mesmo artefato do Pages. O build do React também
+> serve de **checagem**: se ele quebrar lendo a fonte única, o deploy inteiro falha.
 
 **Por que `--strict`?** Faz o build **falhar** se houver link interno quebrado, âncora
 inexistente ou página fora do nav. Assim, um erro na doc barra o deploy em vez de publicar

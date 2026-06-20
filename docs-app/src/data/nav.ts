@@ -63,6 +63,16 @@ export const NAV: NavGroup[] = [
       { slug: 'escala-nuvem', title: 'Escalando para a nuvem', status: 'ready' },
     ],
   },
+  {
+    group: 'Fonte de dados: CNPJ',
+    items: [
+      { slug: 'cnpj-visao-geral', title: 'Visão geral & resultados', status: 'ready' },
+      { slug: 'cnpj-dados-abertos', title: 'A base de Dados Abertos', status: 'ready' },
+      { slug: 'cnpj-download', title: 'Download & atualização', status: 'ready' },
+      { slug: 'cnpj-etl-ferramentas', title: 'ETL, Big Data & ferramentas', status: 'ready' },
+      { slug: 'cnpj-arquitetura', title: 'Arquitetura & integração', status: 'ready' },
+    ],
+  },
 ]
 
 // Busca o título de uma rota (para o placeholder e o <title>).

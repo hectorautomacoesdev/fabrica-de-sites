@@ -41,6 +41,8 @@ const REACT_ROUTES = new Set([
   '', 'fonte-unica', 'estrutura', 'arquitetura', 'bibliotecas', 'react', 'evolucao',
   'resumo', 'boas-praticas', 'custos', 'codigo', 'testes', 'decisoes',
   'roadmap', 'relatorios', 'plano-base-solida', 'publicacao-ci-cd', 'escala-nuvem',
+  'cnpj-visao-geral', 'cnpj-dados-abertos', 'cnpj-download', 'cnpj-etl-ferramentas',
+  'cnpj-arquitetura',
 ])
 
 // Sub-arquivos que no React são concatenados na página-pai. Links relativos do tipo

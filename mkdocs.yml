@@ -116,3 +116,9 @@ nav:
       - Plano — Base Sólida: plano-base-solida.md
       - Publicação & CI/CD: publicacao-ci-cd.md
       - Escalando para a nuvem: escala-nuvem.md
+  - "Fonte de dados: CNPJ":
+      - Visão geral & resultados: cnpj-visao-geral.md
+      - A base de Dados Abertos: cnpj-dados-abertos.md
+      - Download & atualização: cnpj-download.md
+      - ETL, Big Data & ferramentas: cnpj-etl-ferramentas.md
+      - Arquitetura & integração: cnpj-arquitetura.md

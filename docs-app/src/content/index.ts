@@ -21,6 +21,11 @@ import fonteUnica from '../../../docs/fonte-unica.md?raw'
 import planoBaseSolida from '../../../docs/plano-base-solida.md?raw'
 import publicacaoCicd from '../../../docs/publicacao-ci-cd.md?raw'
 import escalaNuvem from '../../../docs/escala-nuvem.md?raw'
+import cnpjVisaoGeral from '../../../docs/cnpj-visao-geral.md?raw'
+import cnpjDadosAbertos from '../../../docs/cnpj-dados-abertos.md?raw'
+import cnpjDownload from '../../../docs/cnpj-download.md?raw'
+import cnpjEtlFerramentas from '../../../docs/cnpj-etl-ferramentas.md?raw'
+import cnpjArquitetura from '../../../docs/cnpj-arquitetura.md?raw'
 
 // Junta vários arquivos numa única página React (com separador visual).
 const join = (...parts: string[]) => parts.join('\n\n---\n\n')
@@ -39,4 +44,9 @@ export const MD_CONTENT: Record<string, string> = {
   'plano-base-solida': planoBaseSolida,
   'publicacao-ci-cd': publicacaoCicd,
   'escala-nuvem': escalaNuvem,
+  'cnpj-visao-geral': cnpjVisaoGeral,
+  'cnpj-dados-abertos': cnpjDadosAbertos,
+  'cnpj-download': cnpjDownload,
+  'cnpj-etl-ferramentas': cnpjEtlFerramentas,
+  'cnpj-arquitetura': cnpjArquitetura,
 }

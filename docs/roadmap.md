@@ -40,6 +40,18 @@ Transformar o Scout em aplicação real e criar a base de conhecimento. Detalhe 
 - [ ] E2E (Playwright) — próxima iteração
 - [ ] CI para testes (`tests.yml`) — próxima iteração
 
+## Melhorias do Scout (em andamento)
+
+Antes de avançar para a Fase 2, alguns reforços no coração do projeto:
+
+- [x] **Tipo de organização** (`org_tipo`) — separar `independente` × `público` × `rede`, para
+      filtrar órgãos públicos e franquias que não são nosso mercado.
+- [ ] **Nova fonte de dados: CNPJ (Receita Federal)** — estudo concluído e **recomendado**:
+      multiplica volume e leva a contactabilidade de ~12% para ~90%, de graça. Ver a seção
+      [Fonte de dados: CNPJ](cnpj-visao-geral.md). Próximo: `feat/scout-fonte-cnpj` (ETL mensal
+      + plugin `CnpjReceitaSource`).
+- [ ] Ampliar cobertura do Overpass (mais categorias de negócio).
+
 ## Fase 2 — Agente Benchmark
 
 Para o setor escolhido, definir o que é um "site bom": funcionalidades esperadas,

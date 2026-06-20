@@ -1,8 +1,9 @@
 name: Deploy da documentação
 
-# Publica o site MkDocs no GitHub Pages a cada push em main e valida o build da doc React.
-# Como o conteúdo Markdown agora é fonte única (pasta docs/), uma mudança em docs/ dispara
-# os dois: redeploy do MkDocs e build do app React que lê os mesmos arquivos.
+# Publica no GitHub Pages, a cada push em main, DOIS sites a partir da fonte única docs/:
+#   - MkDocs (vitrine pública)            -> raiz   (/)
+#   - App React (doc rica)                -> /app/
+# Uma mudança em docs/ atualiza os dois (ambos leem os mesmos arquivos Markdown).
 on:
   push:
     branches: [main]
@@ -31,25 +32,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # 1) Site MkDocs (vitrine pública) → site/
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
       - name: Instalar dependências da doc
         run: pip install -e ".[docs]"
-      - name: Build (modo estrito — falha em qualquer aviso)
+      - name: Build MkDocs (modo estrito — falha em qualquer aviso)
         run: mkdocs build --strict
-      - name: Empacotar artefato do Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-  # Valida que o app React (documentação que as pessoas baixam e rodam local) continua
-  # compilando ao ler o conteúdo da fonte única docs/. Não publica — roda só como checagem.
-  react-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      # 2) App React (doc rica) → site/app/  (mesmo Pages, subcaminho /app/)
+      #    O build também VALIDA que o React compila lendo a fonte única docs/.
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
@@ -58,9 +51,18 @@ jobs:
       - name: Instalar dependências da doc React
         run: npm ci
         working-directory: docs-app
-      - name: Build da doc React (valida a fonte única docs/)
+      - name: Build da doc React
         run: npm run build
         working-directory: docs-app
+      - name: Publicar a doc React em /app
+        run: |
+          mkdir -p site/app
+          cp -r docs-app/dist/. site/app/
+      # 3) Empacota tudo (MkDocs na raiz + React em /app) para o Pages
+      - name: Empacotar artefato do Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
 
   deploy:
     needs: build

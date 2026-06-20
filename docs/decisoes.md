@@ -186,6 +186,28 @@ o CI passa a buildar também o app React. Detalhe em
 **Alternativas:** (a) manter as duas à mão — rejeitada (divergência garantida); (b) ensinar
 o React a renderizar Mermaid/admonitions (rejeitada — somaria ~500 KB ao bundle do React,
 que já tem nota de peso).
-**Papel de cada um:** o **MkDocs** é a vitrine pública ("clica e vê" no GitHub, sem baixar);
-o **React** é a versão rica para baixar e rodar. Ainda **não** publicamos o React (decisão
-em aberto — é só um ajuste no CI quando fizer sentido).
+**Papel de cada um:** o **MkDocs** é a vitrine pública na raiz (`/`); o **React** é a versão
+rica, agora **também publicada** no mesmo GitHub Pages, no subcaminho **`/app/`** (o build do
+CI copia o `docs-app/dist` para `site/app`). Como o Vite usa `base: './'` e HashRouter, o app
+funciona no subcaminho sem ajuste. Continua possível rodar o React local (`npm run dev`).
+
+## D19 — Fonte CNPJ (Dados Abertos da RFB) como fonte de descoberta — proposta
+
+**Contexto:** o OSM tem cobertura de telefone baixíssima (~12,5% em Guarujá), o que trava a
+prospecção. Fizemos um **estudo de viabilidade** (sandbox isolado em `experimentos/cnpj/`) da
+base pública de CNPJ.
+**Escolha (proposta, pendente do ok do Hector):** adotar o CNPJ como **fonte de descoberta +
+contato**, complementar ao OSM, via um **ETL mensal** que gera um arquivo local lido por um
+plugin `CnpjReceitaSource`.
+**Por quê:** medido em dados reais — leva a contactabilidade de ~12% para **~90%** e o volume
+de ~513 para **dezenas de milhares**, com **custo zero**. É a maior alavanca sobre o ponto
+fraco do projeto.
+**Como:** baixar (WebDAV/Nextcloud) → filtrar Guarujá (DuckDB, latin-1 nativo) → juntar nome
+(Empresas) → exportar Parquet → dedup com o OSM (telefone/nome/CNPJ). Detalhe completo na seção
+[Fonte de dados: CNPJ](cnpj-visao-geral.md).
+**Trade-offs honestos:** dados de cadastro podem estar desatualizados; parte do contato é do
+contador; o CNPJ **não** diz se o negócio tem site (isso continua vindo do OSM/DomainGuesser).
+**Alternativas:** APIs por-CNPJ (BrasilAPI etc.) — servem para **enriquecer** um CNPJ conhecido,
+não para **descobrir** todos os negócios de uma cidade; ficam como camada futura de frescor.
+**Status:** estudado e recomendado; implementação proposta como `feat/scout-fonte-cnpj` após o
+trabalho de frontend/API.
