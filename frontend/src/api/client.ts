@@ -31,6 +31,7 @@ export interface BusinessRead {
   id: number
   run_id: number
   nome: string | null
+  org_tipo: string
   setor: string
   setor_nome: string
   lat: number | null
@@ -40,10 +41,18 @@ export interface BusinessRead {
   email: string | null
   website: string | null
   website_kind: string
+  horario?: string | null
   site_status: string
   score: number
   score_label: string
   contactavel: boolean
+  score_motivos?: string[]
+  // ── Campos de enriquecimento (ainda NÃO vêm da API; o painel se adapta
+  //    quando estiverem presentes — ver fase Auditor/enriquecimento). ──
+  instagram?: string | null
+  facebook?: string | null
+  linkedin?: string | null
+  resumo?: string | null
 }
 
 export interface RunStartRequest {
@@ -65,6 +74,7 @@ export interface BusinessFilters {
   site_status?: string
   contactavel?: boolean
   score_min?: number
+  org_tipo?: string
   busca?: string
   order_by?: string
   order_dir?: 'asc' | 'desc'

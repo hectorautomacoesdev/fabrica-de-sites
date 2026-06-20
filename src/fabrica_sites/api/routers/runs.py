@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 from fastapi import APIRouter, HTTPException, Query, Response
 
 from ...db import repository
@@ -117,10 +119,12 @@ def get_businesses(
             email=r.email,
             website=r.website,
             website_kind=r.website_kind,
+            horario=r.horario,
             site_status=r.site_status,
             score=r.score,
             score_label=r.score_label,
             contactavel=r.contactavel,
+            score_motivos=json.loads(r.score_motivos or "[]"),
         )
         for r in rows
     ]

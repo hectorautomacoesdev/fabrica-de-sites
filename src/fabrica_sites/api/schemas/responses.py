@@ -38,10 +38,12 @@ class BusinessRead(BaseModel):
     email: str | None
     website: str | None
     website_kind: str
+    horario: str | None = None
     site_status: str
     score: int
     score_label: str
     contactavel: bool
+    score_motivos: list[str] = Field(default_factory=list)
 
 
 class KpiRead(BaseModel):

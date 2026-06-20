@@ -77,8 +77,8 @@ export default function App() {
           </div>
 
           {/* Tabela de negócios */}
-          <p className="section-title">Negócios mapeados</p>
-          <BusinessTable runId={activeRunId} />
+          <p className="section-title">Negócios mapeados <span className="hint">— clique numa linha para ver o lead</span></p>
+          <BusinessTable runId={activeRunId} cidade={runs.find(r => r.id === activeRunId)?.cidade} />
         </>
       ) : null}
 

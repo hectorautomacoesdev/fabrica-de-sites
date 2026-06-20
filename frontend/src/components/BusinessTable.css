@@ -102,3 +102,25 @@
   font-size: 1rem;
 }
 .site-link:hover { text-decoration: underline; }
+
+/* Linha clicável → abre o painel do lead */
+.biz-row { cursor: pointer; }
+.biz-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* Ação rápida de WhatsApp na linha */
+.td-acao { text-align: center; width: 44px; }
+.wa-mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  background: rgba(37, 211, 102, 0.14);
+}
+.wa-mini:hover { background: rgba(37, 211, 102, 0.3); }
+
+/* Dica no título da seção */
+.hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--text-muted); }
