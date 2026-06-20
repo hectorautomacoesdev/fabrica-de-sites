@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fábrica de Sites — Relatório da Sessão 10 (20/jun/2026)</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#1a1d27; --border:#2e3148; --border-faint:#23263a;
+    --text:#c8cde8; --strong:#e8ecff; --muted:#636b8a; --accent:#4f7ef7; --accent-faint:#1a2240;
+    --green:#25d366; --amber:#d97706; --red:#dc2626; --ok:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+  /* Sidebar */
+  aside{position:sticky;top:0;height:100vh;overflow-y:auto;border-right:1px solid var(--border);padding:24px 18px;background:#0c0e14}
+  .brand{font-weight:800;color:var(--strong);font-size:1.05rem;letter-spacing:-.02em;margin-bottom:4px}
+  .brand span{color:var(--accent)}
+  .sub{font-size:.72rem;color:var(--muted);margin-bottom:22px}
+  nav a{display:block;padding:7px 10px;border-radius:7px;color:var(--text);font-size:.85rem;margin-bottom:2px}
+  nav a:hover{background:var(--accent-faint);text-decoration:none}
+  nav .grp{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:16px 0 6px 10px;font-weight:700}
+  /* Content */
+  main{padding:40px 48px 80px;max-width:980px}
+  h1{font-size:1.9rem;color:var(--strong);letter-spacing:-.02em;margin-bottom:6px}
+  .lead{color:var(--muted);font-size:1rem;margin-bottom:8px}
+  h2{font-size:1.3rem;color:var(--strong);margin:42px 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  h3{font-size:1.02rem;color:var(--strong);margin:24px 0 10px}
+  p{margin-bottom:12px}
+  ul{margin:0 0 14px 22px}li{margin-bottom:6px}
+  code{background:var(--accent-faint);color:#a9c0ff;padding:1px 6px;border-radius:5px;font-size:.85em;font-family:'Cascadia Code',Consolas,monospace}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:8px}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+  .kpi .n{font-size:1.7rem;font-weight:800;color:var(--strong)}
+  .kpi .l{font-size:.78rem;color:var(--muted);margin-top:2px}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.72rem;font-weight:700}
+  .b-ok{background:rgba(16,185,129,.16);color:#34d399}
+  .b-hold{background:#fef3c7;color:#92400e}
+  .b-plan{background:var(--accent-faint);color:#9db8ff}
+  table{width:100%;border-collapse:collapse;font-size:.86rem;margin-bottom:16px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border-faint)}
+  th{color:var(--muted);text-transform:uppercase;font-size:.7rem;letter-spacing:.05em}
+  .pill{font-family:monospace;font-size:.8rem;background:#0c0e14;border:1px solid var(--border);border-radius:6px;padding:2px 7px;color:#a9c0ff}
+  .note{border-left:3px solid var(--accent);background:var(--accent-faint);padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0;font-size:.9rem}
+  .q{border-left:3px solid var(--amber)}
+  .flow{font-family:monospace;font-size:.78rem;white-space:pre;overflow-x:auto;background:#0c0e14;border:1px solid var(--border);border-radius:10px;padding:16px;color:#9fb0d8;line-height:1.45}
+  footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:.8rem}
+  .tag{font-size:.7rem;color:var(--muted)}
+  @media(max-width:820px){.layout{grid-template-columns:1fr}aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border)}main{padding:28px 20px}}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand">Fábrica de Sites <span>&middot; Scout</span></div>
+    <div class="sub">Relatório da Sessão 10 — 20/jun/2026</div>
+    <nav>
+      <a href="#resumo">Resumo da sessão</a>
+      <div class="grp">Frentes de trabalho</div>
+      <a href="#f1">1 · Aplicar pendências (git)</a>
+      <a href="#f2">2 · Painel 360 do lead</a>
+      <a href="#f3">3 · Plano Auditor/Benchmark</a>
+      <div class="grp">Fechamento</div>
+      <a href="#decisoes">Decisões & dúvidas</a>
+      <a href="#push">Pronto para você revisar</a>
+      <a href="#proximos">Próximos passos</a>
+    </nav>
+  </aside>
+
+  <main>
+    <h1>Relatório da Sessão 10</h1>
+    <p class="lead">Trabalho autônomo enquanto você estava offline — aplicar pendências, melhorar o painel de leads e planejar o agente “o site é bom ou ruim?”. Tudo documentado, com decisões registradas.</p>
+
+    <!-- RESUMO -->
+    <section id="resumo">
+      <h2>Resumo da sessão</h2>
+      <div class="cards">
+        <div class="kpi"><div class="n">3</div><div class="l">frentes concluídas</div></div>
+        <div class="kpi"><div class="n">141</div><div class="l">testes passando</div></div>
+        <div class="kpi"><div class="n">2</div><div class="l">sub-agentes de pesquisa</div></div>
+        <div class="kpi"><div class="n">3</div><div class="l">commits (locais)</div></div>
+      </div>
+      <div class="card">
+        <p><strong>O que entreguei:</strong></p>
+        <ul>
+          <li><span class="badge b-ok">feito</span> Mergeei o trabalho pendente na <code>main</code> (total/ordenação + classificação <code>org_tipo</code>), resolvendo o conflito de rebase.</li>
+          <li><span class="badge b-ok">feito</span> Reformei o painel de leads: <strong>painel de detalhe (drawer)</strong> com WhatsApp, redes sociais, mapa, resumo e mais filtros.</li>
+          <li><span class="badge b-ok">feito</span> Pesquisei (web + GitHub) e <strong>planejei os agentes Benchmark + Auditor</strong>, com alternativas, ADRs e roadmap.</li>
+          <li><span class="badge b-hold">aguarda você</span> <strong>Não dei push</strong> em nada (repo é público; o guardrail pede seu ok). Está tudo pronto e listado em “Pronto para você revisar”.</li>
+        </ul>
+      </div>
+      <div class="note">Honestidade: respeitei o guardrail do <code>CLAUDE.md</code> de não publicar sem você. Trabalhei em branches locais, rodei os testes e os builds, mas o <em>push</em> fica por sua conta após revisar.</div>
+    </section>
+
+    <!-- FRENTE 1 -->
+    <section id="f1">
+      <h2>Frente 1 — Aplicar o trabalho pendente <span class="badge b-ok">concluída</span></h2>
+      <p>Havia trabalho commitado mas não integrado. Apliquei na <code>main</code> local, em histórico linear:</p>
+      <table>
+        <tr><th>Commit</th><th>O que traz</th></tr>
+        <tr><td><span class="pill">e586b20</span></td><td>Total via header <code>X-Total-Count</code> + ordenação (<code>order_by</code>/<code>order_dir</code>) na API e no client</td></tr>
+        <tr><td><span class="pill">faed900</span></td><td>Classificação por tipo de organização (<code>org_tipo</code>: independente/público/rede)</td></tr>
+      </table>
+      <h3>A parte delicada (resolvida)</h3>
+      <p>A branch <code>feat/scout-org-tipo</code> estava <strong>defasada</strong>: o diff sugeria que ela apagaria toda a documentação de CNPJ já na <code>main</code>. Verifiquei que era ilusão do diff (3-way merge não apaga) e fiz um <strong>rebase</strong>, resolvendo manualmente o conflito em <code>repository.py</code> e <code>runs.py</code> — combinando a ordenação/contagem <em>com</em> o filtro <code>org_tipo</code> no helper compartilhado. <strong>141 testes</strong> passando depois.</p>
+    </section>
+
+    <!-- FRENTE 2 -->
+    <section id="f2">
+      <h2>Frente 2 — Painel 360 do lead <span class="badge b-ok">concluída</span></h2>
+      <p>Branch <span class="pill">feat/painel-leads-360</span>. Antes, a tabela mostrava só colunas estáticas. Agora cada negócio vira um <strong>lead acionável</strong>.</p>
+      <h3>O que mudou (clique numa linha → abre o painel)</h3>
+      <ul>
+        <li><strong>Ações rápidas:</strong> <span style="color:var(--green)">WhatsApp</span> (link <code>wa.me</code> já com <em>mensagem de prospecção pronta</em>, com gancho conforme o status do site), ligar, e-mail, abrir site, mapa e buscar no Google.</li>
+        <li><strong>Redes sociais:</strong> detecção automática (Instagram/Facebook/LinkedIn/Linktree…) a partir da URL, com @handle. E <strong>atalhos de busca</strong> de perfil no Instagram/LinkedIn — úteis <em>já</em>, antes mesmo de a API trazer esses dados.</li>
+        <li><strong>“Por que essa oportunidade”:</strong> mostra os <code>score_motivos</code> (o porquê do lead ser quente) e o horário de funcionamento.</li>
+        <li><strong>Resumo da empresa:</strong> bloco pronto e <em>graceful</em> — exibe o resumo quando o enriquecimento existir; por ora, oferece “pesquisar sobre a empresa”.</li>
+        <li><strong>Consultas melhores:</strong> filtro por tipo de organização e ordenação (maior/menor score, nome A→Z).</li>
+      </ul>
+      <div class="note">Você pediu para “se adaptar mesmo sem a API ter esses dados ainda”. Foi exatamente o que fiz: o frontend já tem os campos opcionais (instagram/linkedin/resumo) e degrada com elegância — quando o Auditor/enriquecimento popular esses dados, aparecem sem retrabalho.</div>
+      <p class="tag">Pequena mudança de API junto: <code>BusinessRead</code> agora expõe <code>score_motivos</code> e <code>horario</code> (já existiam no banco). Lint limpo, build OK (246 KB / 76,5 KB gzip).</p>
+    </section>
+
+    <!-- FRENTE 3 -->
+    <section id="f3">
+      <h2>Frente 3 — Plano do agente “site bom ou ruim?” <span class="badge b-plan">planejado</span></h2>
+      <p>Lancei <strong>2 sub-agentes</strong> para pesquisar fundo (web + GitHub). Sintetizei tudo numa página de plano + 2 dossiês, na branch <span class="pill">docs/plano-auditor-benchmark</span>.</p>
+      <h3>São dois agentes que trabalham em par</h3>
+      <ul>
+        <li><strong>Benchmark</strong> = a régua: o que um site <em>deveria</em> ter, por setor.</li>
+        <li><strong>Auditor</strong> = a medição: visita o site, checa, compara e dá <strong>nota 0–100 + lista de problemas</strong>.</li>
+      </ul>
+      <h3>O modelo: 3 camadas, da mais barata à mais cara</h3>
+      <div class="flow">Camada 1            Camada 2                  Camada 3
+heurísticas    →    Lighthouse / axe /    →    visão por IA
+httpx + BS4         headers de segurança       (screenshot → nota)
+~0ms, grátis        segundos, grátis           custo de API
+pega 70-80%         nota "de mercado"          pega "amador/datado"
+   v1 (começa)         v1 (destino)               v2 (opcional)</div>
+      <h3>3 alternativas de arquitetura</h3>
+      <table>
+        <tr><th>&nbsp;</th><th>A · Python puro</th><th>B · Híbrido ✅</th><th>C · + Visão IA</th></tr>
+        <tr><td>Custo</td><td>Zero</td><td>Zero</td><td>API de visão</td></tr>
+        <tr><td>Nota “de mercado”</td><td>Não</td><td>Sim (Lighthouse)</td><td>Sim + percepção</td></tr>
+        <tr><td>Escala</td><td>Excelente</td><td>Boa (c/ triagem)</td><td>Limitada (cara)</td></tr>
+        <tr><td>Fase</td><td>v1 inicial</td><td>v1 final</td><td>v2</td></tr>
+      </table>
+      <div class="note">Recomendação: <strong>começar pela A</strong> (valor em dias, zero infra), ter a <strong>B como destino da v1</strong>, e plugar a visão da <strong>C na v2</strong> (desligada por padrão, só para leads quentes). O Benchmark vira <strong>dado YAML versionado</strong> — você edita a régua sem programar.</div>
+      <p>Leitura: <code>docs/plano-auditor-benchmark.md</code> (plano) · <code>docs/auditor-benchmark-pesquisa.md</code> e <code>docs/design-referencias-pesquisa.md</code> (dossiês). Tudo na doc fonte-única (MkDocs + React).</p>
+    </section>
+
+    <!-- DECISOES -->
+    <section id="decisoes">
+      <h2>Decisões tomadas & dúvidas que resolvi</h2>
+      <div class="card q" style="border-left:3px solid var(--amber);padding-left:16px">
+        <p><strong>Push para o GitHub público?</strong> → <em>Não.</em> O <code>CLAUDE.md</code> pede ok explícito e o repo é público. Apliquei tudo localmente e deixei para você publicar.</p>
+        <p><strong>Mergear a <code>org_tipo</code> defasada?</strong> → <em>Sim, com rebase.</em> Confirmei que o merge não apagaria a doc de CNPJ; o ganho (feature pronta e já no roadmap) justificava resolver os 2 conflitos.</p>
+        <p><strong>Começar o Auditor pelo Lighthouse?</strong> → <em>Não, por heurísticas próprias.</em> Entrega valor em dias sem infra e segue “determinístico primeiro”. (ADR D20)</p>
+        <p><strong>Benchmark como código ou dado?</strong> → <em>Dado YAML versionado.</em> Você edita a régua sem programar; versionável e auditável. (ADR D21)</p>
+        <p><strong>Visão por IA já na v1?</strong> → <em>Não.</em> É a única camada paga/não-determinística; fica plugável e desligada até a v2.</p>
+        <p><strong>Usei o Canva (“o designer”)?</strong> → <em>Não nesta sessão.</em> Foco no produto real (o painel, grátis); gerar designs no seu Canva é ação externa que preferi deixar para combinar — veja “Próximos passos”.</p>
+      </div>
+      <p class="tag">Dúvida em aberto registrada na doc: confirmar a licença de OSAT e dos forks <code>python-Wappalyzer</code> antes de adotá-los como dependência.</p>
+    </section>
+
+    <!-- PUSH -->
+    <section id="push">
+      <h2>Pronto para você revisar (e publicar)</h2>
+      <p>Nada foi enviado ao GitHub. Quando quiser, revise e publique. Branches locais:</p>
+      <table>
+        <tr><th>Branch</th><th>Conteúdo</th><th>Estado</th></tr>
+        <tr><td><span class="pill">main</span></td><td>2 commits à frente do <code>origin/main</code> (total/ordenação + org_tipo)</td><td><span class="badge b-hold">não publicada</span></td></tr>
+        <tr><td><span class="pill">feat/painel-leads-360</span></td><td>Painel 360 do lead + DTO score_motivos/horario</td><td><span class="badge b-hold">não publicada</span></td></tr>
+        <tr><td><span class="pill">docs/plano-auditor-benchmark</span></td><td>Plano + 2 dossiês + ADRs D20/D21 + roadmap</td><td><span class="badge b-hold">não publicada</span></td></tr>
+      </table>
+      <div class="note">Sugestão de fluxo (o que já usamos): revisar cada branch → <code>git push</code> da <code>main</code> e das duas branches → abrir e mergear → apagar branches. Posso conduzir isso com você quando voltar.</div>
+      <h3>Como ver o que fiz, agora</h3>
+      <ul>
+        <li><strong>Painel:</strong> <code>uvicorn</code> na porta 8001 + <code>cd frontend &amp;&amp; npm run dev</code> → clique numa linha da tabela.</li>
+        <li><strong>Plano do Auditor:</strong> <code>mkdocs serve</code> → seção “Próximos agentes: Auditor &amp; Benchmark”.</li>
+      </ul>
+    </section>
+
+    <!-- PROXIMOS -->
+    <section id="proximos">
+      <h2>Próximos passos sugeridos</h2>
+      <ul>
+        <li><strong>Validar o plano</strong> do Auditor/Benchmark (ordem das fases e escopo da v1).</li>
+        <li><strong>Fase 2 — Benchmark:</strong> escrever os YAMLs (base + 5 setores) — é trabalho que <em>não precisa de código</em>.</li>
+        <li><strong>Fase 3a — Auditor v1:</strong> esqueleto <code>agents/auditor/</code> (fetch + heuristics + scorer) em Python puro, calibrado em 5–10 sites reais de Guarujá.</li>
+        <li><strong>Decidir sobre o Canva:</strong> se quiser, gero mockups/moodboard do painel e de sites-modelo por setor (preciso do seu ok, pois cria itens na sua conta Canva).</li>
+        <li><strong>Pendências antigas:</strong> testes de componente React (Vitest/RTL), E2E (Playwright), CI <code>tests.yml</code>; e a fonte CNPJ (<code>feat/scout-fonte-cnpj</code>).</li>
+      </ul>
+    </section>
+
+    <footer>
+      Gerado pelo Claude (Opus 4.8) na Sessão 10 — 20/jun/2026 · Fábrica de Sites · documento de uso interno do Hector.
+    </footer>
+  </main>
+</div>
+</body>
+</html>
