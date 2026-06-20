@@ -66,8 +66,16 @@ export interface BusinessFilters {
   contactavel?: boolean
   score_min?: number
   busca?: string
+  order_by?: string
+  order_dir?: 'asc' | 'desc'
   offset?: number
   limit?: number
+}
+
+/** Página de negócios + total (lido do header X-Total-Count) — para paginação server-side. */
+export interface BusinessPage {
+  items: BusinessRead[]
+  total: number
 }
 
 async function get<T>(path: string): Promise<T> {
@@ -107,6 +115,20 @@ export const api = {
 
   getBusinesses: (runId: number, filters: BusinessFilters = {}) =>
     get<BusinessRead[]>(`/api/runs/${runId}/businesses${buildQuery(filters)}`),
+
+  // Versão paginada: além dos itens, devolve o total (header X-Total-Count).
+  // Base para a tabela com paginação/ordenação server-side (Frente 2).
+  getBusinessesPaged: async (
+    runId: number,
+    filters: BusinessFilters = {},
+  ): Promise<BusinessPage> => {
+    const path = `/api/runs/${runId}/businesses${buildQuery(filters)}`
+    const res = await fetch(path)
+    if (!res.ok) throw new Error(`API ${path}: ${res.status}`)
+    const items = (await res.json()) as BusinessRead[]
+    const total = Number(res.headers.get('X-Total-Count') ?? items.length)
+    return { items, total }
+  },
 
   startRun: (body: RunStartRequest) =>
     post<RunStartResponse>('/api/scout/runs', body),

@@ -161,6 +161,65 @@ def test_filtro_busca_retorna_matches(first_run_id):
 
 
 # ---------------------------------------------------------------------------
+# Total (header X-Total-Count) e ordenação
+# ---------------------------------------------------------------------------
+
+def test_businesses_header_total_presente(first_run_id):
+    if first_run_id is None:
+        pytest.skip("Banco sem runs")
+    r = client.get(f"/api/runs/{first_run_id}/businesses?limit=5")
+    assert r.status_code == 200
+    assert "X-Total-Count" in r.headers
+    total = int(r.headers["X-Total-Count"])
+    assert total >= len(r.json())  # o total ignora o limit
+
+
+def test_businesses_total_respeita_filtro(first_run_id):
+    if first_run_id is None:
+        pytest.skip("Banco sem runs")
+    todos = int(client.get(
+        f"/api/runs/{first_run_id}/businesses?limit=1").headers["X-Total-Count"])
+    contact = int(client.get(
+        f"/api/runs/{first_run_id}/businesses?contactavel=true&limit=1"
+    ).headers["X-Total-Count"])
+    assert 0 <= contact <= todos
+
+
+def test_businesses_ordenacao_score_asc_e_desc(first_run_id):
+    if first_run_id is None:
+        pytest.skip("Banco sem runs")
+    asc = [b["score"] for b in client.get(
+        f"/api/runs/{first_run_id}/businesses?order_by=score&order_dir=asc&limit=100"
+    ).json()]
+    assert asc == sorted(asc)                  # crescente
+    desc = [b["score"] for b in client.get(
+        f"/api/runs/{first_run_id}/businesses?limit=100").json()]
+    assert desc == sorted(desc, reverse=True)  # desc é o padrão (compatível)
+
+
+def test_businesses_ordenacao_por_nome_ok(first_run_id):
+    if first_run_id is None:
+        pytest.skip("Banco sem runs")
+    r = client.get(
+        f"/api/runs/{first_run_id}/businesses?order_by=nome&order_dir=asc&limit=10")
+    assert r.status_code == 200
+
+
+def test_businesses_order_by_invalido_retorna_422(first_run_id):
+    if first_run_id is None:
+        pytest.skip("Banco sem runs")
+    r = client.get(f"/api/runs/{first_run_id}/businesses?order_by=cpf")
+    assert r.status_code == 422
+
+
+def test_businesses_order_dir_invalido_retorna_422(first_run_id):
+    if first_run_id is None:
+        pytest.skip("Banco sem runs")
+    r = client.get(f"/api/runs/{first_run_id}/businesses?order_dir=cima")
+    assert r.status_code == 422
+
+
+# ---------------------------------------------------------------------------
 # POST /api/scout/runs — apenas valida que endpoint existe e recusa payloads inválidos
 # ---------------------------------------------------------------------------
 

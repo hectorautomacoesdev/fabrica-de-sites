@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 
+from sqlalchemy import func
 from sqlmodel import Session, col, select
 
 from ..models import Business, ScoutRun, SiteStatus, WebsiteKind
@@ -70,24 +71,29 @@ def list_runs(session: Session, limit: int = 20) -> list[RunTable]:
     )
 
 
-def get_businesses(
-    run_id: int,
-    session: Session,
+# Colunas permitidas para ordenação — allowlist (evita ordenar por coluna
+# arbitrária vinda da query string).
+_ORDENAVEIS = {
+    "score": BusinessTable.score,
+    "nome": BusinessTable.nome,
+    "setor": BusinessTable.setor,
+    "setor_nome": BusinessTable.setor_nome,
+    "site_status": BusinessTable.site_status,
+    "score_label": BusinessTable.score_label,
+    "contactavel": BusinessTable.contactavel,
+}
+
+
+def _aplicar_filtros(
+    stmt,
     *,
-    setor: str | None = None,
-    site_status: str | None = None,
-    contactavel: bool | None = None,
-    score_min: int | None = None,
-    busca: str | None = None,
-    offset: int = 0,
-    limit: int = 200,
-) -> list[BusinessTable]:
-    """Lista negócios de uma run com filtros opcionais."""
-    stmt = (
-        select(BusinessTable)
-        .where(BusinessTable.run_id == run_id)
-        .order_by(col(BusinessTable.score).desc())
-    )
+    setor: str | None,
+    site_status: str | None,
+    contactavel: bool | None,
+    score_min: int | None,
+    busca: str | None,
+):
+    """Aplica os filtros opcionais — compartilhado entre listagem e contagem."""
     if setor:
         stmt = stmt.where(BusinessTable.setor == setor)
     if site_status:
@@ -97,10 +103,56 @@ def get_businesses(
     if score_min is not None:
         stmt = stmt.where(col(BusinessTable.score) >= score_min)
     if busca:
-        term = f"%{busca}%"
-        stmt = stmt.where(col(BusinessTable.nome).like(term))
-    stmt = stmt.offset(offset).limit(limit)
+        stmt = stmt.where(col(BusinessTable.nome).like(f"%{busca}%"))
+    return stmt
+
+
+def get_businesses(
+    run_id: int,
+    session: Session,
+    *,
+    setor: str | None = None,
+    site_status: str | None = None,
+    contactavel: bool | None = None,
+    score_min: int | None = None,
+    busca: str | None = None,
+    order_by: str = "score",
+    order_dir: str = "desc",
+    offset: int = 0,
+    limit: int = 200,
+) -> list[BusinessTable]:
+    """Lista negócios de uma run com filtros, ordenação e paginação."""
+    coluna = _ORDENAVEIS.get(order_by, BusinessTable.score)
+    ordenacao = col(coluna).asc() if order_dir == "asc" else col(coluna).desc()
+    stmt = select(BusinessTable).where(BusinessTable.run_id == run_id)
+    stmt = _aplicar_filtros(
+        stmt, setor=setor, site_status=site_status, contactavel=contactavel,
+        score_min=score_min, busca=busca,
+    )
+    # Desempate estável por id → paginação determinística mesmo com empates.
+    stmt = stmt.order_by(ordenacao, col(BusinessTable.id).asc()).offset(offset).limit(limit)
     return list(session.exec(stmt).all())
+
+
+def count_businesses(
+    run_id: int,
+    session: Session,
+    *,
+    setor: str | None = None,
+    site_status: str | None = None,
+    contactavel: bool | None = None,
+    score_min: int | None = None,
+    busca: str | None = None,
+) -> int:
+    """Conta os negócios que casam com os filtros (ignora offset/limit)."""
+    stmt = select(func.count(col(BusinessTable.id))).where(
+        BusinessTable.run_id == run_id
+    )
+    stmt = _aplicar_filtros(
+        stmt, setor=setor, site_status=site_status, contactavel=contactavel,
+        score_min=score_min, busca=busca,
+    )
+    return int(session.exec(stmt).one())
 
 
 # ---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Response
 
 from ...db import repository
 from ...services import scout_service
@@ -60,25 +60,45 @@ def get_insights(run_id: int, session: SessionDep) -> InsightsRead:
 def get_businesses(
     run_id: int,
     session: SessionDep,
+    response: Response,
     setor: str | None = Query(None),
     site_status: str | None = Query(None),
     contactavel: bool | None = Query(None),
     score_min: int | None = Query(None, ge=0, le=100),
     busca: str | None = Query(None, min_length=2),
+    order_by: str = Query(
+        "score",
+        pattern="^(score|nome|setor|setor_nome|site_status|score_label|contactavel)$",
+        description="Coluna de ordenação.",
+    ),
+    order_dir: str = Query("desc", pattern="^(asc|desc)$"),
     offset: int = Query(0, ge=0),
     limit: int = Query(200, ge=1, le=1000),
 ) -> list[BusinessRead]:
-    """Lista negócios de uma run com filtros opcionais e paginação."""
-    rows = repository.get_businesses(
-        run_id,
-        session,
+    """Lista negócios de uma run com filtros, ordenação e paginação.
+
+    O **total** de registros que casam com os filtros (ignorando ``offset``/
+    ``limit``) é devolvido no header ``X-Total-Count`` — base para a paginação
+    do frontend.
+    """
+    filtros = dict(
         setor=setor,
         site_status=site_status,
         contactavel=contactavel,
         score_min=score_min,
         busca=busca,
+    )
+    response.headers["X-Total-Count"] = str(
+        repository.count_businesses(run_id, session, **filtros)
+    )
+    rows = repository.get_businesses(
+        run_id,
+        session,
+        order_by=order_by,
+        order_dir=order_dir,
         offset=offset,
         limit=limit,
+        **filtros,
     )
     return [
         BusinessRead(

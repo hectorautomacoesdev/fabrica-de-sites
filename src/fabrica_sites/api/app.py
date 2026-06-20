@@ -31,6 +31,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Total-Count"],  # frontend precisa ler o total p/ paginação
 )
 
 app.include_router(misc.router)
