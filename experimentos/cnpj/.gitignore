@@ -1,0 +1,13 @@
+# Sandbox CNPJ — NUNCA versionar dados brutos.
+# Motivo: repo é PÚBLICO e os arquivos são enormes (GBs).
+.venv/
+dados/
+resultados/*.csv
+resultados/*.parquet
+__pycache__/
+*.zip
+*.csv
+*.parquet
+*.db
+*.duckdb
+*.log
