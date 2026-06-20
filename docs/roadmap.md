@@ -52,15 +52,31 @@ Antes de avançar para a Fase 2, alguns reforços no coração do projeto:
       + plugin `CnpjReceitaSource`).
 - [ ] Ampliar cobertura do Overpass (mais categorias de negócio).
 
-## Fase 2 — Agente Benchmark
+## Fase 2 — Agente Benchmark (a "régua")
 
-Para o setor escolhido, definir o que é um "site bom": funcionalidades esperadas,
-referências, checklist pontuável. (LLM + busca web.)
+Definir, **por setor**, o que é um "site bom": itens esperados, pesos e um sinal detectável para
+cada um. Decisão tomada no planejamento (jun/2026): o Benchmark é **dado versionado (YAML/JSON)**,
+não código (ver [Decisões](decisoes.md) D21) — o Hector edita a régua sem programar.
 
-## Fase 3 — Agente Auditor
+- [ ] YAMLs `base` + 5 setores prioritários (alimentação, beleza, saúde, turismo, fitness)
+- [ ] Carregador `benchmark.py` (lê o YAML do setor → checklist pontuável) + testes
 
-Visitar os sites dos negócios que **têm** site, tirar screenshot, rodar checagem técnica,
-comparar com as diretrizes do Benchmark e gerar nota + lista de gaps. (Playwright + LLM.)
+## Fase 3 — Agente Auditor (a "medição")
+
+Visitar o site dos negócios que **têm** site, rodar checagens, comparar com a régua do Benchmark e
+gerar **nota 0–100 + lista de gaps**. Arquitetura decidida: **determinístico-primeiro**, Lighthouse
+depois, visão por IA opcional (ver [Decisões](decisoes.md) D20). Sub-fases:
+
+- [ ] **3a — v1 Python puro:** `fetch` (httpx) + `heuristics` (BeautifulSoup) + `scorer` + checklist.
+      100% grátis/offline; validar contra julgamento humano em sites reais de Guarujá.
+- [ ] **3b — v1 final (híbrido):** `screenshot` (Playwright) + Lighthouse/axe via subprocess nos
+      candidatos. Nota "de mercado" para o pitch.
+- [ ] **3c — v2 (visão IA):** `VisionScorer` plugável (rubrica JSON desktop+mobile), desligado por
+      padrão, ligado só para leads quentes.
+
+> **Plano completo, alternativas e dossiê de pesquisa:**
+> [Plano — Benchmark + Auditor](plano-auditor-benchmark.md) ·
+> [Dossiê de pesquisa](auditor-benchmark-pesquisa.md).
 
 ## Fase 4 — Agente Criador
 

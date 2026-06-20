@@ -26,6 +26,9 @@ import cnpjDadosAbertos from '../../../docs/cnpj-dados-abertos.md?raw'
 import cnpjDownload from '../../../docs/cnpj-download.md?raw'
 import cnpjEtlFerramentas from '../../../docs/cnpj-etl-ferramentas.md?raw'
 import cnpjArquitetura from '../../../docs/cnpj-arquitetura.md?raw'
+import planoAuditor from '../../../docs/plano-auditor-benchmark.md?raw'
+import auditorPesquisa from '../../../docs/auditor-benchmark-pesquisa.md?raw'
+import designPesquisa from '../../../docs/design-referencias-pesquisa.md?raw'
 
 // Junta vários arquivos numa única página React (com separador visual).
 const join = (...parts: string[]) => parts.join('\n\n---\n\n')
@@ -49,4 +52,7 @@ export const MD_CONTENT: Record<string, string> = {
   'cnpj-download': cnpjDownload,
   'cnpj-etl-ferramentas': cnpjEtlFerramentas,
   'cnpj-arquitetura': cnpjArquitetura,
+  'plano-auditor-benchmark': planoAuditor,
+  'auditor-benchmark-pesquisa': auditorPesquisa,
+  'design-referencias-pesquisa': designPesquisa,
 }

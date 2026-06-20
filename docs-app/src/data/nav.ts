@@ -73,6 +73,14 @@ export const NAV: NavGroup[] = [
       { slug: 'cnpj-arquitetura', title: 'Arquitetura & integração', status: 'ready' },
     ],
   },
+  {
+    group: 'Próximos agentes: Auditor & Benchmark',
+    items: [
+      { slug: 'plano-auditor-benchmark', title: 'Plano — Benchmark + Auditor', status: 'ready' },
+      { slug: 'auditor-benchmark-pesquisa', title: 'Dossiê — pesquisa do Auditor', status: 'ready' },
+      { slug: 'design-referencias-pesquisa', title: 'Dossiê — referências de design', status: 'ready' },
+    ],
+  },
 ]
 
 // Busca o título de uma rota (para o placeholder e o <title>).
