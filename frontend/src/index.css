@@ -1,5 +1,11 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Tokens de design — FONTE DA VERDADE das cores (dark por padrão, light no
+   prefers-color-scheme). O CSS existente lê estes nomes diretamente (var(--bg),
+   var(--accent), ...). NÃO renomear sem migrar os .css que os usam.
+   ─────────────────────────────────────────────────────────────────────────── */
 :root {
   --bg:           #0f1117;
   --card-bg:      #1a1d27;
@@ -11,6 +17,13 @@
   --text-muted:   #636b8a;
   --accent:       #4f7ef7;
   --accent-faint: #1a2240;
+
+  /* Extras que o shadcn pede e a paleta original não tinha */
+  --on-accent:    #ffffff;        /* texto sobre o azul (--accent) */
+  --danger:       #ef4444;        /* ações destrutivas */
+  --on-danger:    #ffffff;
+  --ring:         #4f7ef7;        /* anel de foco = accent */
+  --radius:       0.5rem;
 }
 
 @media (prefers-color-scheme: light) {
@@ -25,9 +38,68 @@
     --text-muted:   #6b7280;
     --accent:       #2563eb;
     --accent-faint: #eff6ff;
+
+    --on-accent:    #ffffff;
+    --danger:       #dc2626;
+    --on-danger:    #ffffff;
+    --ring:         #2563eb;
   }
 }
 
+/* ───────────────────────────────────────────────────────────────────────────
+   Ponte com o Tailwind. `@theme inline` gera utilitários que apontam para as
+   var() acima — então eles trocam sozinhos no dark/light, sem duplicar valores.
+
+   Dois conjuntos de nomes apontam para a MESMA paleta:
+   • nomes "amigáveis" (bg-bg, text-text-strong, ...) — espelham seus tokens;
+   • nomes "shadcn" (bg-primary, bg-background, ...) — o que os componentes usam.
+
+   ⚠️ Convenção: seu AZUL é `bg-primary` / `text-primary`. `bg-accent` segue a
+   convenção do shadcn (superfície de hover de menus/itens), NÃO o azul.
+   ─────────────────────────────────────────────────────────────────────────── */
+@theme inline {
+  /* Espelho direto dos seus tokens */
+  --color-bg: var(--bg);
+  --color-card: var(--card-bg);
+  --color-border-faint: var(--border-faint);
+  --color-hover: var(--hover-bg);
+  --color-text: var(--text);
+  --color-text-strong: var(--text-strong);
+  --color-text-muted: var(--text-muted);
+  --color-brand: var(--accent);
+  --color-brand-faint: var(--accent-faint);
+
+  /* Tokens semânticos do shadcn → sua paleta */
+  --color-background: var(--bg);
+  --color-foreground: var(--text-strong);
+  --color-card-foreground: var(--text-strong);
+  --color-popover: var(--card-bg);
+  --color-popover-foreground: var(--text-strong);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--on-accent);
+  --color-secondary: var(--hover-bg);
+  --color-secondary-foreground: var(--text-strong);
+  --color-muted: var(--hover-bg);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--hover-bg);
+  --color-accent-foreground: var(--text-strong);
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: var(--on-danger);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--ring);
+
+  /* Raios derivados do --radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   Estilos base (preservados do original). O Preflight do Tailwind já zera
+   margens/box-sizing; mantemos a tipografia e o fundo do app.
+   ─────────────────────────────────────────────────────────────────────────── */
 html { font-size: 15px; }
 
 body {

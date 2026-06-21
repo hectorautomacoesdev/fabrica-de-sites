@@ -15,6 +15,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Alias de caminho (@/* → src/*) para os componentes shadcn/ui.
+       Sem baseUrl: com moduleResolution "bundler" os paths resolvem
+       relativos a este tsconfig (baseUrl foi depreciado no TS 6). */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
