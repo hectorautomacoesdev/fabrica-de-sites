@@ -1,5 +1,12 @@
-import { useEffect } from 'react'
+import { useState } from 'react'
 import type { BusinessRead } from '../api/client'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from '@/components/ui/sheet'
 import {
   buildProspectMessage,
   instagramSearchUrl,
@@ -34,34 +41,40 @@ interface Props {
 }
 
 export default function LeadDrawer({ business, cidade, onClose }: Props) {
-  // Fecha com Esc enquanto aberto.
-  useEffect(() => {
-    if (!business) return
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [business, onClose])
+  const open = business !== null
+  // Retém o último negócio para o conteúdo não sumir durante a animação de saída
+  // (o Radix mantém o painel montado até a transição terminar). Padrão oficial do
+  // React de "ajustar estado durante o render" — re-renderiza na hora, sem effect.
+  const [shown, setShown] = useState<BusinessRead | null>(business)
+  if (business !== null && business !== shown) {
+    setShown(business)
+  }
 
-  if (!business) return null
-  const b = business
-
-  const nome = b.nome ?? 'Negócio sem nome'
-  const wa = whatsappUrl(b.telefone, buildProspectMessage(b, cidade))
-  const tel = telUrl(b.telefone)
-  const maps = mapsUrl(b)
-  const socials = socialLinks(b)
-  const temSitePróprio = !!b.website && !websiteIsSocial(b)
+  const b = shown
+  const nome = b?.nome ?? 'Negócio sem nome'
+  const wa = b ? whatsappUrl(b.telefone, buildProspectMessage(b, cidade)) : null
+  const tel = b ? telUrl(b.telefone) : null
+  const maps = b ? mapsUrl(b) : null
+  const socials = b ? socialLinks(b) : []
+  const temSitePróprio = !!b?.website && !websiteIsSocial(b)
 
   return (
-    <>
-      <div className="drawer-overlay" onClick={onClose} />
-      <aside className="lead-drawer" role="dialog" aria-modal="true" aria-label={`Detalhe de ${nome}`}>
+    <Sheet open={open} onOpenChange={o => { if (!o) onClose() }}>
+      <SheetContent
+        side="right"
+        showCloseButton={false}
+        className="w-[440px] max-w-[94vw] gap-[18px] overflow-y-auto p-5 sm:max-w-[94vw]"
+        aria-label={`Detalhe de ${nome}`}
+      >
+        {b && (
+          <>
         {/* Cabeçalho */}
         <header className="drawer-head">
           <div>
-            <h2 className="drawer-nome">{nome}</h2>
+            <SheetTitle className="drawer-nome">{nome}</SheetTitle>
+            <SheetDescription className="sr-only">
+              Detalhes, contato e ações de prospecção do lead {nome}.
+            </SheetDescription>
             <div className="drawer-tags">
               <span className="drawer-chip">{b.setor_nome}</span>
               {b.org_tipo && b.org_tipo !== 'independente' && (
@@ -72,7 +85,7 @@ export default function LeadDrawer({ business, cidade, onClose }: Props) {
               </span>
             </div>
           </div>
-          <button className="drawer-close" onClick={onClose} aria-label="Fechar">✕</button>
+          <SheetClose className="drawer-close" aria-label="Fechar">✕</SheetClose>
         </header>
 
         {/* Score + porquês */}
@@ -159,8 +172,10 @@ export default function LeadDrawer({ business, cidade, onClose }: Props) {
             </div>
           )}
         </section>
-      </aside>
-    </>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
   )
 }
 

@@ -1,34 +1,6 @@
-/* ── Overlay + painel deslizante ── */
-.drawer-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(8, 10, 18, 0.55);
-  backdrop-filter: blur(2px);
-  z-index: 40;
-  animation: fade-in 0.15s ease-out;
-}
-
-.lead-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 440px;
-  max-width: 94vw;
-  background: var(--bg);
-  border-left: 1px solid var(--border);
-  z-index: 50;
-  overflow-y: auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  box-shadow: -16px 0 40px rgba(0, 0, 0, 0.25);
-  animation: slide-in 0.2s ease-out;
-}
-
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slide-in { from { transform: translateX(24px); opacity: 0.4; } to { transform: translateX(0); opacity: 1; } }
+/* A casca do painel (posição, overlay, deslize, scroll-lock e foco preso) vem do
+   componente Sheet (shadcn/Radix) — ver LeadDrawer.tsx. Aqui ficam só os estilos
+   do CONTEÚDO interno do drawer. */
 
 /* ── Cabeçalho ── */
 .drawer-head {

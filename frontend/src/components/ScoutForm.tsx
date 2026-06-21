@@ -1,6 +1,13 @@
 import { type FormEvent, useState } from 'react'
 import type { RunStartRequest } from '../api/client'
 import { useStartRun } from '../hooks/useScout'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import './ScoutForm.css'
 
 interface Props {
@@ -25,66 +32,74 @@ export default function ScoutForm({ onSuccess }: Props) {
     })
   }
 
-  if (!open) {
-    return (
-      <button className="btn-run" onClick={() => setOpen(true)}>
-        ＋ Nova coleta
-      </button>
-    )
-  }
-
   return (
-    <div className="scout-form-overlay" onClick={() => !isPending && setOpen(false)}>
-      <form className="scout-form" onSubmit={handleSubmit} onClick={e => e.stopPropagation()}>
-        <h3>Nova coleta do Scout</h3>
+    <Dialog open={open} onOpenChange={o => { if (!isPending) setOpen(o) }}>
+      <DialogTrigger asChild>
+        <button className="btn-run">＋ Nova coleta</button>
+      </DialogTrigger>
 
-        <label>
-          Cidade
-          <input
-            value={cidade}
-            onChange={e => setCidade(e.target.value)}
-            required
-            disabled={isPending}
-          />
-        </label>
+      {/* DialogContent "pelado": o card visível continua sendo o .scout-form,
+          preservando o visual original. O Radix dá overlay, foco preso e ESC. */}
+      <DialogContent
+        showCloseButton={false}
+        className="max-w-[420px] gap-0 border-0 bg-transparent p-0 shadow-none sm:max-w-[420px]"
+      >
+        <form className="scout-form" onSubmit={handleSubmit}>
+          <DialogTitle className="m-0 text-[1.1rem] font-semibold text-text-strong">
+            Nova coleta do Scout
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            Configure e dispare uma nova coleta de negócios do agente Scout.
+          </DialogDescription>
 
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={comSerper}
-            onChange={e => setComSerper(e.target.checked)}
-            disabled={isPending}
-          />
-          Adicionar Serper (Google Maps) como fonte
-        </label>
+          <label>
+            Cidade
+            <input
+              value={cidade}
+              onChange={e => setCidade(e.target.value)}
+              required
+              disabled={isPending}
+            />
+          </label>
 
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={enriquecer}
-            onChange={e => setEnriquecer(e.target.checked)}
-            disabled={isPending}
-          />
-          Enriquecer com DomainGuesser
-        </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={comSerper}
+              onChange={e => setComSerper(e.target.checked)}
+              disabled={isPending}
+            />
+            Adicionar Serper (Google Maps) como fonte
+          </label>
 
-        {error && <p className="form-error">{(error as Error).message}</p>}
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={enriquecer}
+              onChange={e => setEnriquecer(e.target.checked)}
+              disabled={isPending}
+            />
+            Enriquecer com DomainGuesser
+          </label>
 
-        <div className="form-actions">
-          <button type="button" className="btn-cancel" onClick={() => setOpen(false)} disabled={isPending}>
-            Cancelar
-          </button>
-          <button type="submit" className="btn-submit" disabled={isPending}>
-            {isPending ? 'Coletando…' : 'Rodar Scout'}
-          </button>
-        </div>
+          {error && <p className="form-error">{(error as Error).message}</p>}
 
-        {isPending && (
-          <p className="form-hint">
-            A coleta pode levar 5–90 s dependendo das opções escolhidas.
-          </p>
-        )}
-      </form>
-    </div>
+          <div className="form-actions">
+            <button type="button" className="btn-cancel" onClick={() => setOpen(false)} disabled={isPending}>
+              Cancelar
+            </button>
+            <button type="submit" className="btn-submit" disabled={isPending}>
+              {isPending ? 'Coletando…' : 'Rodar Scout'}
+            </button>
+          </div>
+
+          {isPending && (
+            <p className="form-hint">
+              A coleta pode levar 5–90 s dependendo das opções escolhidas.
+            </p>
+          )}
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -11,16 +11,8 @@
 }
 .btn-run:hover { opacity: 0.85; }
 
-.scout-form-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
+/* O overlay e a centralização agora vêm do Dialog (shadcn/Radix). O .scout-form
+   segue sendo o card visível, com o mesmo visual de antes. */
 .scout-form {
   background: var(--card-bg);
   border: 1px solid var(--border);
