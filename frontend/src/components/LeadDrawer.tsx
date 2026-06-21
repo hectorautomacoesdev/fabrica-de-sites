@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { BusinessRead } from '../api/client'
+import { cn } from '@/lib/utils'
 import {
   Sheet,
   SheetClose,
@@ -7,6 +8,8 @@ import {
   SheetDescription,
   SheetTitle,
 } from '@/components/ui/sheet'
+import { StatusBadge } from './Badge'
+import { scoreTextClass } from '../lib/score'
 import {
   buildProspectMessage,
   instagramSearchUrl,
@@ -80,9 +83,7 @@ export default function LeadDrawer({ business, cidade, onClose }: Props) {
               {b.org_tipo && b.org_tipo !== 'independente' && (
                 <span className="drawer-chip chip-warn">{ORG_TIPO_LABELS[b.org_tipo] ?? b.org_tipo}</span>
               )}
-              <span className={`status-badge status-${statusSlug(b.site_status)}`}>
-                {STATUS_LABELS[b.site_status] ?? b.site_status}
-              </span>
+              <StatusBadge status={b.site_status} label={STATUS_LABELS[b.site_status] ?? b.site_status} />
             </div>
           </div>
           <SheetClose className="drawer-close" aria-label="Fechar">✕</SheetClose>
@@ -90,7 +91,7 @@ export default function LeadDrawer({ business, cidade, onClose }: Props) {
 
         {/* Score + porquês */}
         <section className="drawer-score">
-          <div className={`score-ring score-${scoreSlug(b.score_label)}`}>
+          <div className={cn('score-ring', scoreTextClass(b.score_label))}>
             <span className="score-num">{b.score}</span>
             <span className="score-lbl">{b.score_label}</span>
           </div>
@@ -186,24 +187,6 @@ function Item({ label, value }: { label: string; value: string | null | undefine
       <dd>{value ? value : <span className="muted">—</span>}</dd>
     </>
   )
-}
-
-function scoreSlug(label: string): string {
-  return ({
-    'ALTÍSSIMA': 'altissima',
-    'ALTA': 'alta',
-    'MÉDIA': 'media',
-    'BAIXA': 'baixa',
-  } as Record<string, string>)[label] ?? 'baixa'
-}
-
-function statusSlug(status: string): string {
-  return ({
-    SEM_SITE: 'sem-site',
-    SO_REDE_SOCIAL: 'social',
-    COM_SITE: 'com-site',
-    DESCONHECIDO: 'desconh',
-  } as Record<string, string>)[status] ?? 'desconh'
 }
 
 function prettyUrl(url: string): string {

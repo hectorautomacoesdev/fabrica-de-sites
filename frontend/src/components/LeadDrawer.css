@@ -73,11 +73,8 @@
 }
 .score-ring .score-num { font-size: 1.5rem; font-weight: 800; line-height: 1; }
 .score-ring .score-lbl { font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
-
-.score-altissima { color: #dc2626; }
-.score-alta      { color: #d97706; }
-.score-media     { color: #2563eb; }
-.score-baixa     { color: var(--text-muted); }
+/* A COR do anel vem da classe utilitária scoreTextClass() (Badge.tsx) aplicada no
+   elemento; o `border: ... currentColor` abaixo herda dela. */
 
 .score-motivos { flex: 1; min-width: 0; }
 .score-motivos ul { list-style: none; display: flex; flex-direction: column; gap: 3px; }
