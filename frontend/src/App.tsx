@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import './App.css'
 import BusinessTable from './components/BusinessTable'
 import KpiCards from './components/KpiCards'
 import RunSelector from './components/RunSelector'
@@ -19,10 +18,14 @@ export default function App() {
     setSelectedRunId(runId)
   }
 
+  const appShell = 'mx-auto max-w-[1280px] px-5 pb-10'
+  const sectionTitle = 'mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-text-muted'
+  const stateMsg = 'px-5 py-12 text-center text-[0.9rem] text-text-muted'
+
   if (runsError) {
     return (
-      <div className="app">
-        <div className="error-msg">
+      <div className={appShell}>
+        <div className="px-5 py-8 text-center text-[0.9rem] text-[#e74c3c]">
           Não foi possível conectar à API. Certifique-se de que o servidor está rodando em{' '}
           <code>localhost:8001</code>.<br />
           <small>
@@ -36,13 +39,13 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={appShell}>
       {/* ── Header ── */}
-      <header className="app-header">
-        <div className="app-title">
-          Fábrica de Sites &mdash; <span>Scout</span>
+      <header className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border py-4">
+        <div className="text-[1.1rem] font-bold tracking-[-0.02em] text-text-strong">
+          Fábrica de Sites &mdash; <span className="text-brand">Scout</span>
         </div>
-        <div className="header-right">
+        <div className="flex flex-wrap items-center gap-4">
           <RunSelector
             runs={runs}
             selectedId={activeRunId}
@@ -55,37 +58,42 @@ export default function App() {
 
       {/* ── Conteúdo principal ── */}
       {activeRunId === null ? (
-        <div className="state-msg">
+        <div className={stateMsg}>
           Nenhuma execução encontrada. Clique em <strong>+ Nova coleta</strong> para rodar o Scout.
         </div>
       ) : loadingInsights ? (
-        <div className="state-msg">Carregando dados da execução…</div>
+        <div className={stateMsg}>Carregando dados da execução…</div>
       ) : insights ? (
         <>
           {/* KPIs */}
-          <p className="section-title">Indicadores</p>
+          <p className={sectionTitle}>Indicadores</p>
           <KpiCards kpis={insights.kpis} />
 
           {/* Insights de texto */}
-          <div className="insights-section">
-            <h2>Insights</h2>
-            <ul className="insights-list">
+          <div className="mb-6">
+            <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-text-muted">Insights</h2>
+            <ul className="flex list-none flex-col gap-1">
               {insights.insights.map((txt, i) => (
-                <li key={i}>{txt}</li>
+                <li key={i} className="border-b border-border-faint py-1 text-[0.85rem] text-text last:border-b-0">{txt}</li>
               ))}
             </ul>
           </div>
 
           {/* Tabela de negócios */}
-          <p className="section-title">Negócios mapeados <span className="hint">— clique numa linha para ver o lead</span></p>
+          <p className={sectionTitle}>
+            Negócios mapeados{' '}
+            <span className="font-normal normal-case tracking-normal text-text-muted">
+              — clique numa linha para ver o lead
+            </span>
+          </p>
           <BusinessTable runId={activeRunId} cidade={runs.find(r => r.id === activeRunId)?.cidade} />
         </>
       ) : null}
 
       {/* ── Footer ── */}
-      <footer style={{ marginTop: 32, textAlign: 'right' }}>
+      <footer className="mt-8 text-right">
         <a
-          className="api-link"
+          className="text-[0.78rem] text-text-muted"
           href="http://localhost:8001/docs"
           target="_blank"
           rel="noreferrer"
