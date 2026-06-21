@@ -81,6 +81,13 @@ export const NAV: NavGroup[] = [
       { slug: 'design-referencias-pesquisa', title: 'Dossiê — referências de design', status: 'ready' },
     ],
   },
+  {
+    group: 'Refatoração do frontend (BI)',
+    items: [
+      { slug: 'plano-refatoracao-frontend-bi', title: 'Plano — Frontend BI & interatividade', status: 'ready' },
+      { slug: 'bi-frontend-pesquisa', title: 'Dossiê — BI e visualização de dados', status: 'ready' },
+    ],
+  },
 ]
 
 // Busca o título de uma rota (para o placeholder e o <title>).

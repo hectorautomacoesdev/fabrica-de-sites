@@ -29,6 +29,8 @@ import cnpjArquitetura from '../../../docs/cnpj-arquitetura.md?raw'
 import planoAuditor from '../../../docs/plano-auditor-benchmark.md?raw'
 import auditorPesquisa from '../../../docs/auditor-benchmark-pesquisa.md?raw'
 import designPesquisa from '../../../docs/design-referencias-pesquisa.md?raw'
+import planoFrontendBi from '../../../docs/plano-refatoracao-frontend-bi.md?raw'
+import biFrontendPesquisa from '../../../docs/bi-frontend-pesquisa.md?raw'
 
 // Junta vários arquivos numa única página React (com separador visual).
 const join = (...parts: string[]) => parts.join('\n\n---\n\n')
@@ -55,4 +57,6 @@ export const MD_CONTENT: Record<string, string> = {
   'plano-auditor-benchmark': planoAuditor,
   'auditor-benchmark-pesquisa': auditorPesquisa,
   'design-referencias-pesquisa': designPesquisa,
+  'plano-refatoracao-frontend-bi': planoFrontendBi,
+  'bi-frontend-pesquisa': biFrontendPesquisa,
 }
