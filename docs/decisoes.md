@@ -247,3 +247,30 @@ auditáveis no git; separa o ciclo de vida lento da régua do ciclo rápido do A
 **Alternativas:** régua em código (mais rígida, exige PR para cada ajuste) — descartada por engessar
 a evolução do que é, na prática, conhecimento de negócio.
 **Status:** decidido no planejamento; implementação na Fase 2.
+
+## D22 — Estilo do frontend: Tailwind v4 + shadcn/ui (Radix), CSS por componente removido
+
+**Contexto:** o frontend usava **CSS puro** espalhado em uma folha por componente
+(`App.css`, `BusinessTable.css`, `LeadDrawer.css`…). Funcionava, mas: (a) os componentes
+modais (drawer/dialog) eram feitos à mão e tinham acessibilidade frágil (foco preso, ESC,
+ARIA); (b) o Hector já gosta e tem prática com **Tailwind** e já usou **Material UI**.
+**Escolha:** adotar **Tailwind v4** como base de estilo (utilitário-primeiro) + **shadcn/ui**
+(componentes copiados para `components/ui/`, com **Radix** por baixo) para os interativos
+sensíveis a a11y (Sheet, Dialog, Select). Remover **todo** CSS de componente; sobra só o
+`index.css` (Tailwind + tokens). Os tokens da paleta viram a ponte via `@theme inline`, e os
+tokens semânticos do shadcn mapeiam para a mesma paleta (mantém o visual e o dark/light).
+**Por quê:** resolve o atrito do "CSS cru" com a stack que o Hector domina; o Radix dá
+acessibilidade real nos modais sem reinventar (foco preso/ESC/ARIA/teclado); shadcn é
+**código copiado** (somos donos, não dependência trancada), permitindo adoção incremental.
+**Material UI descartado:** traz sistema de estilo próprio (conflita com Tailwind),
+substituiria o visual custom e tem a "cara de Material" — irônico num produto que vende
+design sob medida; além do bundle maior.
+**Trade-offs honestos:** o bundle JS cresceu ~40 kB gzip (Radix de Dialog/Select) — preço da
+acessibilidade; o JSX de componentes densos (LeadDrawer) ficou mais verboso ao migrar para
+utilitários inline. Regra de cascata aprendida: as regras base do `index.css` precisam ficar
+em `@layer base` para os utilitários `text-*`/`bg-*` vencerem o estilo de link global.
+**Alternativas:** (a) só Tailwind, drawer à mão — descartada (a11y frágil); (b) Radix puro sem
+Tailwind — mais trabalho de CSS; (c) Mantine/Chakra/MUI — sistema de estilo paralelo ao
+Tailwind. Detalhe da pesquisa no [Dossiê de referências de design](design-referencias-pesquisa.md).
+**Status:** implementado em fases (fundação → componentes a11y → migração do CSS) na branch
+`refactor/frontend-tailwind-shadcn`.
