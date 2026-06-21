@@ -8,7 +8,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import './ScoutForm.css'
+
+const labelCls = 'flex flex-col gap-[5px] text-[0.85rem] font-medium text-text-muted'
+const checkLabelCls = 'flex cursor-pointer flex-row items-center gap-2 text-[0.85rem] font-medium text-text-strong'
+const inputCls = 'rounded-md border border-border bg-bg px-2.5 py-[7px] text-[0.9rem] text-text-strong'
+const btnCancelCls = 'cursor-pointer rounded-md border border-border bg-transparent px-4 py-[7px] text-text-muted disabled:cursor-not-allowed disabled:opacity-50'
+const btnSubmitCls = 'cursor-pointer rounded-md border-0 bg-brand px-5 py-[7px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50'
 
 interface Props {
   onSuccess: (runId: number) => void
@@ -35,16 +40,21 @@ export default function ScoutForm({ onSuccess }: Props) {
   return (
     <Dialog open={open} onOpenChange={o => { if (!isPending) setOpen(o) }}>
       <DialogTrigger asChild>
-        <button className="btn-run">＋ Nova coleta</button>
+        <button className="cursor-pointer rounded-[7px] border-0 bg-brand px-[18px] py-2 text-[0.9rem] font-semibold text-white transition-opacity hover:opacity-85">
+          ＋ Nova coleta
+        </button>
       </DialogTrigger>
 
-      {/* DialogContent "pelado": o card visível continua sendo o .scout-form,
-          preservando o visual original. O Radix dá overlay, foco preso e ESC. */}
+      {/* DialogContent "pelado": o card visível é o <form>, preservando o visual.
+          O Radix dá overlay, foco preso e ESC. */}
       <DialogContent
         showCloseButton={false}
         className="max-w-[420px] gap-0 border-0 bg-transparent p-0 shadow-none sm:max-w-[420px]"
       >
-        <form className="scout-form" onSubmit={handleSubmit}>
+        <form
+          className="flex w-full max-w-[420px] flex-col gap-[14px] rounded-xl border border-border bg-card px-8 py-7"
+          onSubmit={handleSubmit}
+        >
           <DialogTitle className="m-0 text-[1.1rem] font-semibold text-text-strong">
             Nova coleta do Scout
           </DialogTitle>
@@ -52,9 +62,10 @@ export default function ScoutForm({ onSuccess }: Props) {
             Configure e dispare uma nova coleta de negócios do agente Scout.
           </DialogDescription>
 
-          <label>
+          <label className={labelCls}>
             Cidade
             <input
+              className={inputCls}
               value={cidade}
               onChange={e => setCidade(e.target.value)}
               required
@@ -62,7 +73,7 @@ export default function ScoutForm({ onSuccess }: Props) {
             />
           </label>
 
-          <label className="checkbox-label">
+          <label className={checkLabelCls}>
             <input
               type="checkbox"
               checked={comSerper}
@@ -72,7 +83,7 @@ export default function ScoutForm({ onSuccess }: Props) {
             Adicionar Serper (Google Maps) como fonte
           </label>
 
-          <label className="checkbox-label">
+          <label className={checkLabelCls}>
             <input
               type="checkbox"
               checked={enriquecer}
@@ -82,19 +93,19 @@ export default function ScoutForm({ onSuccess }: Props) {
             Enriquecer com DomainGuesser
           </label>
 
-          {error && <p className="form-error">{(error as Error).message}</p>}
+          {error && <p className="m-0 text-[0.82rem] text-[#e74c3c]">{(error as Error).message}</p>}
 
-          <div className="form-actions">
-            <button type="button" className="btn-cancel" onClick={() => setOpen(false)} disabled={isPending}>
+          <div className="flex justify-end gap-2.5">
+            <button type="button" className={btnCancelCls} onClick={() => setOpen(false)} disabled={isPending}>
               Cancelar
             </button>
-            <button type="submit" className="btn-submit" disabled={isPending}>
+            <button type="submit" className={btnSubmitCls} disabled={isPending}>
               {isPending ? 'Coletando…' : 'Rodar Scout'}
             </button>
           </div>
 
           {isPending && (
-            <p className="form-hint">
+            <p className="m-0 text-center text-[0.78rem] text-text-muted">
               A coleta pode levar 5–90 s dependendo das opções escolhidas.
             </p>
           )}

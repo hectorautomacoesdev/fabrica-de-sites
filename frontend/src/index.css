@@ -97,18 +97,22 @@
 }
 
 /* ───────────────────────────────────────────────────────────────────────────
-   Estilos base (preservados do original). O Preflight do Tailwind já zera
-   margens/box-sizing; mantemos a tipografia e o fundo do app.
+   Estilos base (preservados do original). Ficam em @layer base de propósito:
+   assim os UTILITÁRIOS do Tailwind (text-*, bg-*...) vencem estas regras na
+   cascata. Sem a camada, `a { color }` aqui sobreporia um `text-text-muted`
+   aplicado num <a> — exatamente o que não queremos.
    ─────────────────────────────────────────────────────────────────────────── */
-html { font-size: 15px; }
+@layer base {
+  html { font-size: 15px; }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  line-height: 1.5;
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  a { color: var(--accent); }
+  select, input, button { font-family: inherit; }
 }
-
-a { color: var(--accent); }
-select, input, button { font-family: inherit; }
