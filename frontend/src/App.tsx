@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import BusinessTable from './components/BusinessTable'
 import CitySummary from './components/CitySummary'
 import KpiCards from './components/KpiCards'
@@ -8,6 +8,8 @@ import ScoutForm from './components/ScoutForm'
 import SectorChart from './components/SectorChart'
 import ThemeToggle from './components/ThemeToggle'
 import { useInsights, useRuns } from './hooks/useScout'
+
+const MapView = lazy(() => import('./components/MapView'))
 
 export default function App() {
   const { data: runs = [], isLoading: loadingRuns, error: runsError } = useRuns()
@@ -83,6 +85,18 @@ export default function App() {
           <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
             <ProspectFunnel kpis={insights.kpis} />
             <SectorChart runId={activeRunId} />
+          </div>
+
+          {/* Mapa — Fase C */}
+          <p className={sectionTitle}>Mapa de oportunidades</p>
+          <div className="mb-6">
+            <Suspense fallback={
+              <div className="flex h-[420px] items-center justify-center rounded-xl border border-border bg-card text-[0.85rem] text-text-muted">
+                Carregando mapa…
+              </div>
+            }>
+              <MapView runId={activeRunId} cidade={cidade} />
+            </Suspense>
           </div>
 
           {/* Insights de texto */}
