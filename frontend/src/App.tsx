@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import BusinessTable from './components/BusinessTable'
+import CitySummary from './components/CitySummary'
 import KpiCards from './components/KpiCards'
 import RunSelector from './components/RunSelector'
 import ScoutForm from './components/ScoutForm'
+import ThemeToggle from './components/ThemeToggle'
 import { useInsights, useRuns } from './hooks/useScout'
 
 export default function App() {
@@ -11,6 +13,7 @@ export default function App() {
 
   // Seleciona automaticamente a run mais recente quando os dados chegam
   const activeRunId = selectedRunId ?? (runs.length > 0 ? runs[0].id : null)
+  const cidade = runs.find(r => r.id === activeRunId)?.cidade
 
   const { data: insights, isLoading: loadingInsights } = useInsights(activeRunId)
 
@@ -45,7 +48,8 @@ export default function App() {
         <div className="text-[1.1rem] font-bold tracking-[-0.02em] text-text-strong">
           Fábrica de Sites &mdash; <span className="text-brand">Scout</span>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <ThemeToggle />
           <RunSelector
             runs={runs}
             selectedId={activeRunId}
@@ -65,6 +69,9 @@ export default function App() {
         <div className={stateMsg}>Carregando dados da execução…</div>
       ) : insights ? (
         <>
+          {/* Resumo do mercado — a manchete da visão geral */}
+          <CitySummary kpis={insights.kpis} cidade={cidade} />
+
           {/* KPIs */}
           <p className={sectionTitle}>Indicadores</p>
           <KpiCards kpis={insights.kpis} />
@@ -86,7 +93,7 @@ export default function App() {
               — clique numa linha para ver o lead
             </span>
           </p>
-          <BusinessTable runId={activeRunId} cidade={runs.find(r => r.id === activeRunId)?.cidade} />
+          <BusinessTable runId={activeRunId} cidade={cidade} />
         </>
       ) : null}
 

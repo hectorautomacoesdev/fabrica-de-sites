@@ -33,8 +33,20 @@ function Card({ value, label, sub, highlight }: CardProps) {
 
 export default function KpiCards({ kpis }: Props) {
   return (
+    // Ordem por AÇÃO (não por total): a manchete são os leads quentes; o total
+    // vira contexto no fim. Ver plano de refatoração BI (métricas acionáveis).
     <div className="mb-6 grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-3">
-      <Card value={kpis.total} label="Negócios mapeados" />
+      <Card
+        value={kpis.leads_quentes}
+        label="Leads quentes"
+        sub="Alta oportunidade + contato"
+        highlight
+      />
+      <Card
+        value={kpis.contactavel}
+        label="Com contato"
+        sub={`${kpis.pct_contactavel}% do total`}
+      />
       <Card
         value={kpis.sem_site_proprio}
         label="Sem site próprio"
@@ -42,17 +54,7 @@ export default function KpiCards({ kpis }: Props) {
       />
       <Card value={kpis.so_social} label="Só rede social" />
       <Card value={kpis.com_site} label="Têm site próprio" />
-      <Card
-        value={kpis.contactavel}
-        label="Com contato"
-        sub={`${kpis.pct_contactavel}% do total`}
-      />
-      <Card
-        value={kpis.leads_quentes}
-        label="Leads quentes"
-        sub="Alta oportunidade + contato"
-        highlight
-      />
+      <Card value={kpis.total} label="Negócios mapeados" />
     </div>
   )
 }
