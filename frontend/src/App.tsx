@@ -7,6 +7,7 @@ import RunSelector from './components/RunSelector'
 import ScoutForm from './components/ScoutForm'
 import SectorChart from './components/SectorChart'
 import ThemeToggle from './components/ThemeToggle'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useInsights, useRuns } from './hooks/useScout'
 
 const MapView = lazy(() => import('./components/MapView'))
@@ -15,15 +16,10 @@ export default function App() {
   const { data: runs = [], isLoading: loadingRuns, error: runsError } = useRuns()
   const [selectedRunId, setSelectedRunId] = useState<number | null>(null)
 
-  // Seleciona automaticamente a run mais recente quando os dados chegam
   const activeRunId = selectedRunId ?? (runs.length > 0 ? runs[0].id : null)
   const cidade = runs.find(r => r.id === activeRunId)?.cidade
 
   const { data: insights, isLoading: loadingInsights } = useInsights(activeRunId)
-
-  function handleNewRun(runId: number) {
-    setSelectedRunId(runId)
-  }
 
   const appShell = 'mx-auto max-w-[1280px] px-5 pb-10'
   const sectionTitle = 'mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-text-muted'
@@ -60,7 +56,7 @@ export default function App() {
             onChange={setSelectedRunId}
             loading={loadingRuns}
           />
-          <ScoutForm onSuccess={handleNewRun} />
+          <ScoutForm onSuccess={(id) => setSelectedRunId(id)} />
         </div>
       </header>
 
@@ -72,52 +68,65 @@ export default function App() {
       ) : loadingInsights ? (
         <div className={stateMsg}>Carregando dados da execução…</div>
       ) : insights ? (
-        <>
-          {/* Resumo do mercado — a manchete da visão geral */}
-          <CitySummary kpis={insights.kpis} cidade={cidade} />
+        <Tabs defaultValue="overview">
+          <TabsList className="mb-6">
+            <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="mapa">Mapa</TabsTrigger>
+            <TabsTrigger value="leads">Leads</TabsTrigger>
+          </TabsList>
 
-          {/* KPIs */}
-          <p className={sectionTitle}>Indicadores</p>
-          <KpiCards kpis={insights.kpis} />
+          {/* ── Aba: Visão Geral ── */}
+          <TabsContent value="overview">
+            <CitySummary kpis={insights.kpis} cidade={cidade} />
 
-          {/* Gráficos — Fase B */}
-          <p className={sectionTitle}>Análise visual</p>
-          <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <ProspectFunnel kpis={insights.kpis} />
-            <SectorChart runId={activeRunId} />
-          </div>
+            <p className={sectionTitle}>Indicadores</p>
+            <KpiCards kpis={insights.kpis} />
 
-          {/* Mapa — Fase C */}
-          <p className={sectionTitle}>Mapa de oportunidades</p>
-          <div className="mb-6">
-            <Suspense fallback={
-              <div className="flex h-[420px] items-center justify-center rounded-xl border border-border bg-card text-[0.85rem] text-text-muted">
-                Carregando mapa…
-              </div>
-            }>
+            <p className={sectionTitle}>Análise visual</p>
+            <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <ProspectFunnel kpis={insights.kpis} />
+              <SectorChart runId={activeRunId} />
+            </div>
+
+            <div className="mb-6">
+              <p className={sectionTitle}>Insights gerados</p>
+              <ul className="flex list-none flex-col gap-1">
+                {insights.insights.map((txt, i) => (
+                  <li
+                    key={i}
+                    className="border-b border-border-faint py-1.5 text-[0.85rem] text-text last:border-b-0"
+                  >
+                    {txt}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </TabsContent>
+
+          {/* ── Aba: Mapa ── */}
+          <TabsContent value="mapa">
+            <Suspense
+              fallback={
+                <div className="flex h-[420px] items-center justify-center rounded-xl border border-border bg-card text-[0.85rem] text-text-muted">
+                  Carregando mapa…
+                </div>
+              }
+            >
               <MapView runId={activeRunId} cidade={cidade} />
             </Suspense>
-          </div>
+          </TabsContent>
 
-          {/* Insights de texto */}
-          <div className="mb-6">
-            <h2 className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-text-muted">Insights</h2>
-            <ul className="flex list-none flex-col gap-1">
-              {insights.insights.map((txt, i) => (
-                <li key={i} className="border-b border-border-faint py-1 text-[0.85rem] text-text last:border-b-0">{txt}</li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Tabela de negócios */}
-          <p className={sectionTitle}>
-            Negócios mapeados{' '}
-            <span className="font-normal normal-case tracking-normal text-text-muted">
-              — clique numa linha para ver o lead
-            </span>
-          </p>
-          <BusinessTable runId={activeRunId} cidade={cidade} />
-        </>
+          {/* ── Aba: Leads ── */}
+          <TabsContent value="leads">
+            <p className={sectionTitle}>
+              Negócios mapeados{' '}
+              <span className="font-normal normal-case tracking-normal text-text-muted">
+                — clique numa linha para ver o lead
+              </span>
+            </p>
+            <BusinessTable runId={activeRunId} cidade={cidade} />
+          </TabsContent>
+        </Tabs>
       ) : null}
 
       {/* ── Footer ── */}
