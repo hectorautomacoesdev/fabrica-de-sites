@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import BusinessTable from './components/BusinessTable'
 import CitySummary from './components/CitySummary'
+import ExecutionsTab from './components/ExecutionsTab'
 import KpiCards from './components/KpiCards'
 import ProspectFunnel from './components/ProspectFunnel'
 import RunSelector from './components/RunSelector'
@@ -73,6 +74,7 @@ export default function App() {
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
             <TabsTrigger value="mapa">Mapa</TabsTrigger>
             <TabsTrigger value="leads">Leads</TabsTrigger>
+            <TabsTrigger value="execucoes">Execuções</TabsTrigger>
           </TabsList>
 
           {/* ── Aba: Visão Geral ── */}
@@ -114,6 +116,15 @@ export default function App() {
             >
               <MapView runId={activeRunId} cidade={cidade} />
             </Suspense>
+          </TabsContent>
+
+          {/* ── Aba: Execuções ── */}
+          <TabsContent value="execucoes">
+            <ExecutionsTab
+              runs={runs}
+              activeRunId={activeRunId}
+              onSelect={(id) => setSelectedRunId(id)}
+            />
           </TabsContent>
 
           {/* ── Aba: Leads ── */}
