@@ -2,8 +2,10 @@ import { useState } from 'react'
 import BusinessTable from './components/BusinessTable'
 import CitySummary from './components/CitySummary'
 import KpiCards from './components/KpiCards'
+import ProspectFunnel from './components/ProspectFunnel'
 import RunSelector from './components/RunSelector'
 import ScoutForm from './components/ScoutForm'
+import SectorChart from './components/SectorChart'
 import ThemeToggle from './components/ThemeToggle'
 import { useInsights, useRuns } from './hooks/useScout'
 
@@ -75,6 +77,13 @@ export default function App() {
           {/* KPIs */}
           <p className={sectionTitle}>Indicadores</p>
           <KpiCards kpis={insights.kpis} />
+
+          {/* Gráficos — Fase B */}
+          <p className={sectionTitle}>Análise visual</p>
+          <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <ProspectFunnel kpis={insights.kpis} />
+            <SectorChart runId={activeRunId} />
+          </div>
 
           {/* Insights de texto */}
           <div className="mb-6">
