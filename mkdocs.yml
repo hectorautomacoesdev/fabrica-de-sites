@@ -126,3 +126,6 @@ nav:
       - Plano — Benchmark + Auditor: plano-auditor-benchmark.md
       - Dossiê — pesquisa do Auditor: auditor-benchmark-pesquisa.md
       - Dossiê — referências de design: design-referencias-pesquisa.md
+  - "Refatoração do frontend (BI)":
+      - Plano — Frontend BI & interatividade: plano-refatoracao-frontend-bi.md
+      - Dossiê — BI e visualização de dados: bi-frontend-pesquisa.md

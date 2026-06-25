@@ -1,42 +1,178 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
-:root {
-  --bg:           #0f1117;
-  --card-bg:      #1a1d27;
-  --border:       #2e3148;
-  --border-faint: #23263a;
-  --hover-bg:     #1e2235;
-  --text:         #c8cde8;
-  --text-strong:  #e8ecff;
-  --text-muted:   #636b8a;
-  --accent:       #4f7ef7;
-  --accent-faint: #1a2240;
+/* ────────────────────────────────────────────────────────────────────────────
+   Paleta "Indigo-Slate" — 3 temas: dark (padrão), mid, light.
+   Ativados via data-theme="dark"|"mid"|"light" em <html> (ver useTheme.ts).
+   Anti-flash: index.html aplica o atributo antes do React montar.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ── Escuro (padrão) ───────────────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  --bg:           #0e1017;
+  --card-bg:      #14182a;
+  --border:       #1f2540;
+  --border-faint: #181c30;
+  --hover-bg:     #1c2238;
+  --text:         #bbc8e8;
+  --text-strong:  #e2eaf8;
+  --text-muted:   #4e5878;
+  --accent:       #6366f1;
+  --accent-faint: rgb(99 102 241 / 0.12);
+
+  --on-accent: #ffffff;
+  --danger:    #ef4444;
+  --on-danger: #ffffff;
+  --ring:      #6366f1;
+  --radius:    0.5rem;
+
+  /* Gráficos — Fase B */
+  --chart-1: #6366f1;
+  --chart-2: #f97316;
+  --chart-3: #14b8a6;
+  --chart-4: #f43f5e;
+  --chart-5: #a855f7;
 }
 
+/* ── Médio ─────────────────────────────────────────────────────────────────── */
+[data-theme="mid"] {
+  --bg:           #1a1e2e;
+  --card-bg:      #222740;
+  --border:       #2c3358;
+  --border-faint: #242a4a;
+  --hover-bg:     #28304e;
+  --text:         #b8c4e0;
+  --text-strong:  #d8e0f8;
+  --text-muted:   #5c6888;
+  --accent:       #818cf8;
+  --accent-faint: rgb(129 140 248 / 0.15);
+
+  --on-accent: #ffffff;
+  --danger:    #f87171;
+  --on-danger: #ffffff;
+  --ring:      #818cf8;
+  --radius:    0.5rem;
+
+  --chart-1: #818cf8;
+  --chart-2: #fb923c;
+  --chart-3: #2dd4bf;
+  --chart-4: #fb7185;
+  --chart-5: #c084fc;
+}
+
+/* ── Claro ─────────────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:           #eef0fb;
+  --card-bg:      #ffffff;
+  --border:       #d0d5ef;
+  --border-faint: #e4e8f8;
+  --hover-bg:     #e8ecf8;
+  --text:         #374060;
+  --text-strong:  #1a1f44;
+  --text-muted:   #7880a8;
+  --accent:       #4f46e5;
+  --accent-faint: rgb(79 70 229 / 0.10);
+
+  --on-accent: #ffffff;
+  --danger:    #dc2626;
+  --on-danger: #ffffff;
+  --ring:      #4f46e5;
+  --radius:    0.5rem;
+
+  --chart-1: #4f46e5;
+  --chart-2: #ea580c;
+  --chart-3: #0d9488;
+  --chart-4: #e11d48;
+  --chart-5: #9333ea;
+}
+
+/* Fallback sistema light sem preferência explícita salva */
 @media (prefers-color-scheme: light) {
-  :root {
-    --bg:           #f4f6fb;
+  :root:not([data-theme]) {
+    --bg:           #eef0fb;
     --card-bg:      #ffffff;
-    --border:       #dde1f0;
-    --border-faint: #eaecf5;
-    --hover-bg:     #f0f3fb;
-    --text:         #374151;
-    --text-strong:  #111827;
-    --text-muted:   #6b7280;
-    --accent:       #2563eb;
-    --accent-faint: #eff6ff;
+    --border:       #d0d5ef;
+    --border-faint: #e4e8f8;
+    --hover-bg:     #e8ecf8;
+    --text:         #374060;
+    --text-strong:  #1a1f44;
+    --text-muted:   #7880a8;
+    --accent:       #4f46e5;
+    --accent-faint: rgb(79 70 229 / 0.10);
+    --on-accent: #ffffff;
+    --danger:    #dc2626;
+    --on-danger: #ffffff;
+    --ring:      #4f46e5;
+    --chart-1: #4f46e5;
+    --chart-2: #ea580c;
+    --chart-3: #0d9488;
+    --chart-4: #e11d48;
+    --chart-5: #9333ea;
   }
 }
 
-html { font-size: 15px; }
+/* ────────────────────────────────────────────────────────────────────────────
+   Ponte com o Tailwind. `@theme inline` mapeia CSS vars → utilitários Tailwind.
+   Dois conjuntos de nomes apontam para a MESMA paleta:
+   • "amigáveis" (bg-bg, text-text-strong, ...) — espelham seus tokens;
+   • "shadcn"    (bg-primary, bg-background, ...) — o que os componentes usam.
+   ──────────────────────────────────────────────────────────────────────────── */
+@theme inline {
+  --color-bg:           var(--bg);
+  --color-card:         var(--card-bg);
+  --color-border-faint: var(--border-faint);
+  --color-hover:        var(--hover-bg);
+  --color-text:         var(--text);
+  --color-text-strong:  var(--text-strong);
+  --color-text-muted:   var(--text-muted);
+  --color-brand:        var(--accent);
+  --color-brand-faint:  var(--accent-faint);
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  line-height: 1.5;
+  /* Tokens semânticos shadcn */
+  --color-background:             var(--bg);
+  --color-foreground:             var(--text-strong);
+  --color-card-foreground:        var(--text-strong);
+  --color-popover:                var(--card-bg);
+  --color-popover-foreground:     var(--text-strong);
+  --color-primary:                var(--accent);
+  --color-primary-foreground:     var(--on-accent);
+  --color-secondary:              var(--hover-bg);
+  --color-secondary-foreground:   var(--text-strong);
+  --color-muted:                  var(--hover-bg);
+  --color-muted-foreground:       var(--text-muted);
+  --color-accent:                 var(--hover-bg);
+  --color-accent-foreground:      var(--text-strong);
+  --color-destructive:            var(--danger);
+  --color-destructive-foreground: var(--on-danger);
+  --color-border:                 var(--border);
+  --color-input:                  var(--border);
+  --color-ring:                   var(--ring);
+
+  /* Gráficos — referenciados pelos shadcn Charts (Fase B) */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-a { color: var(--accent); }
-select, input, button { font-family: inherit; }
+@layer base {
+  html { font-size: 15px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  a { color: var(--accent); }
+  select, input, button { font-family: inherit; }
+}

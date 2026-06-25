@@ -2,11 +2,64 @@
 
 Sistema que **encontra negócios locais sem site (ou com site fraco)**, **gera sites** sob medida e **oferece aos donos**. Mercado-alvo inicial: Guarujá, SP.
 
-> **Status:** Fase 1 (Agente Scout) **concluída** — com enriquecimento de contatos e
-> descoberta de sites ocultos. Em andamento: reestruturação para app real (API + React +
-> banco com ORM) e documentação.
+> **Status:** Fase 1.5 (Base Sólida) **concluída** — o Scout virou um **app full-stack local**:
+> CLI + API (FastAPI) + banco (SQLModel/SQLite) + painel React. Próxima: Agente Benchmark.
 >
 > 📚 **Documentação completa:** <https://hectorautomacoesdev.github.io/fabrica-de-sites/>
+> · ▶️ Para rodar, veja [**Como rodar**](#como-rodar) abaixo.
+
+## Como rodar
+
+Há **duas formas de usar o Scout** — e elas são **independentes**:
+
+### 1. Relatório rápido (CLI) — não precisa de servidor
+
+Gera um **arquivo HTML estático** e abre no navegador. Grátis, sem chave de API, sem subir nada.
+
+```powershell
+.\.venv\Scripts\Activate.ps1      # ativa o ambiente (uma vez por terminal)
+pip install -e .                  # instala o projeto (só na primeira vez)
+
+fabrica scout run --cidade "Guarujá" --abrir
+```
+
+O `--abrir` abre o relatório (`file://…/relatorio_scout.html`) direto no navegador. É uma **"foto"** dos dados — não dá pra filtrar ao vivo. Outros comandos: `fabrica scout setores`, `fabrica scout stats`, `fabrica --help`.
+
+### 2. App completo (painel web interativo) — precisa da API + frontend
+
+O painel React **conversa ao vivo com a API**. São **dois processos**: a **API** (FastAPI, porta `8001`) e o **frontend** (Vite, porta `5173`). O front fala com a API por um proxy (`/api → :8001`).
+
+**Jeito fácil (um comando sobe os dois):**
+
+```powershell
+.\start.ps1
+```
+
+O script instala o que faltar, abre a API e o frontend em janelas separadas e abre o navegador em <http://localhost:5173> sozinho. Para parar: feche as duas janelas.
+
+**Jeito manual (dois terminais):**
+
+```powershell
+# Terminal 1 — API (backend).  Swagger em http://localhost:8001/docs
+.\.venv\Scripts\uvicorn.exe fabrica_sites.api.app:app --reload --port 8001
+
+# Terminal 2 — frontend (produto).  Abre em http://localhost:5173
+cd frontend; npm install; npm run dev
+```
+
+> ⚠️ Se o app web disser **"suba a API"**, é porque o backend (porta `8001`) não está no ar. Rode o `start.ps1` ou o Terminal 1 acima.
+
+### Qual a diferença?
+
+| | `fabrica scout run --abrir` | App web (`localhost:5173`) |
+|---|---|---|
+| O que abre | Arquivo HTML estático (`file://`) | Site interativo ao vivo |
+| Precisa da API (`:8001`)? | ❌ Não | ✅ Sim |
+| Precisa do frontend (`:5173`)? | ❌ Não | ✅ Sim |
+| Dá pra filtrar/rodar buscas na tela? | Não (é uma "foto") | Sim |
+| Custo | Grátis | Grátis (roda local) |
+
+Os dois usam **o mesmo motor** (`scout_service`) por baixo — muda só a "embalagem". A saída fica em `data/`: `fabrica.db` (banco SQLite) e `relatorio_scout.html` (relatório do modo CLI).
 
 ## Os 5 agentes
 
@@ -33,30 +86,6 @@ cd docs-app
 npm install      # uma vez
 npm run dev      # abre em http://localhost:5173
 ```
-
-## Como rodar (Fase 1 — Scout)
-
-Não precisa de **nenhuma chave de API**. Usa dados públicos e gratuitos do OpenStreetMap.
-
-```powershell
-# 1. Ativar o ambiente virtual (já criado em .venv)
-.\.venv\Scripts\Activate.ps1
-
-# 2. Instalar o projeto em modo editável (uma vez)
-pip install -e .
-
-# 3. Rodar o Scout para Guarujá
-fabrica scout run --cidade "Guarujá" --abrir
-
-# Outros comandos úteis
-fabrica scout setores      # lista a taxonomia de setores
-fabrica scout stats        # estatísticas da última execução
-fabrica --help
-```
-
-A saída é gravada em `data/`:
-- `fabrica.db` — banco SQLite com todos os negócios encontrados
-- `relatorio_scout.html` — dashboard navegável (mapa, gráficos, tabela filtrável, insights)
 
 ## Estrutura
 
