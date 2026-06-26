@@ -1,6 +1,6 @@
 import { type ChangeEvent, useState } from 'react'
 import type { BusinessRead, BusinessFilters } from '../api/client'
-import { useBusinesses, useSectors } from '../hooks/useScout'
+import { useBusinessesPaged, useSectors } from '../hooks/useScout'
 import {
   buildProspectMessage,
   detectSocial,
@@ -45,10 +45,12 @@ interface Props {
 }
 
 export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
-  const [filters, setFilters] = useState<BusinessFilters>({ limit: 300, order_by: 'score', order_dir: 'desc', setor: sectorFilter })
+  const [filters, setFilters] = useState<BusinessFilters>({ order_by: 'score', order_dir: 'desc', setor: sectorFilter })
   const [busca, setBusca] = useState('')
   const [ordem, setOrdem] = useState('score_desc')
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [page, setPage] = useState(0)
+  const [pageSize, setPageSize] = useState(25)
   const { data: sectors = [] } = useSectors()
 
   // Sincroniza o setor vindo do overview (drill) sem useEffect — "ajustar estado
@@ -64,7 +66,22 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
     busca: busca.length >= 2 ? busca : undefined,
   }
 
-  const { data: businesses = [], isFetching } = useBusinesses(runId, activeFilters)
+  // Volta para a 1ª página sempre que os critérios (não a paginação) mudam.
+  const critKey = JSON.stringify(activeFilters)
+  const [prevCrit, setPrevCrit] = useState(critKey)
+  if (critKey !== prevCrit) {
+    setPrevCrit(critKey)
+    setPage(0)
+  }
+
+  const { data, isFetching } = useBusinessesPaged(runId, {
+    ...activeFilters,
+    offset: page * pageSize,
+    limit: pageSize,
+  })
+  const businesses = data?.items ?? []
+  const total = data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
   const selected = selectedId != null ? businesses.find(b => b.id === selectedId) ?? null : null
 
   function set<K extends keyof BusinessFilters>(key: K, val: BusinessFilters[K]) {
@@ -85,7 +102,7 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
     <div className="mt-2">
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <input
-          className="min-w-[180px] rounded-md border border-border bg-card px-2.5 py-1.5 text-[0.82rem] text-text-strong"
+          className="min-w-[180px] rounded-md border border-border bg-card px-2.5 py-1.5 text-[0.86rem] text-text-strong"
           placeholder="Buscar por nome…"
           value={busca}
           onChange={handleBusca}
@@ -154,20 +171,20 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
           options={Object.entries(ORDENACOES).map(([k, o]) => ({ value: k, label: o.label }))}
         />
 
-        <span className="ml-auto text-[0.8rem] whitespace-nowrap text-text-muted">
-          {isFetching ? 'Filtrando…' : `${businesses.length} negócios`}
+        <span className="ml-auto text-[0.85rem] whitespace-nowrap text-text-muted">
+          {isFetching ? 'Filtrando…' : `${total} negócios`}
         </span>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border">
-        <table className="w-full border-collapse text-[0.82rem] [&_tr:last-child>td]:border-b-0">
+        <table className="w-full border-collapse text-[0.86rem] [&_tr:last-child>td]:border-b-0">
           <thead>
             <tr>
               {['Nome', 'Setor', 'Status', 'Score', 'Telefone', 'Web', ''].map((h, i) => (
                 <th
                   key={i}
                   aria-label={h || 'Ação'}
-                  className="border-b border-border bg-card px-3 py-2 text-left text-[0.72rem] font-semibold uppercase tracking-[0.05em] whitespace-nowrap text-text-muted"
+                  className="border-b border-border bg-card px-3 py-2 text-left text-[0.78rem] font-semibold uppercase tracking-[0.05em] whitespace-nowrap text-text-muted"
                 >
                   {h}
                 </th>
@@ -187,6 +204,41 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Paginação (server-side) */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-[0.83rem] text-text-muted">
+        <label className="flex items-center gap-2">
+          Por página
+          <select
+            className="cursor-pointer rounded-md border border-border bg-card px-2 py-1 text-text-strong"
+            value={pageSize}
+            onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
+          >
+            {[25, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+          </select>
+        </label>
+
+        <div className="flex items-center gap-3">
+          <span className="tabular-nums">
+            {total === 0 ? '0' : `${page * pageSize + 1}–${Math.min(total, (page + 1) * pageSize)}`} de {total}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              className="cursor-pointer rounded-md border border-border bg-card px-2.5 py-1 text-text-strong hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={() => setPage(p => Math.max(0, p - 1))}
+              disabled={page === 0}
+            >‹ Anterior</button>
+            <span className="px-1 whitespace-nowrap tabular-nums">Pág. {page + 1} de {totalPages}</span>
+            <button
+              type="button"
+              className="cursor-pointer rounded-md border border-border bg-card px-2.5 py-1 text-text-strong hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+            >Próxima ›</button>
+          </div>
+        </div>
       </div>
 
       <LeadDrawer business={selected} cidade={cidade} onClose={() => setSelectedId(null)} />
@@ -209,7 +261,7 @@ function FilterSelect({
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger
         size="sm"
-        className="h-auto rounded-md border-border bg-card py-1.5 text-[0.82rem] text-text-strong dark:bg-card dark:hover:bg-hover"
+        className="h-auto rounded-md border-border bg-card py-1.5 text-[0.86rem] text-text-strong dark:bg-card dark:hover:bg-hover"
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
@@ -245,7 +297,7 @@ function Row({ b, cidade, onOpen }: { b: BusinessRead; cidade?: string; onOpen: 
       </td>
       <td className={tdBase}>
         <span className={cn('inline-flex items-baseline gap-1 text-[0.85rem] font-bold', scoreTextClass(b.score_label))}>
-          {b.score} <small className="text-[0.7rem] font-normal text-text-muted">{b.score_label}</small>
+          {b.score} <small className="text-[0.76rem] font-normal text-text-muted">{b.score_label}</small>
         </span>
       </td>
       <td className={tdBase}>{b.telefone ?? <span className="text-text-muted">—</span>}</td>

@@ -14,7 +14,7 @@ export default function CitySummary({ kpis, cidade }: Props) {
   const local = cidade ?? 'a cidade'
   return (
     <section className="mb-6 rounded-xl border border-border bg-card p-4">
-      <p className="mb-1.5 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-text-muted">
+      <p className="mb-1.5 text-[0.78rem] font-bold uppercase tracking-[0.08em] text-text-muted">
         Resumo do mercado — {local}
       </p>
       <p className="text-[0.95rem] leading-relaxed text-text">

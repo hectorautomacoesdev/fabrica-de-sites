@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
 import type { BusinessFilters, RunStartRequest } from '../api/client'
 
@@ -32,6 +32,18 @@ export function useBusinesses(runId: number | null, filters: BusinessFilters = {
     queryKey: ['businesses', runId, filters],
     queryFn: () => api.getBusinesses(runId!, filters),
     enabled: runId !== null,
+    staleTime: 60_000,
+  })
+}
+
+/** Versão paginada (server-side): devolve { items, total }. Mantém a página
+ *  anterior visível enquanto a próxima carrega (sem "piscar"). */
+export function useBusinessesPaged(runId: number | null, filters: BusinessFilters = {}) {
+  return useQuery({
+    queryKey: ['businesses-paged', runId, filters],
+    queryFn: () => api.getBusinessesPaged(runId!, filters),
+    enabled: runId !== null,
+    placeholderData: keepPreviousData,
     staleTime: 60_000,
   })
 }

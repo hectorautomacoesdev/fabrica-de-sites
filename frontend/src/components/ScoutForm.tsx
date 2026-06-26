@@ -93,7 +93,7 @@ export default function ScoutForm({ onSuccess }: Props) {
             Enriquecer com DomainGuesser
           </label>
 
-          {error && <p className="m-0 text-[0.82rem] text-[#e74c3c]">{(error as Error).message}</p>}
+          {error && <p className="m-0 text-[0.86rem] text-[#e74c3c]">{(error as Error).message}</p>}
 
           <div className="flex justify-end gap-2.5">
             <button type="button" className={btnCancelCls} onClick={() => setOpen(false)} disabled={isPending}>
@@ -105,7 +105,7 @@ export default function ScoutForm({ onSuccess }: Props) {
           </div>
 
           {isPending && (
-            <p className="m-0 text-center text-[0.78rem] text-text-muted">
+            <p className="m-0 text-center text-[0.83rem] text-text-muted">
               A coleta pode levar 5–90 s dependendo das opções escolhidas.
             </p>
           )}

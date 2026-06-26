@@ -31,11 +31,11 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 // Padrões repetidos do drawer
-const act = 'inline-flex cursor-pointer items-center gap-[5px] rounded-lg border border-border bg-card px-3 py-[7px] text-[0.8rem] font-semibold text-text-strong no-underline hover:bg-hover'
-const blockTitle = 'mb-2 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-text-muted'
+const act = 'inline-flex cursor-pointer items-center gap-[5px] rounded-lg border border-border bg-card px-3 py-[7px] text-[0.85rem] font-semibold text-text-strong no-underline hover:bg-hover'
+const blockTitle = 'mb-2 text-[0.78rem] font-bold uppercase tracking-[0.08em] text-text-muted'
 const block = 'border-t border-border-faint pt-[14px]'
-const muted = 'text-[0.82rem] text-text-muted'
-const chip = 'rounded-full bg-brand-faint px-2 py-0.5 text-[0.72rem] font-semibold text-brand'
+const muted = 'text-[0.86rem] text-text-muted'
+const chip = 'rounded-full bg-brand-faint px-2 py-0.5 text-[0.78rem] font-semibold text-brand'
 
 const ORG_TIPO_LABELS: Record<string, string> = {
   independente: 'Independente',
@@ -102,14 +102,14 @@ export default function LeadDrawer({ business, cidade, onClose }: Props) {
         <section className="flex items-center gap-4 rounded-xl border border-border bg-card p-[14px]">
           <div className={cn('flex h-[76px] w-[76px] shrink-0 flex-col items-center justify-center rounded-full border-[3px] border-current', scoreTextClass(b.score_label))}>
             <span className="text-[1.5rem] font-extrabold leading-none">{b.score}</span>
-            <span className="mt-0.5 text-[0.55rem] font-bold uppercase tracking-[0.04em]">{b.score_label}</span>
+            <span className="mt-0.5 text-[0.62rem] font-bold uppercase tracking-[0.04em]">{b.score_label}</span>
           </div>
           <div className="min-w-0 flex-1">
             <p className={blockTitle}>Por que essa oportunidade</p>
             {b.score_motivos && b.score_motivos.length > 0 ? (
               <ul className="flex list-none flex-col gap-[3px]">
                 {b.score_motivos.map((m, i) => (
-                  <li key={i} className="relative pl-[14px] text-[0.8rem] text-text before:absolute before:left-[2px] before:text-brand before:content-['•']">{m}</li>
+                  <li key={i} className="relative pl-[14px] text-[0.85rem] text-text before:absolute before:left-[2px] before:text-brand before:content-['•']">{m}</li>
                 ))}
               </ul>
             ) : (
@@ -151,7 +151,7 @@ export default function LeadDrawer({ business, cidade, onClose }: Props) {
           {socials.length > 0 && (
             <div className="mb-2.5 flex flex-wrap gap-1.5">
               {socials.map(s => (
-                <a key={s.network} className="rounded-full border border-border bg-brand-faint px-2.5 py-1 text-[0.78rem] text-brand no-underline hover:bg-hover" href={s.url} target="_blank" rel="noreferrer">
+                <a key={s.network} className="rounded-full border border-border bg-brand-faint px-2.5 py-1 text-[0.83rem] text-brand no-underline hover:bg-hover" href={s.url} target="_blank" rel="noreferrer">
                   {NETWORK_ICON[s.network]} {s.label}{s.handle ? ` · @${s.handle}` : ''}
                 </a>
               ))}
@@ -162,7 +162,7 @@ export default function LeadDrawer({ business, cidade, onClose }: Props) {
           )}
 
           {/* Atalhos de busca — úteis enquanto o enriquecimento não traz os links */}
-          <div className="flex flex-wrap items-center gap-2.5 text-[0.8rem]">
+          <div className="flex flex-wrap items-center gap-2.5 text-[0.85rem]">
             <span className={muted}>Buscar perfis:</span>
             <a className="font-semibold no-underline" href={instagramSearchUrl(b.nome, cidade)} target="_blank" rel="noreferrer">📷 Instagram</a>
             <a className="font-semibold no-underline" href={linkedinSearchUrl(b.nome, cidade)} target="_blank" rel="noreferrer">💼 LinkedIn</a>

@@ -16,7 +16,7 @@ export function StatusBadge({ status, label }: { status: string; label: string }
   return (
     <span
       className={cn(
-        'inline-block rounded-full px-2 py-0.5 text-[0.72rem] font-semibold whitespace-nowrap',
+        'inline-block rounded-full px-2 py-0.5 text-[0.78rem] font-semibold whitespace-nowrap',
         STATUS_COLORS[status] ?? STATUS_COLORS.DESCONHECIDO,
       )}
     >

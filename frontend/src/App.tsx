@@ -7,6 +7,7 @@ import ProspectFunnel from './components/ProspectFunnel'
 import RunSelector from './components/RunSelector'
 import ScoutForm from './components/ScoutForm'
 import SectorChart from './components/SectorChart'
+import SectorDrawer from './components/SectorDrawer'
 import SectorOverview from './components/SectorOverview'
 import ThemeToggle from './components/ThemeToggle'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -19,15 +20,17 @@ export default function App() {
   const [selectedRunId, setSelectedRunId] = useState<number | null>(null)
   const [tab, setTab] = useState('overview')
   const [sectorFilter, setSectorFilter] = useState<string | undefined>(undefined)
+  const [openSectorKey, setOpenSectorKey] = useState<string | null>(null)
 
   const activeRunId = selectedRunId ?? (runs.length > 0 ? runs[0].id : null)
   const cidade = runs.find(r => r.id === activeRunId)?.cidade
 
   const { data: insights, isLoading: loadingInsights } = useInsights(activeRunId)
 
-  // Clicar num setor do overview → abre a aba Leads já filtrada por ele.
-  function drillSetor(key: string) {
+  // "Ver na aba Leads" dentro do painel de setor → abre a aba já filtrada.
+  function verTodosDoSetor(key: string) {
     setSectorFilter(key)
+    setOpenSectorKey(null)
     setTab('leads')
   }
 
@@ -78,6 +81,7 @@ export default function App() {
       ) : loadingInsights ? (
         <div className={stateMsg}>Carregando dados da execução…</div>
       ) : insights ? (
+        <>
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
@@ -120,10 +124,10 @@ export default function App() {
             <p className={sectionTitle}>
               Oportunidade por categoria{' '}
               <span className="font-normal normal-case tracking-normal text-text-muted">
-                — ordenado por negócios sem site próprio; clique para ver os leads
+                — ordenado por negócios sem site próprio; clique num setor para abrir o painel
               </span>
             </p>
-            <SectorOverview data={insights.por_setor} onSelectSector={drillSetor} />
+            <SectorOverview data={insights.por_setor} onSelectSector={setOpenSectorKey} />
           </TabsContent>
 
           {/* ── Aba: Mapa ── */}
@@ -159,12 +163,22 @@ export default function App() {
             <BusinessTable runId={activeRunId} cidade={cidade} sectorFilter={sectorFilter} />
           </TabsContent>
         </Tabs>
+
+        {/* Painel lateral do setor (abre ao clicar num card de Setores) */}
+        <SectorDrawer
+          sector={insights.por_setor.find(s => s.key === openSectorKey) ?? null}
+          runId={activeRunId}
+          cidade={cidade}
+          onClose={() => setOpenSectorKey(null)}
+          onVerTodos={verTodosDoSetor}
+        />
+        </>
       ) : null}
 
       {/* ── Footer ── */}
       <footer className="mt-8 text-right">
         <a
-          className="text-[0.78rem] text-text-muted"
+          className="text-[0.83rem] text-text-muted"
           href="http://localhost:8001/docs"
           target="_blank"
           rel="noreferrer"

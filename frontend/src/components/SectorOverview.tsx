@@ -13,8 +13,8 @@ interface Props {
 /**
  * Overview das categorias: um card por setor, ordenado por oportunidade.
  * A barra segmentada mostra a composição do setor (sem site / só social / com
- * site) de relance — é o "porquê" do número de oportunidade. Clicar abre os
- * leads do setor.
+ * site) de relance — é o "porquê" do número de oportunidade. Clicar abre o
+ * painel lateral do setor.
  */
 export default function SectorOverview({ data, onSelectSector }: Props) {
   if (data.length === 0) {
@@ -44,7 +44,7 @@ function SectorCard({ s, onSelect }: { s: SectorStat; onSelect?: (key: string) =
       tabIndex={clickable ? 0 : undefined}
       onClick={clickable ? () => onSelect!(s.key) : undefined}
       onKeyDown={clickable ? e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect!(s.key) } } : undefined}
-      aria-label={clickable ? `Ver leads de ${s.nome}` : undefined}
+      aria-label={clickable ? `Abrir painel de ${s.nome}` : undefined}
       className={
         'flex flex-col gap-3 rounded-xl border border-border bg-card p-4 transition ' +
         (clickable
@@ -59,7 +59,7 @@ function SectorCard({ s, onSelect }: { s: SectorStat; onSelect?: (key: string) =
           <span className="text-[0.95rem] font-semibold text-text-strong">{s.nome}</span>
         </div>
         {s.prioritario && (
-          <span className="shrink-0 rounded-full bg-brand-faint px-2 py-0.5 text-[0.66rem] font-bold uppercase tracking-[0.04em] text-brand">
+          <span className="shrink-0 rounded-full bg-brand-faint px-2 py-0.5 text-[0.72rem] font-bold uppercase tracking-[0.04em] text-brand">
             ★ foco
           </span>
         )}
@@ -68,7 +68,7 @@ function SectorCard({ s, onSelect }: { s: SectorStat; onSelect?: (key: string) =
       {/* Número-herói: oportunidade (negócios sem site próprio) */}
       <div className="flex items-baseline gap-2">
         <span className="text-[1.9rem] font-extrabold leading-none text-brand">{s.oportunidade}</span>
-        <span className="text-[0.78rem] leading-tight text-text-muted">
+        <span className="text-[0.83rem] leading-tight text-text-muted">
           sem site próprio<br />
           <span className="text-text-muted">de {s.total} ({s.oportunidade_pct}%)</span>
         </span>
@@ -81,7 +81,7 @@ function SectorCard({ s, onSelect }: { s: SectorStat; onSelect?: (key: string) =
           <div style={{ width: seg(s.so_social), background: COR_SO_SOCIAL }} />
           <div style={{ width: seg(s.com_site), background: COR_COM_SITE, opacity: 0.5 }} />
         </div>
-        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[0.72rem] text-text-muted">
+        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[0.78rem] text-text-muted">
           <Dot color={COR_SEM_SITE} label="Sem site" n={s.sem_site} />
           <Dot color={COR_SO_SOCIAL} label="Só social" n={s.so_social} />
           <Dot color={COR_COM_SITE} label="Tem site" n={s.com_site} dim />
@@ -89,7 +89,7 @@ function SectorCard({ s, onSelect }: { s: SectorStat; onSelect?: (key: string) =
       </div>
 
       {/* Rodapé: score médio + leads quentes */}
-      <div className="flex items-center justify-between border-t border-border-faint pt-2 text-[0.76rem] text-text-muted">
+      <div className="flex items-center justify-between border-t border-border-faint pt-2 text-[0.82rem] text-text-muted">
         <span>Score médio <strong className="text-text-strong">{s.score_medio}</strong></span>
         <span>{s.leads_quentes > 0 ? `⭐ ${s.leads_quentes} quentes` : '— sem leads quentes'}</span>
       </div>

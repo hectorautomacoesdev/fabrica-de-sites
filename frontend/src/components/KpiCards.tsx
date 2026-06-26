@@ -23,7 +23,7 @@ function Card({ value, label, sub, highlight }: CardProps) {
       <div className={cn('text-[2rem] font-bold leading-[1.1] text-text-strong', highlight && 'text-brand')}>
         {value}
       </div>
-      <div className="mt-1 text-[0.8rem] font-medium uppercase tracking-[0.04em] text-text-muted">
+      <div className="mt-1 text-[0.85rem] font-medium uppercase tracking-[0.04em] text-text-muted">
         {label}
       </div>
       {sub && <div className="mt-0.5 text-xs text-text-muted">{sub}</div>}

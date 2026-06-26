@@ -34,7 +34,7 @@ export default function ExecutionsTab({ runs, activeRunId, onSelect }: Props) {
       {/* Gráfico de tendência */}
       {runs.length >= 2 && (
         <div className="rounded-xl border border-border bg-card p-4">
-          <p className="mb-3 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-text-muted">
+          <p className="mb-3 text-[0.78rem] font-bold uppercase tracking-[0.08em] text-text-muted">
             Tendência — negócios mapeados por execução
           </p>
           <ChartContainer config={config} className="h-[180px]">
@@ -68,7 +68,7 @@ export default function ExecutionsTab({ runs, activeRunId, onSelect }: Props) {
       <div className="rounded-xl border border-border bg-card">
         <table className="w-full text-[0.84rem]">
           <thead>
-            <tr className="border-b border-border text-left text-[0.72rem] font-bold uppercase tracking-[0.06em] text-text-muted">
+            <tr className="border-b border-border text-left text-[0.78rem] font-bold uppercase tracking-[0.06em] text-text-muted">
               <th className="px-4 py-2.5">Data</th>
               <th className="px-4 py-2.5">Cidade</th>
               <th className="px-4 py-2.5">Fonte</th>
@@ -91,7 +91,7 @@ export default function ExecutionsTab({ runs, activeRunId, onSelect }: Props) {
                   <td className="px-4 py-2.5 text-right font-semibold text-text-strong">{r.total}</td>
                   <td className="px-4 py-2.5 text-right">
                     {active && (
-                      <span className="rounded-full bg-brand px-2 py-0.5 text-[0.68rem] font-semibold text-white">
+                      <span className="rounded-full bg-brand px-2 py-0.5 text-[0.74rem] font-semibold text-white">
                         ativa
                       </span>
                     )}

@@ -90,12 +90,12 @@ export default function MapView({ runId, cidade }: Props) {
                   <p className="m-0 text-[0.9rem] font-semibold text-[#111827]">
                     {b.nome ?? 'Negócio sem nome'}
                   </p>
-                  <p className="m-0 mt-0.5 text-[0.76rem] text-[#6b7280]">{b.setor_nome}</p>
-                  <p className="m-0 mt-1 text-[0.78rem] text-[#374151]">
+                  <p className="m-0 mt-0.5 text-[0.82rem] text-[#6b7280]">{b.setor_nome}</p>
+                  <p className="m-0 mt-1 text-[0.83rem] text-[#374151]">
                     Score <strong>{b.score}</strong> · {b.score_label}
                   </p>
                   <button
-                    className="mt-2 cursor-pointer rounded-md border-0 bg-brand px-2.5 py-1 text-[0.76rem] font-semibold text-white"
+                    className="mt-2 cursor-pointer rounded-md border-0 bg-brand px-2.5 py-1 text-[0.82rem] font-semibold text-white"
                     onClick={() => setSelected(b)}
                   >
                     Ver lead →
@@ -108,7 +108,7 @@ export default function MapView({ runId, cidade }: Props) {
       </div>
 
       {/* Legenda */}
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.78rem] text-text-muted">
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.83rem] text-text-muted">
         {Object.entries(SCORE_COLORS).map(([label, color]) => (
           <span key={label} className="flex items-center gap-1.5">
             <span

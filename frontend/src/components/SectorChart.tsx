@@ -29,7 +29,7 @@ export default function SectorChart({ data }: Props) {
 
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      <p className="mb-3 text-[0.72rem] font-bold uppercase tracking-[0.08em] text-text-muted">
+      <p className="mb-3 text-[0.78rem] font-bold uppercase tracking-[0.08em] text-text-muted">
         Carência por setor — top 10
       </p>
       <ChartContainer config={config} className="h-[200px]">
