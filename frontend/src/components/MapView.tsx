@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import { useMemo, useState } from 'react'
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
 import type { BusinessRead } from '../api/client'
 import { useBusinesses } from '../hooks/useScout'
@@ -82,8 +82,27 @@ export default function MapView({ runId, cidade }: Props) {
               key={b.id}
               position={[b.lat!, b.lon!]}
               icon={ICONS[b.score_label] ?? ICON_DEFAULT}
-              eventHandlers={{ click: () => setSelected(b) }}
-            />
+            >
+              {/* Popup com fundo branco do Leaflet → cores fixas (não usar tokens
+                  de tema, que ficariam invisíveis no modo escuro). */}
+              <Popup>
+                <div className="min-w-[170px]">
+                  <p className="m-0 text-[0.9rem] font-semibold text-[#111827]">
+                    {b.nome ?? 'Negócio sem nome'}
+                  </p>
+                  <p className="m-0 mt-0.5 text-[0.76rem] text-[#6b7280]">{b.setor_nome}</p>
+                  <p className="m-0 mt-1 text-[0.78rem] text-[#374151]">
+                    Score <strong>{b.score}</strong> · {b.score_label}
+                  </p>
+                  <button
+                    className="mt-2 cursor-pointer rounded-md border-0 bg-brand px-2.5 py-1 text-[0.76rem] font-semibold text-white"
+                    onClick={() => setSelected(b)}
+                  >
+                    Ver lead →
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
           ))}
         </MapContainer>
       </div>

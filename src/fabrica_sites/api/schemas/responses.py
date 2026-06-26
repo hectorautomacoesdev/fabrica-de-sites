@@ -44,6 +44,25 @@ class BusinessRead(BaseModel):
     score_label: str
     contactavel: bool
     score_motivos: list[str] = Field(default_factory=list)
+    resumo: str | None = None
+
+
+class SectorStat(BaseModel):
+    """Agregação de uma run por setor — alimenta o overview de categorias."""
+
+    key: str
+    nome: str
+    emoji: str
+    cor: str
+    prioritario: bool
+    total: int
+    sem_site: int
+    so_social: int
+    com_site: int
+    oportunidade: int          # sem_site + so_social (mercado imediato)
+    oportunidade_pct: float
+    score_medio: float
+    leads_quentes: int
 
 
 class KpiRead(BaseModel):
@@ -61,11 +80,13 @@ class KpiRead(BaseModel):
 
 
 class InsightsRead(BaseModel):
-    """KPIs + insights de texto de uma run."""
+    """KPIs + insights de texto + agregação por setor de uma run."""
 
     run_id: int
     kpis: KpiRead
     insights: list[str]
+    por_setor: list[SectorStat] = Field(default_factory=list)
+    status_dist: dict[str, int] = Field(default_factory=dict)
 
 
 class RunStartRequest(BaseModel):

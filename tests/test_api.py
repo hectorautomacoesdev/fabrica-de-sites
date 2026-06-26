@@ -115,6 +115,15 @@ def test_get_insights_retorna_kpis(first_run_id):
     assert isinstance(kpis["pct_sem_site_proprio"], float)
     assert isinstance(body["insights"], list)
     assert len(body["insights"]) > 0
+    # Agregação por setor exposta para o overview de categorias
+    assert "por_setor" in body
+    assert isinstance(body["por_setor"], list)
+    assert len(body["por_setor"]) >= 1
+    s = body["por_setor"][0]
+    for campo in ("key", "nome", "emoji", "cor", "total", "oportunidade",
+                  "score_medio", "leads_quentes"):
+        assert campo in s
+    assert "status_dist" in body and isinstance(body["status_dist"], dict)
 
 
 def test_get_businesses_retorna_lista(first_run_id):
@@ -136,6 +145,19 @@ def test_get_businesses_retorna_lista(first_run_id):
         assert "horario" in b
         assert "score_motivos" in b
         assert isinstance(b["score_motivos"], list)
+        # Resumo determinístico: presente e não-vazio
+        assert "resumo" in b
+        assert b["resumo"] and isinstance(b["resumo"], str)
+
+
+def test_businesses_limit_aceita_ate_5000(first_run_id):
+    if first_run_id is None:
+        pytest.skip("Banco sem runs")
+    # O mapa/overview pedem todos os pontos; o teto subiu de 1000 → 5000.
+    assert client.get(
+        f"/api/runs/{first_run_id}/businesses?limit=5000").status_code == 200
+    assert client.get(
+        f"/api/runs/{first_run_id}/businesses?limit=5001").status_code == 422
 
 
 def test_filtro_contactavel(first_run_id):

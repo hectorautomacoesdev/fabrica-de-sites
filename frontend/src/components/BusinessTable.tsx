@@ -1,6 +1,6 @@
 import { type ChangeEvent, useState } from 'react'
 import type { BusinessRead, BusinessFilters } from '../api/client'
-import { useBusinesses } from '../hooks/useScout'
+import { useBusinesses, useSectors } from '../hooks/useScout'
 import {
   buildProspectMessage,
   detectSocial,
@@ -27,12 +27,6 @@ const STATUS_LABELS: Record<string, string> = {
   DESCONHECIDO: 'Desconh.',
 }
 
-const SETORES = [
-  'alimentacao', 'automotivo', 'beleza', 'comercio',
-  'educacao', 'fitness', 'outros', 'profissional',
-  'saude', 'servicos', 'turismo',
-]
-
 // Opções de ordenação amigáveis → (order_by, order_dir)
 const ORDENACOES: Record<string, { order_by: string; order_dir: 'asc' | 'desc'; label: string }> = {
   'score_desc': { order_by: 'score', order_dir: 'desc', label: 'Maior score' },
@@ -46,13 +40,24 @@ const ALL = '__all__'
 interface Props {
   runId: number
   cidade?: string
+  /** Setor pré-selecionado (drill vindo do overview de Setores). */
+  sectorFilter?: string
 }
 
-export default function BusinessTable({ runId, cidade }: Props) {
-  const [filters, setFilters] = useState<BusinessFilters>({ limit: 300, order_by: 'score', order_dir: 'desc' })
+export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
+  const [filters, setFilters] = useState<BusinessFilters>({ limit: 300, order_by: 'score', order_dir: 'desc', setor: sectorFilter })
   const [busca, setBusca] = useState('')
   const [ordem, setOrdem] = useState('score_desc')
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const { data: sectors = [] } = useSectors()
+
+  // Sincroniza o setor vindo do overview (drill) sem useEffect — "ajustar estado
+  // durante o render": quando o prop muda, reflete no filtro interno.
+  const [prevSector, setPrevSector] = useState(sectorFilter)
+  if (sectorFilter !== prevSector) {
+    setPrevSector(sectorFilter)
+    setFilters(f => ({ ...f, setor: sectorFilter }))
+  }
 
   const activeFilters: BusinessFilters = {
     ...filters,
@@ -92,7 +97,7 @@ export default function BusinessTable({ runId, cidade }: Props) {
           onValueChange={v => set('setor', v === ALL ? undefined : v)}
           options={[
             { value: ALL, label: 'Todos os setores' },
-            ...SETORES.map(s => ({ value: s, label: s })),
+            ...sectors.map(s => ({ value: s.key, label: `${s.emoji} ${s.nome}` })),
           ]}
         />
 

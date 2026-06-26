@@ -1,38 +1,25 @@
 import { Bar, BarChart, LabelList, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
-import { useBusinesses } from '../hooks/useScout'
+import type { SectorStat } from '../api/client'
 
 const config = {
-  sem_site: { label: 'Sem site próprio' },
+  oportunidade: { label: 'Sem site próprio' },
 }
 
-interface Props { runId: number }
+interface Props {
+  /** Agregação por setor vinda dos insights da run (já calculada no backend). */
+  data: SectorStat[]
+}
 
-export default function SectorChart({ runId }: Props) {
-  const { data: businesses = [], isLoading } = useBusinesses(runId, { limit: 5000 })
-
-  if (isLoading) {
-    return (
-      <div className="flex h-[248px] items-center justify-center rounded-xl border border-border bg-card text-[0.85rem] text-text-muted">
-        Carregando setores…
-      </div>
-    )
-  }
-
-  // Conta negócios sem site próprio por setor (top 10)
-  const bySetor: Record<string, number> = {}
-  for (const b of businesses) {
-    if (b.site_status !== 'COM_SITE') {
-      bySetor[b.setor_nome] = (bySetor[b.setor_nome] ?? 0) + 1
-    }
-  }
-
-  const data = Object.entries(bySetor)
-    .map(([setor, sem_site]) => ({ setor, sem_site }))
-    .sort((a, b) => b.sem_site - a.sem_site)
+export default function SectorChart({ data }: Props) {
+  // Carência por setor = negócios sem site próprio (sem_site + só social), top 10.
+  const chartData = [...data]
+    .filter(s => s.oportunidade > 0)
+    .sort((a, b) => b.oportunidade - a.oportunidade)
     .slice(0, 10)
+    .map(s => ({ setor: s.nome, oportunidade: s.oportunidade }))
 
-  if (data.length === 0) {
+  if (chartData.length === 0) {
     return (
       <div className="flex h-[248px] items-center justify-center rounded-xl border border-border bg-card text-[0.85rem] text-text-muted">
         Nenhum setor disponível.
@@ -47,7 +34,7 @@ export default function SectorChart({ runId }: Props) {
       </p>
       <ChartContainer config={config} className="h-[200px]">
         <BarChart
-          data={data}
+          data={chartData}
           margin={{ left: 4, right: 8, top: 16, bottom: 48 }}
         >
           <XAxis
@@ -66,9 +53,9 @@ export default function SectorChart({ runId }: Props) {
             width={28}
           />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey="sem_site" fill="var(--chart-1)" radius={4} maxBarSize={36}>
+          <Bar dataKey="oportunidade" fill="var(--chart-1)" radius={4} maxBarSize={36}>
             <LabelList
-              dataKey="sem_site"
+              dataKey="oportunidade"
               position="top"
               style={{ fontSize: 10, fontWeight: 700, fill: 'var(--text-muted)' }}
             />

@@ -9,7 +9,14 @@ from ...agents.scout.enrichers import DomainGuesser
 from ...agents.scout.sources import OverpassSource, SerperSource
 from ...services import scout_service
 from ..deps import SessionDep
-from ..schemas.responses import InsightsRead, KpiRead, RunRead, RunStartRequest, RunStartResponse
+from ..schemas.responses import (
+    InsightsRead,
+    KpiRead,
+    RunRead,
+    RunStartRequest,
+    RunStartResponse,
+    SectorStat,
+)
 
 router = APIRouter(prefix="/api/scout", tags=["Scout"])
 
@@ -58,5 +65,7 @@ def start_run(body: RunStartRequest, session: SessionDep) -> RunStartResponse:
         run_id=run_id,
         kpis=KpiRead(**kpis),
         insights=dados["insights"],
+        por_setor=[SectorStat(**s) for s in dados["por_setor"]],
+        status_dist=dados["status_dist"],
     )
     return RunStartResponse(run_id=run_id, run=run_read, insights=insights_read)

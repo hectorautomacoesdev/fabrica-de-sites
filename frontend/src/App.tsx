@@ -7,6 +7,7 @@ import ProspectFunnel from './components/ProspectFunnel'
 import RunSelector from './components/RunSelector'
 import ScoutForm from './components/ScoutForm'
 import SectorChart from './components/SectorChart'
+import SectorOverview from './components/SectorOverview'
 import ThemeToggle from './components/ThemeToggle'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useInsights, useRuns } from './hooks/useScout'
@@ -16,11 +17,19 @@ const MapView = lazy(() => import('./components/MapView'))
 export default function App() {
   const { data: runs = [], isLoading: loadingRuns, error: runsError } = useRuns()
   const [selectedRunId, setSelectedRunId] = useState<number | null>(null)
+  const [tab, setTab] = useState('overview')
+  const [sectorFilter, setSectorFilter] = useState<string | undefined>(undefined)
 
   const activeRunId = selectedRunId ?? (runs.length > 0 ? runs[0].id : null)
   const cidade = runs.find(r => r.id === activeRunId)?.cidade
 
   const { data: insights, isLoading: loadingInsights } = useInsights(activeRunId)
+
+  // Clicar num setor do overview → abre a aba Leads já filtrada por ele.
+  function drillSetor(key: string) {
+    setSectorFilter(key)
+    setTab('leads')
+  }
 
   const appShell = 'mx-auto max-w-[1280px] px-5 pb-10'
   const sectionTitle = 'mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-text-muted'
@@ -69,9 +78,10 @@ export default function App() {
       ) : loadingInsights ? (
         <div className={stateMsg}>Carregando dados da execução…</div>
       ) : insights ? (
-        <Tabs defaultValue="overview">
+        <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="mb-6">
             <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+            <TabsTrigger value="setores">Setores</TabsTrigger>
             <TabsTrigger value="mapa">Mapa</TabsTrigger>
             <TabsTrigger value="leads">Leads</TabsTrigger>
             <TabsTrigger value="execucoes">Execuções</TabsTrigger>
@@ -87,7 +97,7 @@ export default function App() {
             <p className={sectionTitle}>Análise visual</p>
             <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
               <ProspectFunnel kpis={insights.kpis} />
-              <SectorChart runId={activeRunId} />
+              <SectorChart data={insights.por_setor} />
             </div>
 
             <div className="mb-6">
@@ -103,6 +113,17 @@ export default function App() {
                 ))}
               </ul>
             </div>
+          </TabsContent>
+
+          {/* ── Aba: Setores ── */}
+          <TabsContent value="setores">
+            <p className={sectionTitle}>
+              Oportunidade por categoria{' '}
+              <span className="font-normal normal-case tracking-normal text-text-muted">
+                — ordenado por negócios sem site próprio; clique para ver os leads
+              </span>
+            </p>
+            <SectorOverview data={insights.por_setor} onSelectSector={drillSetor} />
           </TabsContent>
 
           {/* ── Aba: Mapa ── */}
@@ -135,7 +156,7 @@ export default function App() {
                 — clique numa linha para ver o lead
               </span>
             </p>
-            <BusinessTable runId={activeRunId} cidade={cidade} />
+            <BusinessTable runId={activeRunId} cidade={cidade} sectorFilter={sectorFilter} />
           </TabsContent>
         </Tabs>
       ) : null}

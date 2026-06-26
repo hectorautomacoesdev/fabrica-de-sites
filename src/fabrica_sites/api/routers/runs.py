@@ -6,10 +6,11 @@ import json
 
 from fastapi import APIRouter, HTTPException, Query, Response
 
+from ...agents.scout.resumo import gerar_resumo
 from ...db import repository
 from ...services import scout_service
 from ..deps import SessionDep
-from ..schemas.responses import BusinessRead, InsightsRead, KpiRead, RunRead
+from ..schemas.responses import BusinessRead, InsightsRead, KpiRead, RunRead, SectorStat
 
 router = APIRouter(prefix="/api/runs", tags=["Runs"])
 
@@ -55,7 +56,13 @@ def get_insights(run_id: int, session: SessionDep) -> InsightsRead:
         raise HTTPException(status_code=404, detail=f"Run {run_id} não encontrada.")
     dados = scout_service.get_insights(run)
     kpis = dados["kpis"]
-    return InsightsRead(run_id=run_id, kpis=KpiRead(**kpis), insights=dados["insights"])
+    return InsightsRead(
+        run_id=run_id,
+        kpis=KpiRead(**kpis),
+        insights=dados["insights"],
+        por_setor=[SectorStat(**s) for s in dados["por_setor"]],
+        status_dist=dados["status_dist"],
+    )
 
 
 @router.get("/{run_id}/businesses", response_model=list[BusinessRead])
@@ -76,7 +83,7 @@ def get_businesses(
     ),
     order_dir: str = Query("desc", pattern="^(asc|desc)$"),
     offset: int = Query(0, ge=0),
-    limit: int = Query(200, ge=1, le=1000),
+    limit: int = Query(200, ge=1, le=5000),
 ) -> list[BusinessRead]:
     """Lista negócios de uma run com filtros, ordenação e paginação.
 
@@ -125,6 +132,7 @@ def get_businesses(
             score_label=r.score_label,
             contactavel=r.contactavel,
             score_motivos=json.loads(r.score_motivos or "[]"),
+            resumo=gerar_resumo(repository.table_to_business(r)),
         )
         for r in rows
     ]

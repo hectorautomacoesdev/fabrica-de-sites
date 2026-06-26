@@ -10,6 +10,14 @@ export function useRuns(limit = 20) {
   })
 }
 
+export function useSectors() {
+  return useQuery({
+    queryKey: ['sectors'],
+    queryFn: () => api.listSectors(),
+    staleTime: Infinity,  // taxonomia é estática durante a sessão
+  })
+}
+
 export function useInsights(runId: number | null) {
   return useQuery({
     queryKey: ['insights', runId],

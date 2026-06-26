@@ -190,7 +190,12 @@ def _business_to_table(b: Business, run_id: int) -> BusinessTable:
     )
 
 
-def _table_to_business(row: BusinessTable) -> Business:
+def table_to_business(row: BusinessTable) -> Business:
+    """Converte uma linha do banco no modelo de domínio ``Business``.
+
+    Público: o service/API usam para reaproveitar lógica de domínio (ex.: gerar
+    o resumo) sem reimplementar a desserialização de ``raw_tags``/``score_motivos``.
+    """
     return Business(
         osm_type=row.osm_type or "node",
         osm_id=row.osm_id or 0,
@@ -226,5 +231,5 @@ def _reconstruct_run(run_row: RunTable, session: Session) -> ScoutRun:
         admin_level=run_row.admin_level,
         fonte=run_row.fonte,
         gerado_em=run_row.gerado_em,
-        negocios=[_table_to_business(r) for r in business_rows],
+        negocios=[table_to_business(r) for r in business_rows],
     )

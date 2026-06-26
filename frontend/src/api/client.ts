@@ -21,10 +21,37 @@ export interface KpiRead {
   pct_contactavel: number
 }
 
+/** Um setor da taxonomia do Scout (GET /api/sectors). */
+export interface Sector {
+  key: string
+  nome: string
+  emoji: string
+  prioritario: boolean
+}
+
+/** Agregação de uma run por setor — alimenta o overview de categorias. */
+export interface SectorStat {
+  key: string
+  nome: string
+  emoji: string
+  cor: string
+  prioritario: boolean
+  total: number
+  sem_site: number
+  so_social: number
+  com_site: number
+  oportunidade: number       // sem_site + so_social (mercado imediato)
+  oportunidade_pct: number
+  score_medio: number
+  leads_quentes: number
+}
+
 export interface InsightsRead {
   run_id: number
   kpis: KpiRead
   insights: string[]
+  por_setor: SectorStat[]
+  status_dist: Record<string, number>
 }
 
 export interface BusinessRead {
@@ -119,6 +146,9 @@ function buildQuery(params: object): string {
 export const api = {
   listRuns: (limit = 20) =>
     get<RunRead[]>(`/api/runs${buildQuery({ limit })}`),
+
+  listSectors: () =>
+    get<Sector[]>('/api/sectors'),
 
   getInsights: (runId: number) =>
     get<InsightsRead>(`/api/runs/${runId}/insights`),
