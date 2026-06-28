@@ -2,11 +2,10 @@ import { lazy, Suspense, useState } from 'react'
 import BusinessTable from './components/BusinessTable'
 import CitySummary from './components/CitySummary'
 import ExecutionsTab from './components/ExecutionsTab'
-import KpiCards from './components/KpiCards'
-import ProspectFunnel from './components/ProspectFunnel'
+import IndicadoresSection from './components/IndicadoresSection'
+import SubsetorChart from './components/SubsetorChart'
 import RunSelector from './components/RunSelector'
 import ScoutForm from './components/ScoutForm'
-import SectorChart from './components/SectorChart'
 import SectorDrawer from './components/SectorDrawer'
 import SectorOverview from './components/SectorOverview'
 import ThemeToggle from './components/ThemeToggle'
@@ -93,30 +92,34 @@ export default function App() {
 
           {/* ── Aba: Visão Geral ── */}
           <TabsContent value="overview">
-            <CitySummary kpis={insights.kpis} cidade={cidade} />
+            <CitySummary kpis={insights.kpis} porSetor={insights.por_setor} cidade={cidade} />
 
-            <p className={sectionTitle}>Indicadores</p>
-            <KpiCards kpis={insights.kpis} />
-
-            <p className={sectionTitle}>Análise visual</p>
-            <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <ProspectFunnel kpis={insights.kpis} />
-              <SectorChart data={insights.por_setor} />
-            </div>
+            <IndicadoresSection
+              kpis={insights.kpis}
+              porSetor={insights.por_setor}
+              porSubsetor={insights.por_subsetor ?? {}}
+              runId={activeRunId as number}
+              cidade={cidade}
+            />
 
             <div className="mb-6">
-              <p className={sectionTitle}>Insights gerados</p>
-              <ul className="flex list-none flex-col gap-1">
-                {insights.insights.map((txt, i) => (
-                  <li
-                    key={i}
-                    className="border-b border-border-faint py-1.5 text-[0.85rem] text-text last:border-b-0"
-                  >
-                    {txt}
-                  </li>
-                ))}
-              </ul>
+              <SubsetorChart
+                porSetor={insights.por_setor}
+                porSubsetor={insights.por_subsetor ?? {}}
+                runId={activeRunId as number}
+                cidade={cidade}
+              />
             </div>
+
+            <div className="mb-2">
+              <p className={sectionTitle}>Todos os leads</p>
+            </div>
+            <BusinessTable
+              runId={activeRunId as number}
+              cidade={cidade}
+              porSubsetor={insights.por_subsetor ?? {}}
+              defaultPageSize={15}
+            />
           </TabsContent>
 
           {/* ── Aba: Setores ── */}

@@ -120,10 +120,25 @@ def test_get_insights_retorna_kpis(first_run_id):
     assert isinstance(body["por_setor"], list)
     assert len(body["por_setor"]) >= 1
     s = body["por_setor"][0]
-    for campo in ("key", "nome", "emoji", "cor", "total", "oportunidade",
-                  "score_medio", "leads_quentes"):
+    for campo in ("key", "nome", "emoji", "cor", "total", "contactavel",
+                  "oportunidade", "score_medio", "leads_quentes"):
         assert campo in s
+    assert s["contactavel"] <= s["total"]
     assert "status_dist" in body and isinstance(body["status_dist"], dict)
+    # Subsetores agrupados por setor (novo campo)
+    assert "por_subsetor" in body
+    assert isinstance(body["por_subsetor"], dict)
+    if body["por_subsetor"]:
+        # Pega o primeiro setor com subsetores e valida a estrutura
+        first_key = next(iter(body["por_subsetor"]))
+        subs = body["por_subsetor"][first_key]
+        assert isinstance(subs, list) and len(subs) >= 1
+        sub = subs[0]
+        for campo in ("subsetor", "total", "sem_site", "so_social", "com_site",
+                      "contactavel", "leads_quentes"):
+            assert campo in sub, f"campo '{campo}' ausente em SubsetorStat"
+        assert isinstance(sub["subsetor"], str) and sub["subsetor"]
+        assert sub["total"] >= sub["sem_site"] + sub["so_social"] + sub["com_site"]
 
 
 def test_get_businesses_retorna_lista(first_run_id):

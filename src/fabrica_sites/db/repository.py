@@ -54,6 +54,11 @@ def latest_run(session: Session) -> ScoutRun | None:
     return _reconstruct_run(run_row, session)
 
 
+def get_business_by_id(business_id: int, session: Session) -> BusinessTable | None:
+    """Retorna um negócio pelo id primário."""
+    return session.get(BusinessTable, business_id)
+
+
 def get_run_by_id(run_id: int, session: Session) -> ScoutRun | None:
     """Reconstrói uma execução pelo id."""
     run_row = session.get(RunTable, run_id)
@@ -93,6 +98,7 @@ def _aplicar_filtros(
     score_min: int | None,
     busca: str | None,
     org_tipo: str | None,
+    tag: str | None = None,
 ):
     """Aplica os filtros opcionais — compartilhado entre listagem e contagem."""
     if setor:
@@ -107,6 +113,9 @@ def _aplicar_filtros(
         stmt = stmt.where(col(BusinessTable.nome).like(f"%{busca}%"))
     if org_tipo:
         stmt = stmt.where(BusinessTable.org_tipo == org_tipo)
+    if tag:
+        # Tags guardadas como JSON array — ex.: '["boa_oportunidade","fechado"]'
+        stmt = stmt.where(col(BusinessTable.tags).like(f'%"{tag}"%'))
     return stmt
 
 
@@ -120,6 +129,7 @@ def get_businesses(
     score_min: int | None = None,
     busca: str | None = None,
     org_tipo: str | None = None,
+    tag: str | None = None,
     order_by: str = "score",
     order_dir: str = "desc",
     offset: int = 0,
@@ -131,7 +141,7 @@ def get_businesses(
     stmt = select(BusinessTable).where(BusinessTable.run_id == run_id)
     stmt = _aplicar_filtros(
         stmt, setor=setor, site_status=site_status, contactavel=contactavel,
-        score_min=score_min, busca=busca, org_tipo=org_tipo,
+        score_min=score_min, busca=busca, org_tipo=org_tipo, tag=tag,
     )
     # Desempate estável por id → paginação determinística mesmo com empates.
     stmt = stmt.order_by(ordenacao, col(BusinessTable.id).asc()).offset(offset).limit(limit)
@@ -148,6 +158,7 @@ def count_businesses(
     score_min: int | None = None,
     busca: str | None = None,
     org_tipo: str | None = None,
+    tag: str | None = None,
 ) -> int:
     """Conta os negócios que casam com os filtros (ignora offset/limit)."""
     stmt = select(func.count(col(BusinessTable.id))).where(
@@ -155,7 +166,7 @@ def count_businesses(
     )
     stmt = _aplicar_filtros(
         stmt, setor=setor, site_status=site_status, contactavel=contactavel,
-        score_min=score_min, busca=busca, org_tipo=org_tipo,
+        score_min=score_min, busca=busca, org_tipo=org_tipo, tag=tag,
     )
     return int(session.exec(stmt).one())
 

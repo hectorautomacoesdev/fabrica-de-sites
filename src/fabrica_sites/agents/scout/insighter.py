@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from ...core.sectors import all_sectors, get_sector
 from ...models import OrgTipo, ScoutRun, SiteStatus
+from .subsetores import classificar_subsetor
 
 # Score a partir do qual consideramos um lead "quente" (ALTA/ALTÍSSIMA).
 LEAD_QUENTE = 65
@@ -54,6 +55,7 @@ def compute(run: ScoutRun) -> dict:
             "sem_site": sem,
             "so_social": soc,
             "com_site": com,
+            "contactavel": sum(1 for b in do_setor if b.contactavel),
             "oportunidade": sem + soc,
             "oportunidade_pct": _pct(sem + soc, t),
             "score_medio": round(sum(b.score for b in do_setor) / t, 1),
@@ -66,6 +68,39 @@ def compute(run: ScoutRun) -> dict:
 
     # Ordena por nº de oportunidades (negócios sem site próprio), desc.
     por_setor.sort(key=lambda s: (s["oportunidade"], s["score_medio"]), reverse=True)
+
+    # Agregação por subsetor (granularidade extra dentro de cada setor).
+    por_subsetor: dict[str, list[dict]] = {}
+    for sec in all_sectors():
+        do_setor = [b for b in negocios if b.setor == sec.key]
+        if not do_setor:
+            continue
+        acum: dict[str, dict] = {}
+        for b in do_setor:
+            sub = classificar_subsetor(sec.key, b.raw_tags)
+            entry = acum.setdefault(sub, {
+                "subsetor": sub, "total": 0, "sem_site": 0, "so_social": 0,
+                "com_site": 0, "contactavel": 0, "leads_quentes": 0,
+            })
+            entry["total"] += 1
+            if b.site_status is SiteStatus.SEM_SITE:
+                entry["sem_site"] += 1
+            elif b.site_status is SiteStatus.SO_REDE_SOCIAL:
+                entry["so_social"] += 1
+            elif b.site_status is SiteStatus.COM_SITE:
+                entry["com_site"] += 1
+            if b.contactavel:
+                entry["contactavel"] += 1
+            if b.score >= LEAD_QUENTE and b.contactavel and b.org_tipo is OrgTipo.INDEPENDENTE:
+                entry["leads_quentes"] += 1
+        # Ordena por total desc; "Outros" vai sempre ao final.
+        sorted_subs = sorted(
+            acum.values(),
+            key=lambda e: (e["subsetor"] != "Outros" and not e["subsetor"].endswith("(outros)"),
+                           e["total"]),
+            reverse=True,
+        )
+        por_subsetor[sec.key] = sorted_subs
 
     insights = _gerar_insights(
         run.cidade, total, n_sem_site, n_so_social, n_com_site,
@@ -90,6 +125,7 @@ def compute(run: ScoutRun) -> dict:
             "COM_SITE": n_com_site,
         },
         "por_setor": por_setor,
+        "por_subsetor": por_subsetor,
         "insights": insights,
         "top_leads": sorted(negocios, key=lambda b: b.score, reverse=True),
     }

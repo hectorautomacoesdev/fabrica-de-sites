@@ -91,7 +91,10 @@ def score(fields: dict) -> dict:
         motivos.append("Rede/franquia — site corporativo já existe (cap 25)")
 
     pontos = min(pontos, 100)
-    contactavel = bool(fields.get("telefone") or fields.get("email"))
+    contactavel = bool(
+        fields.get("telefone") or fields.get("telefone2")
+        or fields.get("email") or fields.get("email2")
+    )
 
     return {
         "site_status": status,

@@ -40,9 +40,21 @@ export interface SectorStat {
   sem_site: number
   so_social: number
   com_site: number
+  contactavel: number        // negócios com telefone/e-mail no setor
   oportunidade: number       // sem_site + so_social (mercado imediato)
   oportunidade_pct: number
   score_medio: number
+  leads_quentes: number
+}
+
+/** Contagens de um subsetor dentro de um setor (granularidade extra). */
+export interface SubsetorStat {
+  subsetor: string
+  total: number
+  sem_site: number
+  so_social: number
+  com_site: number
+  contactavel: number
   leads_quentes: number
 }
 
@@ -52,6 +64,14 @@ export interface InsightsRead {
   insights: string[]
   por_setor: SectorStat[]
   status_dist: Record<string, number>
+  /** Subsetores agrupados por setor_key (ex.: "alimentacao" → [...]) */
+  por_subsetor: Record<string, SubsetorStat[]>
+}
+
+export interface NoteItem {
+  id: string
+  texto: string
+  criado_em: string
 }
 
 export interface BusinessRead {
@@ -65,7 +85,9 @@ export interface BusinessRead {
   lon: number | null
   endereco: string | null
   telefone: string | null
+  telefone2?: string | null
   email: string | null
+  email2?: string | null
   website: string | null
   website_kind: string
   horario?: string | null
@@ -74,12 +96,31 @@ export interface BusinessRead {
   score_label: string
   contactavel: boolean
   score_motivos?: string[]
-  // ── Campos de enriquecimento (ainda NÃO vêm da API; o painel se adapta
-  //    quando estiverem presentes — ver fase Auditor/enriquecimento). ──
+  resumo?: string | null
   instagram?: string | null
   facebook?: string | null
   linkedin?: string | null
-  resumo?: string | null
+  resumo_manual?: string | null
+  notas?: NoteItem[]
+  tags?: string[]
+}
+
+export interface BusinessPatch {
+  website_kind?: string | null
+  org_tipo?: string | null
+  telefone?: string | null
+  telefone2?: string | null
+  email?: string | null
+  email2?: string | null
+  endereco?: string | null
+  horario?: string | null
+  website?: string | null
+  instagram?: string | null
+  facebook?: string | null
+  linkedin?: string | null
+  resumo_manual?: string | null
+  notas?: NoteItem[] | null
+  tags?: string[] | null
 }
 
 export interface RunStartRequest {
@@ -98,11 +139,13 @@ export interface RunStartResponse {
 
 export interface BusinessFilters {
   setor?: string
+  subsetor?: string
   site_status?: string
   contactavel?: boolean
   score_min?: number
   org_tipo?: string
   busca?: string
+  tag?: string
   order_by?: string
   order_dir?: 'asc' | 'desc'
   offset?: number
@@ -121,9 +164,9 @@ async function get<T>(path: string): Promise<T> {
   return res.json() as Promise<T>
 }
 
-async function post<T>(path: string, body: unknown): Promise<T> {
+async function post<T>(path: string, body: unknown, method = 'POST'): Promise<T> {
   const res = await fetch(path, {
-    method: 'POST',
+    method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   })
@@ -169,6 +212,9 @@ export const api = {
     const total = Number(res.headers.get('X-Total-Count') ?? items.length)
     return { items, total }
   },
+
+  patchBusiness: (runId: number, businessId: number, patch: BusinessPatch) =>
+    post<BusinessRead>(`/api/runs/${runId}/businesses/${businessId}`, patch, 'PATCH'),
 
   startRun: (body: RunStartRequest) =>
     post<RunStartResponse>('/api/scout/runs', body),

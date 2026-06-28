@@ -50,10 +50,17 @@ class BusinessTable(SQLModel, table=True):
 
     # Contato
     telefone: Optional[str] = None
+    telefone2: Optional[str] = None
     email: Optional[str] = None
+    email2: Optional[str] = None
     website: Optional[str] = None
     website_kind: str = "nenhum"      # valor de WebsiteKind
     horario: Optional[str] = None
+
+    # Redes sociais (editáveis manualmente)
+    instagram: Optional[str] = None
+    facebook: Optional[str] = None
+    linkedin: Optional[str] = None
 
     # Avaliação
     site_status: str = "DESCONHECIDO"  # valor de SiteStatus
@@ -62,3 +69,8 @@ class BusinessTable(SQLModel, table=True):
     contactavel: bool = False
     score_motivos: str = "[]"          # JSON list[str]
     raw_tags: str = "{}"               # JSON dict[str, str]
+
+    # Conteúdo manual
+    resumo_manual: Optional[str] = None
+    notas: Optional[str] = None        # JSON list[{id, texto, criado_em}]
+    tags: Optional[str] = None         # JSON list[str] de tags manuais

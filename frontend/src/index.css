@@ -35,30 +35,30 @@
   --chart-5: #a855f7;
 }
 
-/* ── Médio ─────────────────────────────────────────────────────────────────── */
+/* ── Médio — entre o claro e o escuro ──────────────────────────────────────── */
 [data-theme="mid"] {
-  --bg:           #1a1e2e;
-  --card-bg:      #222740;
-  --border:       #2c3358;
-  --border-faint: #242a4a;
-  --hover-bg:     #28304e;
-  --text:         #b8c4e0;
-  --text-strong:  #d8e0f8;
-  --text-muted:   #5c6888;
-  --accent:       #818cf8;
-  --accent-faint: rgb(129 140 248 / 0.15);
+  --bg:           #c2ccec;
+  --card-bg:      #d2dafc;
+  --border:       #9aa8d4;
+  --border-faint: #aab6dc;
+  --hover-bg:     #b8c4e4;
+  --text:         #1e2858;
+  --text-strong:  #0e1645;
+  --text-muted:   #5060a0;
+  --accent:       #4f46e5;
+  --accent-faint: rgb(79 70 229 / 0.16);
 
   --on-accent: #ffffff;
-  --danger:    #f87171;
+  --danger:    #dc2626;
   --on-danger: #ffffff;
-  --ring:      #818cf8;
+  --ring:      #4f46e5;
   --radius:    0.5rem;
 
-  --chart-1: #818cf8;
-  --chart-2: #fb923c;
-  --chart-3: #2dd4bf;
-  --chart-4: #fb7185;
-  --chart-5: #c084fc;
+  --chart-1: #4f46e5;
+  --chart-2: #ea580c;
+  --chart-3: #0d9488;
+  --chart-4: #e11d48;
+  --chart-5: #9333ea;
 }
 
 /* ── Claro ─────────────────────────────────────────────────────────────────── */

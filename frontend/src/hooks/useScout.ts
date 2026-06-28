@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '../api/client'
-import type { BusinessFilters, RunStartRequest } from '../api/client'
+import type { BusinessFilters, BusinessPatch, RunStartRequest } from '../api/client'
 
 export function useRuns(limit = 20) {
   return useQuery({
@@ -54,6 +54,17 @@ export function useStartRun() {
     mutationFn: (body: RunStartRequest) => api.startRun(body),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['runs'] })
+    },
+  })
+}
+
+export function usePatchBusiness(runId: number) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ businessId, patch }: { businessId: number; patch: BusinessPatch }) =>
+      api.patchBusiness(runId, businessId, patch),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['businesses-paged', runId] })
     },
   })
 }

@@ -1,5 +1,5 @@
 import { type ChangeEvent, useState } from 'react'
-import type { BusinessRead, BusinessFilters } from '../api/client'
+import type { BusinessRead, BusinessFilters, SubsetorStat } from '../api/client'
 import { useBusinessesPaged, useSectors } from '../hooks/useScout'
 import {
   buildProspectMessage,
@@ -8,6 +8,7 @@ import {
   websiteIsSocial,
   whatsappUrl,
 } from '../lib/leadUtils'
+import { TAGS, TAG_BY_ID } from '../lib/tags'
 import { cn } from '@/lib/utils'
 import {
   Select,
@@ -42,15 +43,19 @@ interface Props {
   cidade?: string
   /** Setor pré-selecionado (drill vindo do overview de Setores). */
   sectorFilter?: string
+  /** Subsetores por setor_key — habilita o filtro dinâmico de subsetor. */
+  porSubsetor?: Record<string, SubsetorStat[]>
+  /** Tamanho de página inicial (padrão 25). */
+  defaultPageSize?: number
 }
 
-export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
+export default function BusinessTable({ runId, cidade, sectorFilter, porSubsetor, defaultPageSize = 25 }: Props) {
   const [filters, setFilters] = useState<BusinessFilters>({ order_by: 'score', order_dir: 'desc', setor: sectorFilter })
   const [busca, setBusca] = useState('')
   const [ordem, setOrdem] = useState('score_desc')
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [page, setPage] = useState(0)
-  const [pageSize, setPageSize] = useState(25)
+  const [pageSize, setPageSize] = useState(defaultPageSize)
   const { data: sectors = [] } = useSectors()
 
   // Sincroniza o setor vindo do overview (drill) sem useEffect — "ajustar estado
@@ -58,8 +63,18 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
   const [prevSector, setPrevSector] = useState(sectorFilter)
   if (sectorFilter !== prevSector) {
     setPrevSector(sectorFilter)
-    setFilters(f => ({ ...f, setor: sectorFilter }))
+    setFilters(f => ({ ...f, setor: sectorFilter, subsetor: undefined }))
   }
+
+  // Limpa subsetor ao trocar de setor internamente
+  const [prevFilterSetor, setPrevFilterSetor] = useState(filters.setor)
+  if (filters.setor !== prevFilterSetor) {
+    setPrevFilterSetor(filters.setor)
+    if (filters.subsetor) setFilters(f => ({ ...f, subsetor: undefined }))
+  }
+
+  const subsetorOptions: SubsetorStat[] =
+    filters.setor && porSubsetor ? (porSubsetor[filters.setor] ?? []) : []
 
   const activeFilters: BusinessFilters = {
     ...filters,
@@ -118,6 +133,18 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
           ]}
         />
 
+        {subsetorOptions.length > 0 && (
+          <FilterSelect
+            placeholder="Todos os subsetores"
+            value={filters.subsetor ?? ALL}
+            onValueChange={v => set('subsetor', v === ALL ? undefined : v)}
+            options={[
+              { value: ALL, label: 'Todos os subsetores' },
+              ...subsetorOptions.map(s => ({ value: s.subsetor, label: s.subsetor })),
+            ]}
+          />
+        )}
+
         <FilterSelect
           placeholder="Todos os status"
           value={filters.site_status ?? ALL}
@@ -165,6 +192,16 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
         />
 
         <FilterSelect
+          placeholder="Todas as tags"
+          value={filters.tag ?? ALL}
+          onValueChange={v => set('tag', v === ALL ? undefined : v)}
+          options={[
+            { value: ALL, label: 'Todas as tags' },
+            ...TAGS.map(t => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
+          ]}
+        />
+
+        <FilterSelect
           placeholder="Ordenar"
           value={ordem}
           onValueChange={handleOrdem}
@@ -180,7 +217,7 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
         <table className="w-full border-collapse text-[0.86rem] [&_tr:last-child>td]:border-b-0">
           <thead>
             <tr>
-              {['Nome', 'Setor', 'Status', 'Score', 'Telefone', 'Web', ''].map((h, i) => (
+              {['Nome', 'Setor', 'Status', 'Score', 'Telefone', 'Web', 'Tags', ''].map((h, i) => (
                 <th
                   key={i}
                   aria-label={h || 'Ação'}
@@ -197,7 +234,7 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
             ))}
             {businesses.length === 0 && !isFetching && (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-text-muted">
+                <td colSpan={8} className="p-8 text-center text-text-muted">
                   Nenhum negócio encontrado com esses filtros.
                 </td>
               </tr>
@@ -215,7 +252,7 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
             value={pageSize}
             onChange={e => { setPageSize(Number(e.target.value)); setPage(0) }}
           >
-            {[25, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
+            {[15, 25, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
           </select>
         </label>
 
@@ -241,7 +278,7 @@ export default function BusinessTable({ runId, cidade, sectorFilter }: Props) {
         </div>
       </div>
 
-      <LeadDrawer business={selected} cidade={cidade} onClose={() => setSelectedId(null)} />
+      <LeadDrawer business={selected} cidade={cidade} runId={runId} onClose={() => setSelectedId(null)} />
     </div>
   )
 }
@@ -313,6 +350,26 @@ function Row({ b, cidade, onOpen }: { b: BusinessRead; cidade?: string; onOpen: 
         ) : (
           <span className="text-text-muted">—</span>
         )}
+      </td>
+      <td className={cn(tdBase, 'max-w-[140px]')}>
+        <div className="flex flex-wrap gap-1">
+          {(b.tags ?? []).length > 0
+            ? (b.tags ?? []).slice(0, 3).map(id => {
+                const t = TAG_BY_ID[id]
+                if (!t) return null
+                return (
+                  <span
+                    key={id}
+                    className={cn('inline-flex items-center gap-0.5 rounded border px-1 py-0.5 text-[0.68rem] leading-none', t.cls)}
+                    title={t.label}
+                  >
+                    {t.emoji}
+                  </span>
+                )
+              })
+            : <span className="text-text-muted">—</span>
+          }
+        </div>
       </td>
       <td className={cn(tdBase, 'w-[44px] text-center')}>
         {wa ? (

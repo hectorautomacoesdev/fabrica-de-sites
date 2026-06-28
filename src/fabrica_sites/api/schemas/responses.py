@@ -7,8 +7,9 @@ o schema do banco e vice-versa.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class RunRead(BaseModel):
@@ -35,7 +36,9 @@ class BusinessRead(BaseModel):
     lon: float | None
     endereco: str | None
     telefone: str | None
+    telefone2: str | None = None
     email: str | None
+    email2: str | None = None
     website: str | None
     website_kind: str
     horario: str | None = None
@@ -45,6 +48,41 @@ class BusinessRead(BaseModel):
     contactavel: bool
     score_motivos: list[str] = Field(default_factory=list)
     resumo: str | None = None
+    instagram: str | None = None
+    facebook: str | None = None
+    linkedin: str | None = None
+    resumo_manual: str | None = None
+    notas: list[dict[str, Any]] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
+
+
+class BusinessPatch(BaseModel):
+    """Campos editáveis de um negócio (PATCH). Apenas campos presentes são atualizados."""
+
+    model_config = ConfigDict(extra='ignore')
+
+    # Inputs do scorer (trigger re-score automático)
+    website_kind: str | None = None
+    org_tipo: str | None = None
+
+    # Contato
+    telefone: str | None = None
+    telefone2: str | None = None
+    email: str | None = None
+    email2: str | None = None
+    endereco: str | None = None
+    horario: str | None = None
+
+    # Presença online
+    website: str | None = None
+    instagram: str | None = None
+    facebook: str | None = None
+    linkedin: str | None = None
+
+    # Conteúdo manual
+    resumo_manual: str | None = None
+    notas: list[dict[str, Any]] | None = None
+    tags: list[str] | None = None
 
 
 class SectorStat(BaseModel):
@@ -59,6 +97,7 @@ class SectorStat(BaseModel):
     sem_site: int
     so_social: int
     com_site: int
+    contactavel: int           # negócios com telefone/e-mail no setor
     oportunidade: int          # sem_site + so_social (mercado imediato)
     oportunidade_pct: float
     score_medio: float
@@ -79,6 +118,18 @@ class KpiRead(BaseModel):
     pct_contactavel: float
 
 
+class SubsetorStat(BaseModel):
+    """Contagens de um subsetor dentro de um setor de uma run."""
+
+    subsetor: str
+    total: int
+    sem_site: int
+    so_social: int
+    com_site: int
+    contactavel: int
+    leads_quentes: int
+
+
 class InsightsRead(BaseModel):
     """KPIs + insights de texto + agregação por setor de uma run."""
 
@@ -87,6 +138,8 @@ class InsightsRead(BaseModel):
     insights: list[str]
     por_setor: list[SectorStat] = Field(default_factory=list)
     status_dist: dict[str, int] = Field(default_factory=dict)
+    # Subsetores agrupados por setor_key → lista ordenada por total desc.
+    por_subsetor: dict[str, list[SubsetorStat]] = Field(default_factory=dict)
 
 
 class RunStartRequest(BaseModel):
